@@ -253,7 +253,7 @@ Moreover, **Wuhan** itself is widely recognized as a major internal transport ne
 
 A more sophisticated modeling choice would involve using a compartmental **SEIR** (or multi-stage **SEnIR**) approach, capturing a more realistic incubation period distribution (Gamma-like) and enhancing epidemiological accuracy [@abou2020; @rozan2024]. Such models provide nuanced insights into epidemic peaks, spread timing, and infection dynamics. However, they require additional parameters, detailed calibration, and more extensive computational resources, often demanding agent-based or fine-grained simulations.
 
-Given this thesis’s resource constraints, the simpler **SIR formulation**—using a mean-rate approximation of incubation and recovery periods as suggested by [@brockmann2013]—is methodologically sufficient to estimate initial arrival ranks of the epidemic across Europe. Nevertheless, future extensions of this work could explore implementing the more detailed **SEnIR** approach, particularly for studies aiming to examine secondary waves, detailed transmission dynamics, or public health interventions over longer time frames.
+Given this thesis’s resource constraints, the simpler **SIR formulation**—using a mean-rate approximation of incubation and recovery periods as suggested by [@brockmann2013]—is methodologically sufficient to estimate initial arrival ranks of the epidemic across Europe. Nevertheless, future extensions of this work could explore implementing the more detailed **SEnIR** approach, particularly for studies aiming to examine secondary waves, detailed transmission dynamics, or public health interventions over longer time frames.*
 
 ## Specified Data
 
@@ -261,13 +261,13 @@ Many providers of flight movement data (e.g., FR24, OpenSky, ADS-B Exchange) rel
 
 ### Access & Terms of Service
 
-- Eurocontrol grants access via an **R&D Platform** exclusively for **non-commercial research**, requiring **user registration** and acceptance of their Terms of Service (TOS).
-- While **raw ATM data** sharing is prohibited, researchers can publicly disseminate **aggregated or derived** insights (e.g., charts, maps, diagrams) provided Eurocontrol is appropriately **credited**.
+- Eurocontrol grants access via an **R&D Platform** exclusively for **non-commercial research**, requiring **user registration** and acceptance of their Terms of Service (TOS).  
+- While **raw ATM data** sharing is prohibited, researchers can publicly disseminate **aggregated or derived** insights (e.g., charts, maps, diagrams) provided Eurocontrol is appropriately **credited**.  
 - For this thesis, I obtained **personal access** under strict adherence to these research-focused guidelines.
 
 ### Airport Reference Data
 
-To match flight records with actual airport locations and metadata (including ICAO codes, IATA codes, lat/long coordinates, and airport categories), this thesis uses the publicly available CSV data provided by [**OurAirports**](https://ourairports.com/data/). Although not formally required by OurAirports’ terms of use, appropriate credit is given here in recognition of their comprehensive dataset, which is updated daily and includes worldwide airports, heliports, and other facilities. The file used in this project is `airports.csv` (dated 24 March 2025), obtained via the **OurAirports** [Website](https://ourairports.com/data/). 
+To match flight records with actual airport locations and metadata (including ICAO codes, IATA codes, lat/long coordinates, and airport categories), this thesis uses the publicly available CSV data provided by [**OurAirports**](https://ourairports.com/). Although not formally required by OurAirports’ terms of use, appropriate credit is given here in recognition of their comprehensive dataset, which is updated daily and includes worldwide airports, heliports, and other facilities. The file used in this project is `airports.csv` (dated 24 March 2025), obtained via the **OurAirports** [Website](https://ourairports.com/data/).
 
 ### Data Availability & Format
 
@@ -276,7 +276,7 @@ To match flight records with actual airport locations and metadata (including IC
 - Detailed flight-level information comprises scheduled and actual departure/arrival times, aircraft type (ICAO 8643), operator details (ICAO 8585), route waypoints, and airspace specifics, updated each AIRAC cycle.
 - Given the limited temporal coverage (four months annually), supplementary sources (e.g., **OpenSky**) will help fill critical temporal gaps.
 
-**Metadata & TOS:** Further details available via the [EUROCONTROL ATM R&D Datasets – Terms of Use](https://www.eurocontrol.int/publication/eurocontrol-atm-rd-datasets-terms-use). All data handling complies with **non-commercial research use**, restricting public dissemination of raw flight records.
+> **Metadata & TOS:** Further details available via the [EUROCONTROL ATM R&D Datasets – Terms of Use](https://www.eurocontrol.int/publication/eurocontrol-atm-rd-datasets-terms-use). All data handling complies with **non-commercial research use**, restricting public dissemination of raw flight records.
 
 ### Combining with OpenSky
 
@@ -284,9 +284,9 @@ To bridge temporal gaps between the quarterly Eurocontrol snapshots, the thesis 
 
 ### Modeling Europe’s Initial COVID-19 Wave and Time Windows {#wavetime}
 
-Although **officially recognized** European COVID-19 cases did not appear until January 2020, at least one retrospective study suggests that SARS-CoV-2 may have reached Europe as early as **late December 2019** (@deslandes2020). In that investigation, a single archived respiratory sample from a patient in the Paris region tested positive for SARS-CoV-2 upon re-analysis, hinting at possible sporadic introductions prior to January. However, the authors acknowledge that this result does not confirm large-scale circulation at the time. 
+Although **officially recognized** European COVID-19 cases did not appear until January 2020, at least one retrospective study suggests that SARS-CoV-2 may have reached Europe as early as **late December 2019** (@deslandes2020). In that investigation, a single archived respiratory sample from a patient in the Paris region tested positive for SARS-CoV-2 upon re-analysis, hinting at possible sporadic introductions prior to January. However, the authors acknowledge that this result does not confirm large-scale circulation at the time.
 
-Indeed, by most accounts, the **major viral seeding** in Europe occurred through air travel from China throughout **January and February 2020** (@chinazzi2020). Gradual travel restrictions emerged over this period:
+By most accounts, the **major viral seeding** in Europe occurred through air travel from China throughout **January and February 2020** (@chinazzi2020). Gradual travel restrictions emerged over this period:
 
 - **23 January 2020:** Wuhan city enforced an internal lockdown, yet international travel continued, allowing asymptomatic or undetected carriers to reach global aviation hubs. As highlighted by @chinazzi2020, the travel quarantine of Wuhan delayed epidemic progression by only 3 to 5 days within mainland China but significantly reduced international case importations by nearly 80% until mid-February.  
   - Further modeling by @chinazzi2020 suggests that even **drastic travel reductions** (up to 90%) alone could delay—but not fully prevent—virus exportation unless paired with substantial reductions in local transmissibility (e.g., effective NPIs).
@@ -298,12 +298,12 @@ Indeed, by most accounts, the **major viral seeding** in Europe occurred through
 - **8 April 2020:** After approximately 10 weeks of strict lockdown measures, Wuhan resumed air and train services, further underscoring how interconnected aviation networks can accelerate or revive international spread (@zhang2020a).
 
 Because **Eurocontrol** only provides quarterly snapshots, this thesis strategically integrates:
-- **OpenSky (January–February, April–May 2020)**: Documents mobility changes surrounding initial lockdowns.  
-- **Eurocontrol (March & June 2020)**: Provides detailed flight data during Europe’s most intense lockdown phase (March) and the initial easing of restrictions (June). It also enables comparative analyses to evaluate the impact of mitigation measures.
+- **OpenSky (January–February, April 2020):** Documents overall flight trends and mobility changes prior to and following initial lockdowns.
+- **Eurocontrol (March 2020):** Provides detailed flight data during Europe’s most intense lockdown phase, allowing for a more granular look at flight patterns in the critical month when widespread restrictions took hold.
 
-By combining these sources, the analysis can partially account for the heightened transmission risk in **February 2020**, even if flight data coverage for early 2020 in certain Asian regions remains incomplete.
+By combining these sources, the analysis can partially account for the heightened transmission risk in **early 2020**, even if flight data coverage remains incomplete for certain Asian regions.
 
-> *While global transit hubs outside Europe (e.g., Dubai, Doha) remained critical in February for indirect arrivals, major European airports (e.g., Frankfurt, Paris Charles de Gaulle, London Heathrow) also served as high-volume nodes for intra-European distribution. Accounting for every potential route and transit point through June 2020 would vastly exceed the scope of this thesis. Instead, this study focuses on primary external seeding pathways from China—alongside aggregated intra-European flows—via OpenSky (January–February, April–May) and Eurocontrol (March, June). Restricting the time frame to the first half of 2020 thus captures the crucial early wave of viral importation and subsequent lockdown effects without venturing into later pandemic phases.*
+> *While global transit hubs outside Europe (e.g., Dubai, Doha) remained critical in February for indirect arrivals, major European airports (e.g., Frankfurt, Paris Charles de Gaulle, London Heathrow) also served as high-volume nodes for intra-European distribution. Accounting for every potential route and transit point beyond April would vastly exceed the scope of this thesis. Instead, this study focuses on initial external seeding pathways from China—alongside aggregated intra-European flows—using OpenSky (January–February, April) and Eurocontrol (March) data, capturing the crucial early wave of viral importation and the subsequent lockdown effects without venturing into later pandemic phases.*
 
 ### Correlation with Excess Mortality
 
@@ -313,13 +313,20 @@ A recent short communication by Neuwirth & Elixhauser (202x, in preparation) com
 
 *Although incorporating additional socioeconomic factors would enrich the analysis, such an approach exceeds the scope and time constraints of this thesis. Nevertheless, the proposed Europe-focused correlation offers meaningful insights into how epidemic arrival timing may have impacted national mortality outcomes, contributing to a deeper understanding of early COVID-19 pandemic dynamics.*
 
+### Excess Mortality Data
+
+To measure country-level excess mortality during the first wave, this thesis relies on **The Economist**’s publicly documented estimates @theeconomist2021. Because official records of death counts remain incomplete or delayed in many regions, **The Economist** constructed a machine-learning model to impute missing data and approximate total excess deaths, as described in [their methodology](https://www.economist.com/graphic-detail/2021/05/13/how-we-estimated-the-true-death-toll-of-the-pandemic). 
+
+Although these estimates carry inherent uncertainties—particularly for countries with underreported statistics—this dataset offers a reasonably consistent, cross-national view of pandemic-attributable mortality. The analysis in this thesis uses the aggregated excess-death estimates through [Date/Period], focusing on the first COVID-19 wave in Europe.
+
+
 ## Advanced Research Question & Hypothesis
 
 **Research Question**  
 > Does the timing of epidemic seeding—derived from integrated air traffic data (OpenSky for January–February and April–May, and Eurocontrol for March and June 2020)—correlate with higher excess mortality in Europe during the first wave of COVID-19?
 
 **Hypothesis**  
-We hypothesize that **countries experiencing earlier epidemic seeding**, as inferred from our integrated flight network analysis (January–June 2020), will exhibit **higher first-wave excess mortality**. Although controlling for additional socioeconomic factors would strengthen the analysis, this thesis explicitly focuses on the direct relationship between epidemic arrival timing and mortality, acknowledging socioeconomic elements as important but beyond the immediate scope.
+We hypothesize that **countries experiencing earlier epidemic seeding**, as inferred from our integrated flight network analysis (January–April 2020), will exhibit **higher first-wave excess mortality**. Although controlling for additional socioeconomic factors would strengthen the analysis, this thesis explicitly focuses on the direct relationship between epidemic arrival timing and mortality, acknowledging socioeconomic elements as important but beyond the immediate scope.
 
 The anticipated mechanism driving this relationship includes:
 
@@ -353,7 +360,8 @@ In line with my **Supervisor’s advice (March 14, 2025)**, this thesis **avoids
 
 2. **Implement a Simplified ODE-Based SIR Model**  
    - Represent each airport as a node with daily changes in **Susceptible (S), Infected (I), Recovered (R)** compartments.  
-   - Rather than using Wuhan alone as the origin, we incorporate inbound flight data from **multiple major Chinese airports** (e.g., Beijing, Shanghai, Shenzhen) to approximate early European seeding, consistent with research showing widespread exportation after Wuhan’s 23 January 2020 lockdown ([@chinazzi2020; @zhang2020a]).
+   - Account for **all relevant daily flights** (both from China and **within** Europe) by aggregating seat capacity × assumed load factor, thereby simulating how infections spread among European nodes once seeded.  
+   - Rather than using Wuhan alone as the origin, incorporate inbound flight data from **multiple major Chinese airports** (e.g., Beijing, Shanghai, Shenzhen) to approximate early European seeding, consistent with research showing widespread exportation after Wuhan’s 23 January 2020 lockdown ([@chinazzi2020; @zhang2020a]).
 
 3. **Estimate Country-Level Epidemic Arrival Times**  
    - Define an **infection threshold** for “arrival time” at each airport.  
