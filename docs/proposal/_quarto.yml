@@ -7,7 +7,7 @@ execute:
 format:
   html:
     toc: true
-    theme: slate
+    theme: cosmo
     comments:
       hypothesis: true
 
@@ -15,3 +15,6 @@ manuscript:
   article: proposal.qmd
   # resources: 
   #- ..
+
+bibliography: proposal_ref.bib
+link-citations: true

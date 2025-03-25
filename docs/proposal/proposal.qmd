@@ -1,5 +1,5 @@
 ---
-title: Assessment of the Proposed Hypothesis and Research Approach
+title: "Proposal: Tracing COVID-19 Arrival in Europe: Air Travel, Epidemic Seeding, and Excess Mortality"
 author:
   - name: Maximilian Elixhauser
     corresponding: true
@@ -25,11 +25,11 @@ format:
 
 ## Introduction
 
-In January 2020, a single infected traveler on a long-haul flight could spark an outbreak thousands of kilometers away—turning global aviation into a high-speed conveyor belt for COVID-19. Indeed, early analyses demonstrated that aviation can rapidly reduce effective distances between cities, accelerating worldwide transmission [@chinazzi2020; @sun2022_a]. At the same time, countries exhibited **large variability in excess mortality**, often shaped by **demographic** (e.g., population age, life expectancy) and **economic** (e.g., GDP, healthcare capacity) factors. For instance, [@rahmanian2024] identified government effectiveness, vaccination coverage, and population age structure as key drivers of cross-national differences in pandemic mortality across 21 countries. Similarly, [@matveeva2023] noted that lower GDP per capita and slower vaccination rates were correlated with higher excess mortality among European nations, reflecting a synergistic effect of vaccination coverage and broader healthcare resources on reducing COVID-19–associated deaths.
+In January 2020, a single infected traveler on a long-haul flight could spark an outbreak thousands of kilometers away—turning global aviation into a high-speed conveyor belt for COVID-19. Indeed, early analyses demonstrated that aviation can rapidly reduce effective distances between cities, accelerating worldwide transmission [@chinazzi2020; @sun2022_a]. At the same time, countries exhibited **large variability in excess mortality**, often shaped by **demographic** (e.g., population age, life expectancy) and **economic** (e.g., GDP, healthcare capacity) factors. For instance, @rahmanian2024 identified government effectiveness, vaccination coverage, and population age structure as key drivers of cross-national differences in pandemic mortality across 21 countries. Similarly, @matveeva2023 noted that lower GDP per capita and slower vaccination rates were correlated with higher excess mortality among European nations, reflecting a synergistic effect of vaccination coverage and broader healthcare resources on reducing COVID-19–associated deaths.
 
 A less investigated aspect, however, is **epidemic arrival time**: Did countries “hit first” by the virus—when non-pharmaceutical interventions (NPI) were still immature—face worse overall mortality outcomes? This project aims to explore how early seeding of COVID-19 might have compounded the effects of the aforementioned demographic and economic predictors, ultimately shaping cross-national excess mortality patterns.
 
-As outlined in the Z_GIS Thesis Blog by [@neuwirth2024], the **hypothesis** states that **locations hit early and unprepared** faced more severe outbreaks, characterized by:
+As outlined in the Z_GIS Thesis Blog by @neuwirth2024, the **hypothesis** states that **locations hit early and unprepared** faced more severe outbreaks, characterized by:
 
 - **Longer durations** without access to vaccination  
 - **Lack of effective non-pharmaceutical interventions (NPIs)** during early waves  
@@ -37,10 +37,10 @@ As outlined in the Z_GIS Thesis Blog by [@neuwirth2024], the **hypothesis** stat
 
 Accordingly, **early epidemic arrival** is expected to correlate with **higher prevalence, reproduction rates, and excess mortality** at the national level.  
 
-To test this hypothesis, the initial approach suggested by [@neuwirth2024] (which I will evaluate and refine in subsequent sections) followed five key steps:
+To test this hypothesis, the initial approach suggested by @neuwirth2024 (which I will evaluate and refine in subsequent sections) followed five key steps:
 
 1. **Construct a Global Mobility Network (GMN)** using worldwide air travel data from early 2020 (**OpenSky COVID-19 Flight Dataset and/or FlightRadar24 API**) to represent the situation at the outbreak’s onset.  
-2. **Implement a SIR network simulation model** as presented by [@brockmann2013].  
+2. **Implement a SIR network simulation model** as presented by @brockmann2013.  
 3. **Run outbreak simulations** (seeding in Wuhan) to estimate **arrival times (ranks)** of the epidemic in different regions.  
 4. **Validate the model** by comparing simulated epidemic arrivals with reported data.
 5. **Correlate modeled epidemic arrivals with reported excess mortality**, assessing the impact of arrival timing on overall mortality outcomes.
@@ -51,110 +51,85 @@ To test this hypothesis, the initial approach suggested by [@neuwirth2024] (whic
 
 This section outlines my evaluation of publicly accessible aviation data sources, with the aim of assessing whether a global SIR model based on air travel is realistically implementable within the scope of a bachelor’s thesis. The findings justify a Europe-focused network as the most feasible and methodologically sound approach.
 
-Although the initial approach proposed by [@neuwirth2024] emphasizes a global-scale simulation using OpenSky or FlightRadar24, preliminary explorations and data evaluations have revealed substantial feasibility challenges. This section addresses key limitations encountered, particularly regarding data accessibility, coverage issues, and practical modeling constraints.
+Although the initial approach proposed by @neuwirth2024 emphasizes a global-scale simulation using OpenSky or FlightRadar24, preliminary explorations and data evaluations have revealed substantial feasibility challenges. This section addresses key limitations encountered, particularly regarding **data accessibility, coverage issues**, and **practical modeling constraints**.
 
-Specifically, crowdsourced ADS-B datasets such as OpenSky present significant coverage gaps in critical regions like China, especially during the early months of the pandemic (e.g., February 2020). Conversely, high-quality commercial datasets such as Eurocontrol, while robust, provide only limited temporal coverage (four discrete months per year), complicating continuous epidemic modeling.
+Specifically, crowdsourced ADS-B datasets such as OpenSky present **significant coverage gaps** in critical regions like China, especially during the early months of the pandemic (e.g., February 2020). Conversely, high-quality commercial datasets such as Eurocontrol, while robust, provide only **limited temporal coverage** (four discrete months per year), complicating continuous epidemic modeling.
+
+### February 2020 Flight Data
+
+During February 2020, the raw OpenSky dataset contained **2,648,835 flight records** (@fig-result_feb, top panel). After discarding incomplete entries—flights lacking either an origin or a destination—**1,617,962 records** remained, reflecting a data reduction of **38.92%** (@fig-result_feb, bottom panel). Among these cleaned entries, **674 flights** originated in **Mainland China, Hong Kong, or Macau** and terminated within the [Eurocontrol zone's member states](https://www.eurocontrol.int/our-member-and-comprehensive-agreement-states) (excluding Iceland, which joined in 2025). This modest number illustrates the **limited direct connectivity** captured by OpenSky during this critical month. While likely an **underestimate** of actual passenger flows due to regional coverage gaps, this subset nonetheless provides a valuable **baseline** for modeling early epidemic arrival into Europe.
 
 ```{r}
+#| label: define_zones
+#| warning: false
+#| include: false
+#| echo: false
+#| message: false
+
 
 library(tidyverse)
+library(patchwork)
 
-# Read flight and airport data
 df <- read_csv("data/opensky/opensky_2020_02.csv.gz")
 airports <- read_csv("data/airports.csv")
 
-#eurocontrol <- read_csv("C:/Users/b1090201/Downloads/flightlist_20200201_20200229.csv.gz")
-
-#glimpse(eurocontrol)
-
-# Inspect the structure of the airports dataset
-glimpse(airports)
-
-# Official Eurocontrol membership (excluding Iceland, because 2025) based on your list:
-# Belgium, France, Germany, Luxembourg, The Netherlands, United Kingdom,
-# Ireland, Portugal, Greece, Malta, Türkiye, Cyprus, Hungary, Switzerland,
-# Austria, Denmark, Norway, Slovenia, Sweden, Czech Republic, Italy, Romania,
-# Bulgaria, Croatia, Monaco, Slovakia, Spain, North Macedonia, Republic of Moldova,
-# Finland, Albania, Bosnia and Herzegovina, Poland, Ukraine, Serbia, Armenia,
-# Lithuania, Montenegro, Latvia, Georgia, Estonia.
 eurocontrol_countries <- c("BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR", 
                             "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI", 
                             "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES", 
                             "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM", 
                             "LT", "ME", "LV", "GE", "EE")
 
-# Extract ICAO codes for China: includes mainland China ("CN") plus Hong Kong ("HK") and Macau ("MO")
+# 3. Extract ICAO codes for China, HK, MO
 china_airports <- airports %>%
-  filter(iso_country %in% c("CN", "HK", "MO")) %>% 
-  filter(!is.na(icao_code)) %>%
+  filter(iso_country %in% c("CN", "HK", "MO"), !is.na(icao_code)) %>%
   pull(icao_code)
 
-# Extract ICAO codes for the Eurocontrol zone of Europe
+# 4. Extract ICAO codes for the Eurocontrol zone
 europe_airports <- airports %>%
-  filter(iso_country %in% eurocontrol_countries) %>%  
-  filter(!is.na(icao_code)) %>%
+  filter(iso_country %in% eurocontrol_countries, !is.na(icao_code)) %>%
   pull(icao_code)
 
-# Quick check on European ICAO codes
-head(europe_airports)
-
-## Flight Data Cleaning and Analysis
-
-# Total number of flights before cleaning
-total_flights <- nrow(df)
-
-# Remove flights with missing origin or destination
+# 5. Clean data
 df_cleaned <- df %>%
-  filter(!is.na(origin) & !is.na(destination))
+  filter(!is.na(origin), !is.na(destination))
 
+# 6. Summaries
+total_flights <- nrow(df)
 cleaned_flights <- nrow(df_cleaned)
+removed_pct <- round((1 - cleaned_flights / total_flights) * 100, 2)
 
-cat("Total flights before cleaning:", total_flights, "\n")
-cat("Total flights after cleaning:", cleaned_flights, "\n")
-cat("Percentage of flights removed:", round((1 - cleaned_flights / total_flights) * 100, 2), "%\n")
-
-# Summarize missing origins and destinations
-df %>%
-  summarise(
-    missing_origin = sum(is.na(origin)),
-    missing_destination = sum(is.na(destination))
-  )
-
-# Check uniqueness of airports before and after cleaning
-cat("Unique airports before cleaning:", length(unique(df$origin)), "\n")
-cat("Unique airports after cleaning:", length(unique(df_cleaned$origin)), "\n")
-
-# Most common Top 10 destinations (Before cleaning)
-df %>%
-  count(destination, sort = TRUE) %>%
-  head(10)
-
-# Most common Top 10 destinations (After cleaning)
-df_cleaned %>%
-  count(destination, sort = TRUE) %>%
-  head(10)
-
-# Compare daily flight counts before & after cleaning
-df %>%
-  count(day) %>%
-  ggplot(aes(x = day, y = n)) +
-  geom_line(color = "red") +
-  labs(title = "Daily Flight Counts (Raw Data)", x = "Date", y = "Number of Flights")
-
-df_cleaned %>%
-  count(day) %>%
-  ggplot(aes(x = day, y = n)) +
-  geom_line(color = "blue") +
-  labs(title = "Daily Flight Counts (Cleaned Data)", x = "Date", y = "Number of Flights")
-
+# 7. Summarize flights from China -> Europe
 china_to_europe_flights <- df_cleaned %>%
-  filter(origin %in% china_airports & destination %in% europe_airports)
+  filter(origin %in% china_airports, destination %in% europe_airports) %>%
+  nrow()
 
-cat("Total flights from China to Eurocontrol zone:", nrow(china_to_europe_flights), "\n")
+raw_counts <- df %>% count(day)
+cleaned_counts <- df_cleaned %>% count(day)
 
 ```
 
-To overcome these limitations, I propose integrating multiple complementary data sources. Specifically, the OpenSky dataset from February 2020—despite its limited volume (only 674 direct flights China-Eurocontrol Zone Members)—will serve as a critical baseline for the early epidemic arrival phase. Eurocontrol data (starting March 2020), offering comprehensive European flight records, will help normalize and validate February's flight numbers. For months lacking explicit records, linear interpolation and seasonal normalization methods will be employed. Furthermore, considering early travel restrictions in China (e.g., Wuhan’s lockdown on stated [here](#wavetime)), additional major international transit hubs such as Dubai, Doha, and Singapore will be incorporated as secondary seed locations, reflecting a more realistic scenario of initial COVID-19 dissemination into Europe.
+
+```{r}
+#| label: fig-result_feb
+#| fig-cap: "Daily flight counts in February 2020 before (top) and after (bottom) data cleaning. The raw dataset (red line) included flights with missing origins or destinations, while the cleaned dataset (blue line) excludes incomplete entries."
+
+cat("Total flights (raw):", total_flights, "\n")
+cat("Total flights (cleaned):", cleaned_flights, "\n")
+cat("Percentage removed:", removed_pct, "%\n")
+cat("China to Eurocontrol flights (Feb 2020):", china_to_europe_flights, "\n")
+
+p_raw <- ggplot(raw_counts, aes(x = day, y = n)) +
+  geom_line(color = "red") +
+  labs(title = "Daily Flight Counts (Raw Data)", x = "Date", y = "Flights")
+
+p_cleaned <- ggplot(cleaned_counts, aes(x = day, y = n)) +
+  geom_line(color = "blue") +
+  labs(title = "Daily Flight Counts (Cleaned Data)", x = "Date", y = "Flights")
+
+print(p_raw / p_cleaned)
+```
+
+To overcome these limitations, I propose integrating **multiple complementary data sources**. Specifically, the **OpenSky** dataset from February 2020—despite its limited volume—will serve as a **baseline** for the early epidemic arrival phase. **Eurocontrol** data (starting March 2020), offering comprehensive European flight records, will help validate February’s flight numbers and fill key gaps. For months lacking explicit records, **linear interpolation** and **seasonal normalization** methods may be employed, ensuring continuity in flight data for the initial seeding period. Recognizing early travel restrictions in China (e.g., Wuhan’s lockdown—see [here](#wavetime)) further highlights the importance of including multiple major Chinese airports, rather than focusing on Wuhan alone.
 
 ### Crowdsourced ADS-B: Strengths and Weaknesses
 
@@ -162,7 +137,7 @@ Multiple studies have leveraged crowdsourced ADS-B data for COVID-19 mobility an
 
 > “OpenSky Network [...] does not provide global coverage and [...] flight data for major global airports such as the Beijing Capital International Airport in China and the Soekarno-Hatta International Airport in Indonesia are not available.” [@iacus2020]
 
-Such large discrepancies between partial flight samples (@suzumura2020 early 2020 subset) and near-full annual coverage (@strohmeier2021 2019 totals) underscore the network’s highly uneven global sensor distribution. While some countries enjoy excellent receiver density, enabling robust analysis, large swaths of Asia and Africa have insufficient coverage. This unevenness must be accounted for in any study that relies on ADS-B data for measuring pandemic-related changes in global air travel. Alternatives mentioned below may help to mitigate these gaps, either by incorporating proprietary datasets (OAG/IATA), leveraging regional traffic records, or exploring hybrid machine-learning approaches using open data.
+Such large discrepancies between partial flight samples from @suzumura2020 (early 2020 subset) and near-full annual coverage by @strohmeier2021 (2019 totals) underscore the network’s highly uneven global sensor distribution. While some countries enjoy excellent receiver density, enabling robust analysis, large swaths of Asia and Africa have insufficient coverage. This unevenness must be accounted for in any study that relies on ADS-B data for measuring pandemic-related changes in global air travel. Alternatives mentioned below may help to mitigate these gaps, either by incorporating proprietary datasets (OAG/IATA), leveraging regional traffic records, or exploring hybrid machine-learning approaches using open data.
 
 *Given these coverage biases, researchers often look beyond crowdsourced ADS-B to fill critical data gaps, as discussed next.*
 
@@ -192,7 +167,7 @@ Given the resource-intensity, uneven coverage, and potential analytical limitati
 
 ### A Different Approach: Wikipedia + XGBoost
 
-A promising open-data alternative to overcome gaps in aviation datasets has been recently proposed by [@salgas2024]. Their method merges **Wikipedia-scraped airport route data** with **XGBoost-based seat-capacity estimations**, providing a novel way to impute missing flight connections. Although originally applied to **2019 data**, this approach theoretically could be extended to early 2020 using historical Wikipedia snapshots (e.g., via the Internet Archive).
+A promising open-data alternative to overcome gaps in aviation datasets has been recently proposed by @salgas2024. Their method merges **Wikipedia-scraped airport route data** with **XGBoost-based seat-capacity estimations**, providing a novel way to impute missing flight connections. Although originally applied to **2019 data**, this approach theoretically could be extended to early 2020 using historical Wikipedia snapshots (e.g., via the Internet Archive).
 
 However, as emphasized by @salgas2024, this method requires substantial effort, including:
 
@@ -218,7 +193,7 @@ Pre-pandemic, the global PLF reached a record **82.6% in 2019** [@IATA2020], yet
 
 ### Are Passengers “Isolated” in Transit? How Does This Affect the Model?
 
-A further simplification inherent to large-scale network models, such as the **SIR** model presented by [@brockmann2013], involves treating air travel as instantaneous transmission events:
+A further simplification inherent to large-scale network models, such as the **SIR** model presented by @brockmann2013, involves treating air travel as instantaneous transmission events:
 
 - **No in-flight quarantine or detailed cabin modeling**: Passengers are not considered isolated during flights; the model effectively assumes immediate infection potential upon arrival.
 - **Ignored intra-cabin transmission**: While cabin-specific airflow and seating arrangements can influence in-flight transmission [@wang2023], these micro-level factors are typically omitted in macro-scale epidemic models due to computational and data complexity.
@@ -241,19 +216,19 @@ In contrast, adopting a **regional scope**, particularly **Europe**, offers seve
 - Greater methodological reliability, as Europe’s aviation patterns are consistently captured by multiple data sources (e.g., Eurocontrol complemented by OpenSky).
 - Practical alignment with project constraints (~300 hours available), allowing for thorough and well-founded analysis without sacrificing accuracy.
 
-Moreover, intra-country transmission dynamics also play a significant role in epidemic spread. For instance, @laroze2020 showed that domestic commuting patterns significantly influenced COVID-19’s progression within English districts. A Europe-centric modeling approach thus presents an opportunity to incorporate not only international but potentially domestic and subregional mobility patterns as well, thereby capturing a more realistic spread scenario within manageable data requirements.
+Moreover, intra-country transmission dynamics also play a significant role in epidemic spread. For instance, @laroze2021 showed that domestic commuting patterns significantly influenced COVID-19’s progression within English districts. A Europe-centric modeling approach thus presents an opportunity to incorporate not only international but potentially domestic and subregional mobility patterns as well, thereby capturing a more realistic spread scenario within manageable data requirements.
 
 Given these considerations, **this thesis adopts a Europe-centric network approach**, enabling precise analysis of epidemic arrival timing and its subsequent impact on national-level excess mortality. The next sections will detail the methodological steps taken to integrate these European flight data into a network-based epidemic simulation.
 
 ### SIR as a Model Implementation
 
-The thesis employs a **network-based SIR model**, as originally presented by [@brockmann2013], to simulate the initial epidemic spread through aviation networks. Although ideally Wuhan airport would serve as the starting node (initial seeding), early data limitations make it necessary to consider other major Chinese airports (e.g., Shanghai, Beijing, Shenzhen) as proxies, especially given Wuhan's strict travel restrictions beginning 23 January 2020 [@chinazzi2020]. This approach aligns with previous studies highlighting the central role of major international hubs in early global dissemination [@lai2020].
+The thesis employs a **network-based SIR model**, as originally presented by @brockmann2013, to simulate the initial epidemic spread through aviation networks. Although ideally Wuhan airport would serve as the starting node (initial seeding), early data limitations make it necessary to consider other major Chinese airports (e.g., Shanghai, Beijing, Shenzhen) as proxies, especially given Wuhan's strict travel restrictions beginning 23 January 2020 [@chinazzi2020]. This approach aligns with previous studies highlighting the central role of major international hubs in early global dissemination [@lai2020].
 
 Moreover, **Wuhan** itself is widely recognized as a major internal transport nexus [@zhang2020_a; @zhu2019], with air passenger flows strongly correlated to outbreak severity in connected regions [@zhao2020; @ai2020]. However, since multiple modes (rail, road, air) facilitated COVID-19’s domestic spread, focusing on Wuhan airport alone may underestimate case exportations—particularly after the 23 January lockdown. Incorporating data from other large airports better captures the broader seeding routes, ensuring our model reflects the reality that multiple Chinese hubs likely contributed to Europe’s early epidemic arrival.
 
 A more sophisticated modeling choice would involve using a compartmental **SEIR** (or multi-stage **SEnIR**) approach, capturing a more realistic incubation period distribution (Gamma-like) and enhancing epidemiological accuracy [@abou2020; @rozan2024]. Such models provide nuanced insights into epidemic peaks, spread timing, and infection dynamics. However, they require additional parameters, detailed calibration, and more extensive computational resources, often demanding agent-based or fine-grained simulations.
 
-Given this thesis’s resource constraints, the simpler **SIR formulation**—using a mean-rate approximation of incubation and recovery periods as suggested by [@brockmann2013]—is methodologically sufficient to estimate initial arrival ranks of the epidemic across Europe. Nevertheless, future extensions of this work could explore implementing the more detailed **SEnIR** approach, particularly for studies aiming to examine secondary waves, detailed transmission dynamics, or public health interventions over longer time frames.*
+*Given this thesis’s resource constraints, the simpler **SIR formulation**—using a mean-rate approximation of incubation and recovery periods as suggested by @brockmann2013 is methodologically sufficient to estimate initial arrival ranks of the epidemic across Europe. Nevertheless, future extensions of this work could explore implementing the more detailed **SEnIR** approach, particularly for studies aiming to examine secondary waves, detailed transmission dynamics, or public health interventions over longer time frames.*
 
 ## Specified Data
 
@@ -284,18 +259,18 @@ To bridge temporal gaps between the quarterly Eurocontrol snapshots, the thesis 
 
 ### Modeling Europe’s Initial COVID-19 Wave and Time Windows {#wavetime}
 
-Although **officially recognized** European COVID-19 cases did not appear until January 2020, at least one retrospective study suggests that SARS-CoV-2 may have reached Europe as early as **late December 2019** (@deslandes2020). In that investigation, a single archived respiratory sample from a patient in the Paris region tested positive for SARS-CoV-2 upon re-analysis, hinting at possible sporadic introductions prior to January. However, the authors acknowledge that this result does not confirm large-scale circulation at the time.
+Although **officially recognized** European COVID-19 cases did not appear until January 2020, at least one retrospective study suggests that SARS-CoV-2 may have reached Europe as early as **late December 2019** [@deslandes2020]. In that investigation, a single archived respiratory sample from a patient in the Paris region tested positive for SARS-CoV-2 upon re-analysis, hinting at possible sporadic introductions prior to January. However, the authors acknowledge that this result does not confirm large-scale circulation at the time.
 
-By most accounts, the **major viral seeding** in Europe occurred through air travel from China throughout **January and February 2020** (@chinazzi2020). Gradual travel restrictions emerged over this period:
+By most accounts, the **major viral seeding** in Europe occurred through air travel from China throughout **January and February 2020** [@chinazzi2020]. Gradual travel restrictions emerged over this period:
 
 - **23 January 2020:** Wuhan city enforced an internal lockdown, yet international travel continued, allowing asymptomatic or undetected carriers to reach global aviation hubs. As highlighted by @chinazzi2020, the travel quarantine of Wuhan delayed epidemic progression by only 3 to 5 days within mainland China but significantly reduced international case importations by nearly 80% until mid-February.  
   - Further modeling by @chinazzi2020 suggests that even **drastic travel reductions** (up to 90%) alone could delay—but not fully prevent—virus exportation unless paired with substantial reductions in local transmissibility (e.g., effective NPIs).
 
-- **Late January–Early February 2020:** Several countries introduced formal travel bans on direct flights from China—for instance, the U.S. (31 January) and Australia (1 February)—although indirect transit through international hubs (e.g., Dubai, Doha) remained open (@whitehouse2020proclamation; @australia2020ban; @sun2020). This partial restriction meant travelers could still route through third countries, underscoring the ongoing importance of global transit hubs during February.
+- **Late January–Early February 2020:** Several countries introduced formal travel bans on direct flights from China—for instance, the U.S. (31 January) and Australia (1 February)—although indirect transit through international hubs (e.g., Dubai, Doha) remained open [@whitehouse2020proclamation; @australia2020ban; @sun2020]. This partial restriction meant travelers could still route through third countries, underscoring the ongoing importance of global transit hubs during February.
 
 - **March 2020:** Comprehensive lockdown measures across Europe dramatically curtailed flight volumes, but significant viral entry had already occurred by this stage, seeding community transmission.
 
-- **8 April 2020:** After approximately 10 weeks of strict lockdown measures, Wuhan resumed air and train services, further underscoring how interconnected aviation networks can accelerate or revive international spread (@zhang2020a).
+- **8 April 2020:** After approximately 10 weeks of strict lockdown measures, Wuhan resumed air and train services, further underscoring how interconnected aviation networks can accelerate or revive international spread [@zhang2020_a].
 
 Because **Eurocontrol** only provides quarterly snapshots, this thesis strategically integrates:
 - **OpenSky (January–February, April 2020):** Documents overall flight trends and mobility changes prior to and following initial lockdowns.
@@ -307,7 +282,7 @@ By combining these sources, the analysis can partially account for the heightene
 
 ### Correlation with Excess Mortality
 
-After simulating epidemic arrival timing in European countries using the adjusted SIR model, these predictions will be correlated specifically with national-level excess mortality rates to quantify whether early epidemic seeding systematically influenced mortality outcomes (@sun2022).
+After simulating epidemic arrival timing in European countries using the adjusted SIR model, these predictions will be correlated specifically with national-level excess mortality rates to quantify whether early epidemic seeding systematically influenced mortality outcomes. [@theeconomist2021]
 
 A recent short communication by Neuwirth & Elixhauser (202x, in preparation) compiles global excess mortality data but explicitly highlights that the most comprehensive and consistently measured datasets—including excess mortality alongside key socioeconomic indicators (e.g., GDP, healthcare quality, vaccination rates)—are predominantly available for European countries. Thus, despite the broader global intent of our dataset, the density and reliability of European data specifically justify the focused analysis undertaken here.
 
@@ -315,10 +290,9 @@ A recent short communication by Neuwirth & Elixhauser (202x, in preparation) com
 
 ### Excess Mortality Data
 
-To measure country-level excess mortality during the first wave, this thesis relies on **The Economist**’s publicly documented estimates @theeconomist2021. Because official records of death counts remain incomplete or delayed in many regions, **The Economist** constructed a machine-learning model to impute missing data and approximate total excess deaths, as described in [their methodology](https://www.economist.com/graphic-detail/2021/05/13/how-we-estimated-the-true-death-toll-of-the-pandemic). 
+To measure country-level excess mortality during the first wave, this thesis uses estimates published by The Economist [@theeconomist2021], who constructed a machine-learning model to impute missing data and approximate total excess deaths, as described in [their explanatory article](https://www.economist.com/graphic-detail/2021/05/13/how-we-estimated-the-true-death-toll-of-the-pandemic). 
 
-Although these estimates carry inherent uncertainties—particularly for countries with underreported statistics—this dataset offers a reasonably consistent, cross-national view of pandemic-attributable mortality. The analysis in this thesis uses the aggregated excess-death estimates through [Date/Period], focusing on the first COVID-19 wave in Europe.
-
+Although these estimates carry inherent uncertainties—particularly for countries with underreported statistics—this dataset offers a reasonably consistent, cross-national view of pandemic-attributable mortality. The analysis in this thesis uses the aggregated excess-death estimates through [January / April], focusing on the first COVID-19 wave in Europe.
 
 ## Advanced Research Question & Hypothesis
 
@@ -344,7 +318,7 @@ By integrating OpenSky and Eurocontrol data, our Europe-centric model will effec
 
 ### Research Design and Methodology
 
-In line with my **Supervisor’s advice (March 14, 2025)**, this thesis **avoids complex agent-based modeling (ABM)** in favor of a **simplified network-based SIR model** ([@brockmann2013]). This streamlined approach is justified by:
+In line with my **Supervisor’s advice (March 14, 2025)**, this thesis **avoids complex agent-based modeling (ABM)** in favor of a **simplified network-based SIR model** [@brockmann2013]. This streamlined approach is justified by:
 
 - **Feasibility:** Avoids excessive complexity, aligning with the limited scope and timeline of a bachelor’s thesis.  
 - **Aggregated Flows:** Airports (and ultimately countries) are represented as **nodes**, with aggregated passenger flows as edges—maintaining manageable data complexity.  
@@ -361,7 +335,7 @@ In line with my **Supervisor’s advice (March 14, 2025)**, this thesis **avoids
 2. **Implement a Simplified ODE-Based SIR Model**  
    - Represent each airport as a node with daily changes in **Susceptible (S), Infected (I), Recovered (R)** compartments.  
    - Account for **all relevant daily flights** (both from China and **within** Europe) by aggregating seat capacity × assumed load factor, thereby simulating how infections spread among European nodes once seeded.  
-   - Rather than using Wuhan alone as the origin, incorporate inbound flight data from **multiple major Chinese airports** (e.g., Beijing, Shanghai, Shenzhen) to approximate early European seeding, consistent with research showing widespread exportation after Wuhan’s 23 January 2020 lockdown ([@chinazzi2020; @zhang2020a]).
+   - Rather than using Wuhan alone as the origin, incorporate inbound flight data from **multiple major Chinese airports** (e.g., Beijing, Shanghai, Shenzhen) to approximate early European seeding, consistent with research showing widespread exportation after Wuhan’s 23 January 2020 lockdown ([@chinazzi2020; @zhang2020_a]).
 
 3. **Estimate Country-Level Epidemic Arrival Times**  
    - Define an **infection threshold** for “arrival time” at each airport.  
