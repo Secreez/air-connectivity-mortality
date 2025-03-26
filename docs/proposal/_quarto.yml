@@ -1,13 +1,11 @@
 project:
   type: manuscript
 
-execute:
-  freeze: auto
 
 format:
   html:
     toc: true
-    theme: cosmo
+    theme: spacelab
     comments:
       hypothesis: true
 
@@ -17,4 +15,3 @@ manuscript:
   #- ..
 
 bibliography: proposal_ref.bib
-link-citations: true

@@ -12,5 +12,9 @@ docs/thesis/_freeze/
 /.luarc.json
 
 data/*
+docs/proposal/data/*
 .github/*
 .Rproj.user
+
+
+
