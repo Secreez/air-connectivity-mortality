@@ -302,7 +302,7 @@ By combining these sources, the model captures the **critical early period of ep
 
 Following simulation of epidemic arrival timing across Europe using the adjusted SIR model, these predicted **arrival ranks** will be compared with national **excess mortality rates** to explore whether early seeding corresponded with worse mortality outcomes [@theeconomist2021].
 
-An upcoming short communication by **Neuwirth & Elixhauser (202x, in prep.)** notes that the **most consistent excess mortality estimates and associated predictors** (GDP, HAQ, vaccination rates) are concentrated in Europe. Although the original modeling concept considered global mortality variation, the **density and reliability** of European data ultimately justify a **Europe-focused analysis**.
+An upcoming short communication by Neuwirth & Elixhauser (202x, in prep.) explores how socioeconomic factors such as GDP, median age, healthcare capacity, and vaccination coverage interact as part of a causal system influencing COVID-19 mortality. While their focus is global and system-based, their findings reinforce the importance of European data, given its high reliability and completeness—justifying the Europe-focused approach taken in this thesis.
 
 > *While including additional socioeconomic controls would deepen the analysis, this lies beyond the scope of this thesis. Nevertheless, the correlation between arrival timing and mortality provides meaningful insight into early pandemic dynamics.*
 
