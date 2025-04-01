@@ -87,36 +87,29 @@ This thesis draws on two primary datasets:
 
 #### Flight Data
 
-The EUROCONTROL data were filtered to include:
-- Origin airports in **Mainland China, Hong Kong, and Macao**.
+The EUROCONTROL air traffic data were filtered to include:
+
+- Origin airports located in **Mainland China, Hong Kong, and Macao**.
 - Destination airports located in **EUROCONTROL member states**.
 
-Airport codes were matched using the openly available **OurAirports** dataset ([https://ourairports.com](https://ourairports.com)). The flight records were then aggregated at the **destination country** level, separately for:
-- **December 2019** (pre-pandemic international air traffic)
-- **March 2020** (onset of European lockdowns and flight restrictions)
-[NEEDS BETTER REFERENCE .. perhaps add OurAirports even into the references]
+To ensure accurate country-level aggregation, **airport codes were matched using the openly available OurAirports dataset** [@ourairports2025], which provides global airport information in the public domain. Following the matching process, the flight records were aggregated at the **destination country** level, separately for:
+- **December 2019** (reflecting international air traffic patterns prior to formal global recognition and containment measures of the COVID-19 pandemic [@chinazzi2020])
+- **March 2020** (reflecting the onset of European lockdowns and flight restrictions)
 
-These inbound flight counts were used to calculate a **flight exposure ranking** for each country.
+This aggregation resulted in a **country-level flight exposure ranking** based on the total number of inbound flights from China, Hong Kong, and Macao.
 
 #### Mortality Data
 
-The cumulative excess mortality dataset was cleaned and matched by ISO3 country code. Values were extracted for four annual timepoints, to capture long-term pandemic outcomes:
+The cumulative excess mortality dataset was cleaned and harmonized by ISO3 country code to ensure consistency with the flight data. Mortality values were extracted for four annual reference dates to capture long-term pandemic impacts:
+
 - 05 May 2020
 - 05 May 2021
 - 05 May 2022
 - 05 May 2023
 
-This dataset is based on **recorded all-cause mortality data** reported by national statistical agencies and compiled by **Our World in Data (OWID)**. It deliberately excludes modeled global estimates and focuses on transparent, data-driven records for European countries.
+These data are based on ... *add more details*
 
-[WHY 05 May? - NEEDS BETTER REFERENCE ..]
-
-### Analytical Approach 
-
-(OUTLINE:)
-- **Flight Exposure Ranking:** Countries were ranked by inbound flight counts from China, Hong Kong, and Macao.
-- **Cumulative Excess Mortality Markers:** Excess mortality values were extracted for four timepoints.
-- **Statistical Analysis:** **Spearman rank correlation** was used to assess associations between flight exposure and cumulative excess mortality.
-- **Visualization:** Descriptive visualizations including Sankey-style maps and multi-panel mortality plots.
+(*Note: The choice of 05 May as an annual reference date ... Further detail is provided in Section X.X.*)
 
 ## Results
 
@@ -194,20 +187,27 @@ as above again, but aggregated exposure (December + March):
 *Table 4.5: Correlation coefficients for combined exposure.*  
 *Figure 4.5: Scatterplots for combined exposure.*
 
-###  Analysis
+### Sensitivity Analyses
 
-assess the robustness of the correlation results, additional analyses:
+evaluate the robustness of the observed correlation patterns, additional sensitivity analyses:
 
-- **Exclusion of small-population countries** (e.g., countries with <2 million population)
-- **Exclusion of countries with incomplete mortality data**
-- **Optional normalization** of exposure by population size (exposure per 1 million inhabitants)
-- **Comparison of correlations across December, March, and combined data** to evaluate potential timing effects
+- **Exclusion of small-population countries:**  
+Countries with fewer than 2 million inhabitants excluded to assess potential distortion from small-country effects.
+
+- **Exclusion of countries with incomplete mortality data:**  
+Countries lacking complete excess mortality records for all four reference timepoints removed.
+
+- **Normalization by population size:**  
+Flight exposure indicators normalized by country population (in millions) to evaluate whether relative exposure, rather than absolute flight volume, influenced correlation outcomes.
+
+- **Separate analysis by month:**  
+Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects.
 
 *Table 4.6: Sensitivity analysis results.*
 
 ### Summary of Key Patterns
 
-briefly summarizes the key findings of the results:
+Here, briefly summarizes the key findings of the results:
 
 - Overview of which month(s) exhibited stronger correlation signals
 - Geographic patterns in exposure and mortality
