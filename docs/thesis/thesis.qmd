@@ -12,7 +12,7 @@ keywords:
   - COVID-19 Pandemic
   - Excess Mortality
   - Air Traffic Networks
-  - Descriptive Analysis
+  - Exploratory Data Analysis (EDA)
   - Spearman Correlation
   - Epidemic Seeding
   - Europe
@@ -29,17 +29,13 @@ format:
     toc-depth: 3
 ---
 
-## Acknowledgments
-
-*This thesis includes results derived from the ATM Datasets made available by EUROCONTROL (©2025). EUROCONTROL does not necessarily endorse or support the conclusions drawn herein and shall not be liable for any direct or indirect damages arising out of or in connection with this work.*
-
 ## Introduction
 
 ### Context & Motivation
 
 The COVID-19 pandemic highlighted the speed at which infectious diseases can spread globally in a highly interconnected world. Aviation networks, in particular, played a crucial role in facilitating the international dissemination of SARS-CoV-2 during the early months of 2020. Previous studies demonstrated that long-haul flights drastically reduced effective distances between cities, accelerating the initial spread of the virus across continents [@chinazzi2020; @sun2022_a].
 
-At the same time, countries exhibited substantial variation in excess mortality outcomes during the pandemic. Research has linked these differences to demographic, economic, and healthcare factors [@rahmanian2024; @matveeva2023]. However, the potential role of **early exposure to international air travel**—and its relationship to pandemic impact—remains underexplored.
+At the same time, countries exhibited substantial variation in excess mortality outcomes during the pandemic. Research has linked these differences to demographic, economic, and healthcare factors [@rahmanian2024; @matveeva2023]. However, the potential role of early exposure to international air travel—particularly its relationship to subsequent pandemic mortality—has received comparatively little attention in existing research.
 
 This thesis investigates whether European countries that received higher volumes of direct inbound flights from China, Hong Kong, and Macao at the onset of the pandemic exhibited higher subsequent excess mortality. *Rather than implying causation, the analysis seeks to identify descriptive statistical patterns between early international flight exposure and mortality outcomes over time.*
 
@@ -47,7 +43,7 @@ This thesis investigates whether European countries that received higher volumes
 
 #### Research Question
 
-> Does early exposure to international air traffic—measured by inbound flights from China, Hong Kong, and Macao—correlate with higher excess mortality during the first pandemic wave in Europe?
+> Does early exposure to international air traffic—measured by inbound flights from China, Hong Kong, and Macao—statistically correlate with higher excess mortality during the first pandemic wave in Europe?
 
 #### Objectives
 
@@ -55,9 +51,11 @@ This thesis investigates whether European countries that received higher volumes
 
 2. **Assess the association** between flight exposure rankings and cumulative excess mortality at four annual timepoints (05 May 2020, 2021, 2022, and 2023).
 
-3. **Reflect on methodological limitations** of air traffic–based exposure indicators and discuss potential directions for future research.
+3. **Critically reflect on the limitations** of air traffic–based exposure indicators and outline implications for future research.
 
 ### Thesis Outline
+
+This thesis is structured as follows: Chapter 2 provides an overview of relevant literature on pandemic mobility, excess mortality, and methodological considerations. Chapter 3 outlines the analytical framework and data sources. Chapter 4 presents the results of the exploratory correlation analysis. Chapter 5 discusses the findings in the broader context of structural factors and methodological limitations. Finally, Chapter 6 concludes the thesis and suggests directions for future research.
 
 ## Literature Review
 
@@ -69,7 +67,11 @@ Recent comprehensive analyses (e.g. [@pizzato2024]) have highlighted substantial
 
 ### Prior Work on Air Travel & COVID-19 Spread
 
-### Methodological Reflections: Dynamic Modeling Alternatives
+### Data & Methodological Considerations
+
+Several studies investigating the spread of COVID-19 have used crowdsourced ADS-B flight data from the OpenSky Network to model mobility patterns and international virus transmission pathways [@strohmeier2021; @iacus2020]. OpenSky data offer broad accessibility and near-real-time coverage, making them a valuable resource for exploratory mobility analyses. However, these datasets are subject to significant limitations, particularly concerning geographic coverage gaps in regions with sparse receiver infrastructure. Previous research has highlighted the lack of reliable OpenSky coverage over Mainland China, Hong Kong, and Macao—the primary source regions relevant to this thesis's research question [@iacus2020].
+
+In the early conceptual phase of this thesis, OpenSky data were considered as a primary source for reconstructing early pandemic mobility patterns. However, preliminary analysis revealed substantial gaps in flight records for direct China-to-Europe connections during December 2019 and the early months of 2020. Many direct flights, particularly those departing from Chinese airports, were either missing or incomplete in the OpenSky dataset. Given these limitations, this thesis instead relied exclusively on verified Eurocontrol operational air traffic data, which provide comprehensive coverage of European airspace and flight operations. OpenSky data were used solely for illustrative purposes and to highlight known coverage deficiencies (see Appendix, Figure X).
 
 ## Analytical Framework & Correlation Method
 
@@ -92,7 +94,7 @@ The EUROCONTROL data were filtered to include:
 Airport codes were matched using the openly available **OurAirports** dataset ([https://ourairports.com](https://ourairports.com)). The flight records were then aggregated at the **destination country** level, separately for:
 - **December 2019** (pre-pandemic international air traffic)
 - **March 2020** (onset of European lockdowns and flight restrictions)
-(NEEDS BETTER REFERENCE ..)
+[NEEDS BETTER REFERENCE .. perhaps add OurAirports even into the references]
 
 These inbound flight counts were used to calculate a **flight exposure ranking** for each country.
 
@@ -106,7 +108,7 @@ The cumulative excess mortality dataset was cleaned and matched by ISO3 country 
 
 This dataset is based on **recorded all-cause mortality data** reported by national statistical agencies and compiled by **Our World in Data (OWID)**. It deliberately excludes modeled global estimates and focuses on transparent, data-driven records for European countries.
 
-(WHY 05 May? )
+[WHY 05 May? - NEEDS BETTER REFERENCE ..]
 
 ### Analytical Approach 
 
@@ -116,65 +118,129 @@ This dataset is based on **recorded all-cause mortality data** reported by natio
 - **Statistical Analysis:** **Spearman rank correlation** was used to assess associations between flight exposure and cumulative excess mortality.
 - **Visualization:** Descriptive visualizations including Sankey-style maps and multi-panel mortality plots.
 
-
-
 ## Results
 
-### Early Air Connectivity Rankings
+This chapter presents the results of the exploratory analysis investigating the association between early international flight exposure and cumulative excess mortality in European countries. It includes a descriptive overview of the flight data, early air connectivity patterns, country exposure rankings, and the results of the correlation analyses. Where relevant, additional sensitivity analyses are provided to assess the robustness of findings.
 
-### Correlation Outcomes
+### Descriptive Overview of Flight Data
 
-### Sensitivity Analysis (Optional)
+This section summarizes the characteristics of the inbound flight data used for the analysis.
 
-### Visualizations
+- **Total number of recorded flights** from China, Hong Kong, and Macao to Europe in **December 2019** and **March 2020**
+- **Number of destination countries included** after data cleaning and filtering
+- Summary of the **data preparation steps**:
+  - Matching origin and destination airports
+  - Aggregation at country level
+  - Removal of incomplete records
+- **Descriptive statistics**:
+  - Minimum, maximum, median, mean inbound flights per country
+  - Comparison of flight volumes between December 2019 and March 2020
+
+*Table 4.1: Descriptive statistics of inbound flight data.*
+
+### Early Air Connectivity Patterns
+
+This section illustrates the spatial and temporal distribution of early international flight exposure.
+
+- **Bar chart** of top 10–15 European countries by inbound flight volume (separately for December & March)
+- **Time trend plot** of daily/weekly inbound flights
+- **Map visualization** of aggregated inbound flight volumes at the country level
+- Optional: Sankey diagram showing aggregated flows from China/Hong Kong/Macao to European countries
+
+*Figure 4.1: Inbound flight volumes by country.*  
+*Figure 4.2: Sankey diagram of early air connectivity.*
+
+### Country Exposure Rankings
+
+A ranking of European countries based on their total inbound flight exposure is presented.
+
+- Separate ranking for **December 2019** and **March 2020**
+- Combined ranking aggregating total exposure (December + March)
+
+*Table 4.2: Country exposure rankings.*
+
+Optional: **Heatmap-style plot** of exposure rankings across months
+
+### Correlation Analysis Results
+
+presents the results of the statistical correlation analyses.
+
+#### Correlation for December 2019
+
+- **Spearman rank correlation** between December 2019 flight exposure and cumulative excess mortality
+- Correlation coefficients and significance levels at four timepoints:
+  - 05 May 2020
+  - 05 May 2021
+  - 05 May 2022
+  - 05 May 2023
+- **Scatterplots** of exposure rank vs excess mortality
+
+*Table 4.3: Correlation coefficients for December 2019 exposure.*  
+*Figure 4.3: Scatterplots for December 2019 exposure.*
+
+#### Correlation for March 2020
+
+same structure as I did above:
+- Spearman rank correlation for March 2020 exposure
+- Four timepoints
+- Scatterplots
+
+*Table 4.4: Correlation coefficients for March 2020 exposure.*  
+*Figure 4.4: Scatterplots for March 2020 exposure.*
+
+#### Correlation for Combined Exposure
+as above again, but aggregated exposure (December + March):
+
+*Table 4.5: Correlation coefficients for combined exposure.*  
+*Figure 4.5: Scatterplots for combined exposure.*
+
+###  Analysis
+
+assess the robustness of the correlation results, additional analyses:
+
+- **Exclusion of small-population countries** (e.g., countries with <2 million population)
+- **Exclusion of countries with incomplete mortality data**
+- **Optional normalization** of exposure by population size (exposure per 1 million inhabitants)
+- **Comparison of correlations across December, March, and combined data** to evaluate potential timing effects
+
+*Table 4.6: Sensitivity analysis results.*
+
+### Summary of Key Patterns
+
+briefly summarizes the key findings of the results:
+
+- Overview of which month(s) exhibited stronger correlation signals
+- Geographic patterns in exposure and mortality
+- Effect of data filtering and sensitivity analysis on correlation strength
+
+[Transission to the next section]
 
 ## Discussion
 
-### Interpretation of Correlations
+### Interpretation of Findings
 
-### Relation to Structural Factors
+[My discussion of the Spearman correlations, ranking, and visual insights.]
 
-### Limitations and Methodological Reflections
+### Relation to Broader Structural Factors
 
-This thesis deliberately focuses on a **descriptive, exploratory analysis** of early pandemic exposure via international air travel and its association with subsequent excess mortality. It does not attempt to model epidemic arrival times or simulate disease dynamics. Accordingly, several key limitations must be acknowledged:
+[Now, how things like GDP, vaccination, age structure, or healthcare could interact.]
 
-- **Correlation does not imply causation.** Many confounding factors—such as demographic structure, healthcare capacity, government response, and socioeconomic disparities—likely shaped pandemic mortality outcomes beyond the early exposure measured in this analysis [@ioannidis2023; @pizzato2024].
+### Limitations 
+[Likely needs more meat.]
 
-- **Data aggregation at the country level** may obscure important subnational variations in both exposure and mortality outcomes.
+This thesis deliberately applies an exploratory, correlation-based approach to investigate potential associations between early international air connectivity and excess mortality. The following key limitations must be acknowledged:
 
-- **Flight data reflect seat capacities rather than confirmed passenger numbers.** Occupancy rates were highly volatile during early 2020 due to emerging travel restrictions and ghost flights, introducing uncertainty into exposure estimates.
+- **No causal inference:** The observed correlations do not imply causation. Socioeconomic, demographic, and healthcare-related factors likely contributed substantially to mortality outcomes [@ioannidis2023; @pizzato2024].
 
-- **Mortality data limitations.** Excess mortality estimates carry uncertainties, particularly for countries with incomplete vital registration systems.
+- **Country-level aggregation:** National-level analysis may obscure subnational differences in both exposure and vulnerability.
 
-Additionally, while preliminary exploration of crowdsourced flight data from **The OpenSky Network** [@strohmeier2021] was conducted, this dataset was ultimately not used for the primary analysis. OpenSky records suffer from **substantial coverage gaps**—particularly over China, Hong Kong, and Macao, which were key source regions in early 2020. As noted by @iacus2020:
+- **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric.
 
-> "OpenSky Network [...] does not provide global coverage and [...] flight data for major global airports such as the Beijing Capital International Airport in China and the Soekarno-Hatta International Airport in Indonesia are not available."
+- **Mortality data quality:** Excess mortality estimates vary in completeness across countries due to differences in death registration systems.
+### Methodological Reflections
 
-A visual inspection of OpenSky data confirmed these deficiencies, with **many direct China-to-Europe flights missing** in the relevant months. Therefore, this thesis exclusively relied on **Eurocontrol's operational flight data**, which offer verified and comprehensive coverage of European airspace. OpenSky data were used only for a **sanity check** to illustrate known coverage limitations (see Appendix, Figure X).
+Early versions of this research design included dynamic modeling approaches such as a network-based SIR simulation [@brockmann2013] or SEIR extensions [@abou2020; @rozan2024]. However, incomplete flight records for January–February 2020, combined with uneven global data coverage and the practical time constraints of a Bachelor's thesis (~300 hours), rendered such approaches infeasible. A simplified, descriptive correlation analysis was chosen to maintain feasibility and transparency while stillallowing meaningful insights into early pandemic exposure patterns.
 
-Finally, while the initial research design considered implementing a dynamic **SIR network simulation model** [@brockmann2013], this approach was abandoned due to:
-
-- incomplete flight records from key early months (January–February 2020),
-- the uneven global coverage of available datasets,
-- and the limited scope of a bachelor's thesis (~300 hours).
-
-Instead, a **pragmatic and transparent correlation analysis** was conducted, using Eurocontrol data to construct an inbound flight exposure ranking and assess its association with cumulative excess mortality at the country level. This regional focus ensures methodological consistency and data reliability while remaining feasible within project constraints.
-
-### Methodological Reflections: Dynamic Modeling Alternatives
-
-The initial research design considered implementing a dynamic network-based SIR simulation model [@brockmann2013] or a more detailed SEIR compartmental model [@abou2020; @rozan2024] to estimate relative epidemic arrival times across Europe. However, data availability constraints—particularly incomplete flight records for January–February 2020—and the limited scope of a bachelor's thesis (~300 hours) rendered such dynamic modeling approaches unfeasible.
-
-Instead, this thesis deliberately adopted a simplified, descriptive correlation analysis. This methodological shift ensured a feasible, data-driven exploration while acknowledging the limitations of not explicitly modeling epidemic dynamics.
-
-The analysis is further limited by:
-
-- Aggregation at the country level, potentially overlooking intra-country heterogeneity.
-
-- Uncertainty in actual passenger numbers, as flight data reflect seat capacities rather than confirmed passengers.
-
-- Correlation-based analysis, which does not imply causation. Socioeconomic factors, healthcare capacity, and structural vulnerabilities, as highlighted in recent research [@pizzato2024], likely exert greater influence on mortality outcomes than early epidemic arrival alone.
-
-Nevertheless, this exploratory analysis provides descriptive insight into potential statistical patterns linking early air connectivity and pandemic impact.
 
 ### Final Thoughts
 
@@ -190,6 +256,10 @@ Nevertheless, this exploratory analysis provides descriptive insight into potent
 
 ::: {#refs}
 :::
+
+## Acknowledgments
+
+*This thesis includes results derived from the ATM Datasets made available by EUROCONTROL (©2025). EUROCONTROL does not necessarily endorse or support the conclusions drawn herein and shall not be liable for any direct or indirect damages arising out of or in connection with this work.*
 
 ## Appendix (code, etc.)
 
