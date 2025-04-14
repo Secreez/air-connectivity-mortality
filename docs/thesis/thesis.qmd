@@ -73,43 +73,38 @@ Several studies investigating the spread of COVID-19 have used crowdsourced ADS-
 
 In the early conceptual phase of this thesis, OpenSky data were considered as a primary source for reconstructing early pandemic mobility patterns. However, preliminary analysis revealed substantial gaps in flight records for direct China-to-Europe connections during December 2019 and the early months of 2020. Many direct flights, particularly those departing from Chinese airports, were either missing or incomplete in the OpenSky dataset. Given these limitations, this thesis instead relied exclusively on verified Eurocontrol operational air traffic data, which provide comprehensive coverage of European airspace and flight operations. OpenSky data were used solely for illustrative purposes and to highlight known coverage deficiencies (see Appendix, Figure X).
 
+Yes, combining them into a single **“Data Sources & Preparation”** section often reads more smoothly. It avoids the “double mention” of data sources in one subheading and the actual filtering in another. For a concise, academic style, you can merge them like this:
+
+---
+
 ## Analytical Framework & Correlation Method
 
-### Data Sources
+### Data Sources & Preparation
 
-This thesis draws on two primary datasets:
+This thesis draws on two primary datasets and applies tailored filtering and aggregation steps to align them for correlation analysis:
 
-- **EUROCONTROL Air Traffic Data** [@eurocontrolData2025]: Aggregated IFR flight records for December 2019 and March 2020, covering commercial flights originating in Mainland China, Hong Kong, and Macao with destinations in European countries.
+1. **EUROCONTROL Air Traffic Data** [@eurocontrolData2025]:  
+   - **Coverage:** December 2019 and March 2020, covering commercial flights from **Mainland China, Hong Kong, and Macao** to **EUROCONTROL member states**.  
+   - **Preparation:**  
+     - Filtered to include only flights originating in the three source regions.  
+     - **Airport codes** matched using the **OurAirports dataset** [@ourairports2025] to ensure accurate country-level aggregation.  
+     - Aggregated at the **destination country** level separately for **December 2019** (reflecting air traffic patterns prior to formal global recognition of COVID-19 [@chinazzi2020]) and **March 2020** (onset of European lockdowns).  
+     - Result: A **country-level flight exposure ranking** based on inbound flights from the source regions.
 
-- **Excess Mortality Data** [@owidExcess2024; @karlinsky2021]: All-cause mortality data for European countries, compiled from the **World Mortality Dataset (WMD)** and the **Human Mortality Database (HMD STMF)** by **Our World in Data (2024)**. These data are based on official death registrations and reflect observed mortality patterns without reliance on model-based estimates.
+2. **Excess Mortality Data** [@owidExcess2024; @karlinsky2021]:  
+   - **Coverage:** All-cause mortality in European countries, drawn from Our World in Data (OWID), which compiles the **World Mortality Dataset (WMD)** and the **Human Mortality Database (HMD STMF)**.  
+   - **Preparation:**  
+     - Focuses on `excess_mortality_cumulative_per_million`, tracking the cumulative number of excess deaths per million inhabitants since **1 January 2020**, compared to a pre-pandemic baseline.  
+     - Data were harmonized by **ISO3 country code** to ensure consistency with the flight data.  
+     - **Four annual reference dates** were extracted to capture long-term pandemic outcomes:  
+       - 05 May 2020  
+       - 05 May 2021  
+       - 05 May 2022  
+       - 05 May 2023  
 
-### Data Preparation & Filtering
+> *(Note: The choice of 05 May aligns with the WHO’s declaration ending COVID-19 as a Public Health Emergency of International Concern on **5 May 2023** [@who2023end]. Consistency across years was maintained by selecting 05 May in each preceding year.)*
 
-#### Flight Data
-
-The EUROCONTROL air traffic data were filtered to include:
-
-- Origin airports located in **Mainland China, Hong Kong, and Macao**.
-- Destination airports located in **EUROCONTROL member states**.
-
-To ensure accurate country-level aggregation, **airport codes were matched using the openly available OurAirports dataset** [@ourairports2025], which provides global airport information in the public domain. Following the matching process, the flight records were aggregated at the **destination country** level, separately for:
-- **December 2019** (reflecting international air traffic patterns prior to formal global recognition and containment measures of the COVID-19 pandemic [@chinazzi2020])
-- **March 2020** (reflecting the onset of European lockdowns and flight restrictions)
-
-This aggregation resulted in a **country-level flight exposure ranking** based on the total number of inbound flights from China, Hong Kong, and Macao.
-
-#### Mortality Data
-
-The cumulative excess mortality dataset was cleaned and harmonized by ISO3 country code to ensure consistency with the flight data. Mortality values were extracted for four annual reference dates to capture long-term pandemic impacts:
-
-- 05 May 2020
-- 05 May 2021
-- 05 May 2022
-- 05 May 2023
-
-These data are based on ... *add more details*
-
-(*Note: The choice of 05 May as an annual reference date ... Further detail is provided in Section X.X.*)
+By combining these two datasets, we obtain a comparative measure of **early flight exposure** and **excess mortality** at the **country level**, forming the basis for the subsequent correlation analysis.
 
 ## Results
 
@@ -215,6 +210,8 @@ Here, briefly summarizes the key findings of the results:
 
 [Transission to the next section]
 
+The following chapter discusses these findings in the broader context of structural factors and methodological considerations
+
 ## Discussion
 
 ### Interpretation of Findings
@@ -226,7 +223,7 @@ Here, briefly summarizes the key findings of the results:
 [Now, how things like GDP, vaccination, age structure, or healthcare could interact.]
 
 ### Limitations 
-[Likely needs more meat.]
+[Likely needs more meat - might combine it with Methodological Reflections]
 
 This thesis deliberately applies an exploratory, correlation-based approach to investigate potential associations between early international air connectivity and excess mortality. The following key limitations must be acknowledged:
 

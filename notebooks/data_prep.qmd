@@ -1,0 +1,186 @@
+---
+title: "Data Preparation"
+format: html
+editor: source
+---
+
+## Setup
+
+```{r}
+library(tidyverse)
+```
+
+## Load Data
+
+```{r}
+#data/raw/owid/owid-covid-data.csv
+covid_data <- read_csv("notebooks/data/raw/owid/owid-covid-data.csv")
+spec(covid_data)
+head(covid_data$iso_code)
+```
+
+## Data Cleaning
+
+TODO: 15 April: - combine iso codes for all data sets and check for any missing values! 
+```{r}
+eurocontrol_iso_map <- tribble(
+  ~country_name,                ~iso2, ~iso3,
+  "Belgium",                    "BE",  "BEL",
+  "France",                     "FR",  "FRA",
+  "Germany",                    "DE",  "DEU",
+  "Luxembourg",                 "LU",  "LUX",
+  "The Netherlands",            "NL",  "NLD",
+  "United Kingdom",             "GB",  "GBR",
+  "Ireland",                    "IE",  "IRL",
+  "Portugal",                   "PT",  "PRT",
+  "Greece",                     "GR",  "GRC",
+  "Malta",                      "MT",  "MLT",
+  "Türkiye",                    "TR",  "TUR",
+  "Cyprus",                     "CY",  "CYP",
+  "Hungary",                    "HU",  "HUN",
+  "Switzerland",                "CH",  "CHE",
+  "Austria",                    "AT",  "AUT",
+  "Denmark",                    "DK",  "DNK",
+  "Norway",                     "NO",  "NOR",
+  "Slovenia",                   "SI",  "SVN",
+  "Sweden",                     "SE",  "SWE",
+  "Czech Republic",             "CZ",  "CZE",
+  "Italy",                      "IT",  "ITA",
+  "Romania",                    "RO",  "ROU",
+  "Bulgaria",                   "BG",  "BGR",
+  "Croatia",                    "HR",  "HRV",
+  "Monaco",                     "MC",  "MCO",
+  "Slovakia",                   "SK",  "SVK",
+  "Spain",                      "ES",  "ESP",
+  "North Macedonia",            "MK",  "MKD",
+  "Republic of Moldova",        "MD",  "MDA",
+  "Finland",                    "FI",  "FIN",
+  "Albania",                    "AL",  "ALB",
+  "Bosnia and Herzegovina",     "BA",  "BIH",
+  "Poland",                     "PL",  "POL",
+  "Ukraine",                    "UA",  "UKR",
+  "Serbia",                     "RS",  "SRB",
+  "Armenia",                    "AM",  "ARM",
+  "Lithuania",                  "LT",  "LTU",
+  "Montenegro",                 "ME",  "MNE",
+  "Latvia",                     "LV",  "LVA",
+  "Georgia",                    "GE",  "GEO",
+  "Estonia",                    "EE",  "EST"
+)
+```
+
+```{r}
+covid_data %>%
+  summarize(
+    NAs_iso_code = sum(is.na(iso_code)),
+    NAs_location = sum(is.na(location)),
+    NAs_date = sum(is.na(date)),
+    NAs_excess_per_million = sum(is.na(excess_mortality_cumulative_per_million))
+  )
+
+selected_dates <- c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05")
+
+filtered_data <- covid_data %>%
+  filter(date %in% selected_dates)
+
+filtered_data <- filtered_data %>%
+  select(
+    iso_code,
+    location,
+    date,
+    excess_mortality_cumulative_per_million
+  )
+
+nrow(filtered_data)
+
+# Identification
+
+filtered_data %>%
+  filter(is.na(excess_mortality_cumulative_per_million)) %>%
+  distinct(iso_code, location) %>%
+  arrange(location) # !!! quite a few countries have missing values as expected
+print(filtered_data$iso_code)
+```
+
+
+Metadata: https://www.eurocontrol.int/sites/default/files/2023-07/rnd-data-description-2023.pdf
+
+Based out the Excerpt from the Eurocontrol document, .. what I really need is the following:
+
+1. ECTL_ID - ECTL_ID (unique identifier for the flight to ensure uniqueness)
+2. ADEP / ADES - Departure and Arrival airports (ICAO codes) - Match these to reference OurAirports to see if ADEP is CN/HK/MO and ADES is in Eurocontrol
+3. ADEP Latitude / ADEP Longitude / ADES Latitude / ADES Longitude - These are the lat/long of the airports probably overkill but useful for plotting
+4. ICAO Fligth Type - S or N - S for scheduled, N for non-scheduled commercial flights "he data is collected from commercial flights operating in and over Europe. We enrich this data with live data from air navigation service" @https://www.eurocontrol.int/dashboard/rnd-data-archive
+5. Actual Off-Block Time or Actual Arrival Time -  to confirm that the flight occurred in the correct time window (e.g., you might have a big monthly file but want only flights that actually departed in December 2019 or March 2020).
+
+If that is done, save immediately to a CSV file in the data/processed folder. To make it easier to work with less loading.
+
+Load the monthly dataset (e.g., December 2019. Then do the same for March 2020).
+
+Filter:
+
+ICAO Flight Type == "S" or "N".
+
+ADEP ∈ {China/HK/Macao airports} and ADES ∈ {Eurocontrol airports}.
+
+Group by ADES country (or you might group by your 2-letter code after you join with an airport reference).
+
+Summarize the total inbound flights per European country. That’s your “flight exposure.”
+
+Then match that exposure to the excess mortality for each country’s ISO code (3-letter or 2-letter, depending on reference system).
+
+```{r}
+library(readr)
+library(dplyr)
+flights_2019_12 <- read_csv("notebooks/data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
+flights_2020_03 <- read_csv("notebooks/data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
+
+col_subset <- c("ECTRL ID", "ADEP", "ADES", "ADEP Latitude", "ADEP Longitude",
+                "ADES Latitude", "ADES Longitude", "ICAO Flight Type",
+                "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME")
+
+flights_dec19 <- flights_2019_12 %>%
+  select(all_of(col_subset)) %>%
+  filter(`ICAO Flight Type` %in% c("S", "N")) # Scheduled or Non-scheduled
+
+flights_mar20 <- flights_2020_03 %>%
+  select(all_of(col_subset)) %>%
+  filter(`ICAO Flight Type` %in% c("S", "N")) 
+
+```
+
+
+```{r}
+# ICAO Airports builder 
+airports <- read_csv("notebooks/data/raw/OurAirpots/airports.csv")
+spec(airports)
+print(airports$iso_country)
+
+
+china_hk_macao_airports <- airports %>%
+  filter(iso_country %in% c("CN", "HK", "MO"), !is.na(icao_code)) %>%
+  select(icao_code) %>%
+  distinct()
+
+eurocontrol_countries <- c("BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR", 
+                           "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI", 
+                           "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES", 
+                           "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM", 
+                           "LT", "ME", "LV", "GE", "EE")
+
+eurocontrol_airports <- airports %>%
+  filter(iso_country %in% eurocontrol_countries, !is.na(icao_code)) %>%
+  select(icao_code) %>%
+  distinct()
+```
+
+```{r}
+# Filter to only include flights from China/HK/Macao to Eurocontrol airports
+flights_dec19_filtered <- flights_dec19 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code)
+
+flights_mar20_filtered <- flights_mar20 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code)
+```
