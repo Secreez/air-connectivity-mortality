@@ -77,33 +77,64 @@ In the early conceptual phase of this thesis, OpenSky data were considered as a 
 
 ## Analytical Framework & Correlation Method
 
-### Data Sources & Preparation
+### Data Sources & Preperation
 
-This thesis draws on two primary datasets and applies tailored filtering and aggregation steps to align them for correlation analysis:
+The empirical analysis links an **origin–destination flight count** with an **all‑cause excess‑mortality series** at the country level.
 
-1. **EUROCONTROL Air Traffic Data** [@eurocontrolData2025]:  
-   - **Coverage:** December 2019 and March 2020, covering commercial flights from **Mainland China, Hong Kong, and Macao** to **EUROCONTROL member states**.  
-   - **Preparation:**  
-     - Filtered to include only flights originating in the three source regions.  
-     - **Airport codes** matched using the **OurAirports dataset** [@ourairports2025] to ensure accurate country-level aggregation.  
-     - Aggregated at the **destination country** level separately for **December 2019** (reflecting air traffic patterns prior to formal global recognition of COVID-19 [@chinazzi2020]) and **March 2020** (onset of European lockdowns).  
-     - Result: A **country-level flight exposure ranking** based on inbound flights from the source regions.
+#### EUROCONTROL flight file [@eurocontrolData2025]
 
-2. **Excess Mortality Data** [@owidExcess2024; @karlinsky2021]:  
-   - **Coverage:** All-cause mortality in European countries, drawn from Our World in Data (OWID), which compiles the **World Mortality Dataset (WMD)** and the **Human Mortality Database (HMD STMF)**.  
-   - **Preparation:**  
-     - Focuses on `excess_mortality_cumulative_per_million`, tracking the cumulative number of excess deaths per million inhabitants since **1 January 2020**, compared to a pre-pandemic baseline.  
-     - Data were harmonized by **ISO3 country code** to ensure consistency with the flight data.  
-     - **Four annual reference dates** were extracted to capture long-term pandemic outcomes:  
-       - 05 May 2020  
-       - 05 May 2021  
-       - 05 May 2022  
-       - 05 May 2023  
+* **Temporal window** December 2019 and March 2020.  
+  *Dec‑19* precedes widespread European awareness of SARS‑CoV‑2, while *Mar‑20* coincides with the first continent‑wide lockdowns.  
+* **Filtering steps**    
+  1. Retain ICAO flight types **S** (scheduled) and **N** (non‑scheduled commercial).  
+  2. Keep flights whose origin (**ADEP**) is in Mainland China (CN), Hong Kong (HK) or Macao (MO) and whose destination (**ADES**) lies in a EUROCONTROL member state.  
+  3. Match ADEP/ADES ICAO codes to the public‑domain **OurAirports** registry [@ourairports2025] to retrieve ISO‑2 country codes.  
+* **Aggregation** Count flights by destination country:  
 
-> *(Note: The choice of 05 May aligns with the WHO’s declaration ending COVID-19 as a Public Health Emergency of International Concern on **5 May 2023** [@who2023end]. Consistency across years was maintained by selecting 05 May in each preceding year.)*
+\[
+\text{Flights\_Dec2019}_{i},\;
+\text{Flights\_Mar2020}_{i},\;
+\text{Flights\_Sum}_{i}= \text{Dec} + \text{Mar}
+\]
 
-[!!!! Careful see data_prep. not possible to use the sole day of 5 May, as it is not available for all countries.. need to find a method and explain why. Reading https://www.nature.com/articles/s41586-022-05522-2 right now..]
+* **Deliverable** A flight‑exposure table for **<N_countries>** EUROCONTROL states (saved as `...`).
 
+
+#### 2  Excess‑mortality series (OWID → WMD + HMD‑STMF) [@karlinsky2021; @owidExcess2024]
+
+* **Variable** `excess_mortality_cumulative_per_million` — cumulative excess deaths per 1 million residents since **1 Jan 2020**, benchmarked against a 2015‑19 baseline.  
+* **Join key** ISO‑3 country codes; populations come from the same OWID release.  
+* **Reference date strategy**  
+  *Target day:* **05 May** of each year (2020‑2023).  
+  Because several countries report weekly rather than daily ACM, an exact 05 May record is not always present.  
+  *Work‑around:* if the 05 May value is missing, select the **nearest available** date within ±3 days (usually ISO‑week 18). A log of substitutions is stored in `data_prep.R` [Will change.] 
+  A quick test with linear interpolation shows that adjusting by ±3 days changes the level by **<TODO%** on average (max **TODO%**).
+* **Rationale**  Using the same early‑May snapshot each year standardises seasonality and aligns the final point (5 May 2023) with the WHO declaration ending the Public‑Health‑Emergency‑of‑International‑Concern [@who2023end].
+
+
+
+#### Robustness cross‑check (WHO modelled series, optional)
+
+WHO publishes model‑adjusted monthly excess‑mortality estimates [@msemburi2023].  
+For completeness these values were downloaded and compared to the Eurostat/HMD observations; the median absolute difference for the European subset is **<TODO** (Appendix X).  
+Given that Eurostat weekly ACM coverage exceeds 98 % (https://ec.europa.eu/eurostat/cache/metadata/en/demo_mexrt_esms.htm), the main analysis proceeds with the *observed* series; WHO estimates are only reported in sensitivity tables.
+
+#### Output for analysis
+
+`exposure_mortality_2020‑23.parquet` contains, for each EUROCONTROL member state:
+
+| variable | description |
+|----------|-------------|
+| `iso3` | ISO‑3166‑3 country code |
+| `flights_dec19`, `flights_mar20`, `flights_sum` | inbound flights CN/HK/MO → EU |
+| `excess_pm_2020` … `excess_pm_2023` | excess deaths per 1 M (≈ 05 May snapshot) |
+| `population_2020` | mid‑year population (OWID) |
+
+This table provides the input for the Spearman‑rank correlations reported in **Chapter X**.
+
+[!!!! Careful see data_prep. not possible to use the sole day of 5 May, as it is not available for all countries.. need to find a method and explain why. Reading https://www.nature.com/articles/s41586-022-05522-2 right now.. and https://pmc.ncbi.nlm.nih.gov/articles/PMC11917389/#sec26 - WHO Data very error prone? Eurostat using as a https://ec.europa.eu/eurostat/cache/metadata/en/demomwk_esms.htm 
+
+MORGEN WEITERMACHEN HIER ! 
 
 ## Results
 
@@ -230,7 +261,9 @@ This thesis deliberately applies an exploratory, correlation-based approach to i
 
 - **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric.
 
-- **Mortality data quality:** Excess mortality estimates vary in completeness across countries due to differences in death registration systems.
+- **Mortality data quality:** Excess mortality estimates vary in completeness across countries due to differences in death registration systems. (https://www.nature.com/articles/s41586-022-05522-2)
+
+
 ### Methodological Reflections
 
 Early versions of this research design included dynamic modeling approaches such as a network-based SIR simulation [@brockmann2013] or SEIR extensions [@abou2020; @rozan2024]. However, incomplete flight records for January–February 2020, combined with uneven global data coverage and the practical time constraints of a Bachelor's thesis (~300 hours), rendered such approaches infeasible. A simplified, descriptive correlation analysis was chosen to maintain feasibility and transparency while stillallowing meaningful insights into early pandemic exposure patterns.
