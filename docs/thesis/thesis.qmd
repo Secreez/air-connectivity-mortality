@@ -102,6 +102,8 @@ This thesis draws on two primary datasets and applies tailored filtering and agg
 
 > *(Note: The choice of 05 May aligns with the WHO’s declaration ending COVID-19 as a Public Health Emergency of International Concern on **5 May 2023** [@who2023end]. Consistency across years was maintained by selecting 05 May in each preceding year.)*
 
+[!!!! Careful see data_prep. not possible to use the sole day of 5 May, as it is not available for all countries.. need to find a method and explain why. Reading https://www.nature.com/articles/s41586-022-05522-2 right now..]
+
 
 ## Results
 
