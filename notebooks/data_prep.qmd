@@ -4,24 +4,201 @@ format: html
 editor: source
 ---
 
-## Setup
+## Libraries & Setup
 
 ```{r}
 library(tidyverse)
+library(tibble)
 ```
 
-## Load Data
+## Load & Inspect the OWID COVID-19 Data
+
+**Goal**: Filter to the 4 date snapshots, focus on `excess_mortality_cumulative_per_million`, and see which countries are missing data.
+```{r}
+# Load full OWID COVID data
+covid_data <- read_csv("data/raw/owid/owid-covid-data.csv")
+
+# Inspect columns
+spec(covid_data)
+
+# 4 date snapshots only
+selected_dates <- c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05")
+
+owid_filtered <- covid_data %>%
+  filter(date %in% selected_dates) %>%
+  select(
+    iso_code,
+    location,
+    date,
+    excess_mortality_cumulative_per_million
+  )
+
+# Quick missingness check
+owid_filtered %>%
+  summarize(
+    n_missing_iso_code = sum(is.na(iso_code)),
+    n_missing_mortality = sum(is.na(excess_mortality_cumulative_per_million))
+  )
+
+# Which countries/dates have missing mortality data?
+owid_filtered %>%
+  filter(is.na(excess_mortality_cumulative_per_million)) %>%
+  distinct(iso_code, location, date) %>%
+  arrange(location)
+
+colnames(owid_filtered)
+
+
+```
 
 ```{r}
-#data/raw/owid/owid-covid-data.csv
-covid_data <- read_csv("notebooks/data/raw/owid/owid-covid-data.csv")
-spec(covid_data)
-head(covid_data$iso_code)
+# check excess_mortality_cumulative_per_million how many values are na vs not na differenz
+
+covid_data %>%
+  summarize(
+    n_missing = sum(is.na(excess_mortality_cumulative_per_million)),
+    n_not_missing = sum(!is.na(excess_mortality_cumulative_per_million)),
+    total = n()
+  ) %>%
+  mutate(
+    difference = n_missing - n_not_missing
+  )
+
+owid_filtered %>%
+  summarize(
+    n_missing = sum(is.na(excess_mortality_cumulative_per_million)),
+    n_not_missing = sum(!is.na(excess_mortality_cumulative_per_million)),
+    total = n()
+  ) %>%
+  mutate(
+    difference = n_missing - n_not_missing
+  )
+```
+## Load & Partially Filter the EUROCONTROL Flight Data
+
+**Goal**: read the December 2019 and March 2020 flight data, select needed columns, filter by flight type S/N, then save smaller CSVs.
+
+```{r}
+# Load big CSV for December 2019
+flights_2019_12 <- read_csv("data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
+
+# Load big CSV for March 2020
+flights_2020_03 <- read_csv("data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
+
+col_subset <- c(
+  "ECTRL ID",
+  "ADEP",
+  "ADES",
+  "ADEP Latitude",
+  "ADEP Longitude",
+  "ADES Latitude",
+  "ADES Longitude",
+  "ICAO Flight Type",
+  "ACTUAL OFF BLOCK TIME",
+  "ACTUAL ARRIVAL TIME"
+)
+
+# December 2019 flights, select columns, filter flight types
+flights_dec19 <- flights_2019_12 %>%
+  select(all_of(col_subset)) %>%
+  filter(`ICAO Flight Type` %in% c("S", "N"))
+
+# March 2020 flights
+flights_mar20 <- flights_2020_03 %>%
+  select(all_of(col_subset)) %>%
+  filter(`ICAO Flight Type` %in% c("S", "N"))
 ```
 
-## Data Cleaning
+## Load & Prepare Airport Reference (OurAirports)
 
-TODO: 15 April: - combine iso codes for all data sets and check for any missing values! 
+**Goal**: Identify which airports are in Mainland China/HK/Macau vs. which are in Eurocontrol countries (by ISO2 code).
+
+```{r}
+airports <- read_csv("data/raw/OurAirpots/airports.csv")
+spec(airports)
+
+# Mainland China, HK, Macao airports
+china_hk_macao_airports <- airports %>%
+  filter(iso_country %in% c("CN", "HK", "MO"),
+         !is.na(icao_code)) %>%
+  distinct(icao_code)
+
+# Eurocontrol countries (2-letter codes)
+eurocontrol_countries <- c(
+  "BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR",
+  "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI",
+  "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES",
+  "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM",
+  "LT", "ME", "LV", "GE", "EE"
+)
+
+eurocontrol_airports <- airports %>%
+  filter(iso_country %in% eurocontrol_countries,
+         !is.na(icao_code)) %>%
+  distinct(icao_code)
+
+```
+
+## Subset Flight Data to (CN/HK/MO) → (Eurocontrol)
+
+**Goal**: keep only flights from the relevant origins to relevant destinations in each monthly dataset.
+
+```{r}
+flights_dec19_filtered <- flights_dec19 %>%
+  filter(
+    ADEP %in% china_hk_macao_airports$icao_code,
+    ADES %in% eurocontrol_airports$icao_code
+  )
+
+flights_mar20_filtered <- flights_mar20 %>%
+  filter(
+    ADEP %in% china_hk_macao_airports$icao_code,
+    ADES %in% eurocontrol_airports$icao_code
+  )
+```
+
+Now `flights_dec19_filtered` and `flights_mar20_filtered` each contain only the flights you care about.
+
+## Map Destination Airports to Countries & Summarize
+
+**Goal**: For each flight, see which **country** it arrives in. Then group/summarize for flight counts.
+```{r}
+# We'll left_join to airports again, matching ADES to icao_code
+flights_dec19_country <- flights_dec19_filtered %>%
+  left_join(airports, by = c("ADES" = "icao_code")) %>%
+  group_by(iso_country) %>%
+  summarise(
+    total_inbound_flights_dec19 = n()
+  ) %>%
+  ungroup()
+
+flights_mar20_country <- flights_mar20_filtered %>%
+  left_join(airports, by = c("ADES" = "icao_code")) %>%
+  group_by(iso_country) %>%
+  summarise(
+    total_inbound_flights_mar20 = n()
+  ) %>%
+  ungroup()
+```
+
+## Merge December & March Stats + Create Combined Exposure
+
+```{r}
+flight_exposure <- full_join(
+  flights_dec19_country,
+  flights_mar20_country,
+  by = "iso_country"
+) %>%
+  mutate(
+    total_inbound_flights_dec19 = replace_na(total_inbound_flights_dec19, 0),
+    total_inbound_flights_mar20 = replace_na(total_inbound_flights_mar20, 0),
+    total_inbound_flights_combined = total_inbound_flights_dec19 + total_inbound_flights_mar20
+  )
+```
+
+## Create a 2→3 Letter Mapping & Merge with OWID
+We want to join with OWID, which uses `iso_code` in 3 letters. So:
+
 ```{r}
 eurocontrol_iso_map <- tribble(
   ~country_name,                ~iso2, ~iso3,
@@ -67,120 +244,31 @@ eurocontrol_iso_map <- tribble(
   "Georgia",                    "GE",  "GEO",
   "Estonia",                    "EE",  "EST"
 )
+
+# Merge flight_exposure with the iso_map
+flight_exposure_mapped <- flight_exposure %>%
+  left_join(eurocontrol_iso_map, by = c("iso_country" = "iso2"))
+
+# Then merge with OWID
+analysis_df <- flight_exposure_mapped %>%
+  left_join(
+    owid_filtered,
+    by = c("iso3" = "iso_code")
+  )
 ```
 
+Now each row corresponds to **one country** + **one of the 4 date snapshots**. You’ll see columns like:
+
+- `total_inbound_flights_dec19`
+- `total_inbound_flights_mar20`
+- `total_inbound_flights_combined`
+- `excess_mortality_cumulative_per_million`
+- `date` (the snapshot date)
+
+## Check Missing Data or Countries Not Matched
+
 ```{r}
-covid_data %>%
-  summarize(
-    NAs_iso_code = sum(is.na(iso_code)),
-    NAs_location = sum(is.na(location)),
-    NAs_date = sum(is.na(date)),
-    NAs_excess_per_million = sum(is.na(excess_mortality_cumulative_per_million))
-  )
-
-selected_dates <- c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05")
-
-filtered_data <- covid_data %>%
-  filter(date %in% selected_dates)
-
-filtered_data <- filtered_data %>%
-  select(
-    iso_code,
-    location,
-    date,
-    excess_mortality_cumulative_per_million
-  )
-
-nrow(filtered_data)
-
-# Identification
-
-filtered_data %>%
+analysis_df %>%
   filter(is.na(excess_mortality_cumulative_per_million)) %>%
-  distinct(iso_code, location) %>%
-  arrange(location) # !!! quite a few countries have missing values as expected
-print(filtered_data$iso_code)
-```
-
-
-Metadata: https://www.eurocontrol.int/sites/default/files/2023-07/rnd-data-description-2023.pdf
-
-Based out the Excerpt from the Eurocontrol document, .. what I really need is the following:
-
-1. ECTL_ID - ECTL_ID (unique identifier for the flight to ensure uniqueness)
-2. ADEP / ADES - Departure and Arrival airports (ICAO codes) - Match these to reference OurAirports to see if ADEP is CN/HK/MO and ADES is in Eurocontrol
-3. ADEP Latitude / ADEP Longitude / ADES Latitude / ADES Longitude - These are the lat/long of the airports probably overkill but useful for plotting
-4. ICAO Fligth Type - S or N - S for scheduled, N for non-scheduled commercial flights "he data is collected from commercial flights operating in and over Europe. We enrich this data with live data from air navigation service" @https://www.eurocontrol.int/dashboard/rnd-data-archive
-5. Actual Off-Block Time or Actual Arrival Time -  to confirm that the flight occurred in the correct time window (e.g., you might have a big monthly file but want only flights that actually departed in December 2019 or March 2020).
-
-If that is done, save immediately to a CSV file in the data/processed folder. To make it easier to work with less loading.
-
-Load the monthly dataset (e.g., December 2019. Then do the same for March 2020).
-
-Filter:
-
-ICAO Flight Type == "S" or "N".
-
-ADEP ∈ {China/HK/Macao airports} and ADES ∈ {Eurocontrol airports}.
-
-Group by ADES country (or you might group by your 2-letter code after you join with an airport reference).
-
-Summarize the total inbound flights per European country. That’s your “flight exposure.”
-
-Then match that exposure to the excess mortality for each country’s ISO code (3-letter or 2-letter, depending on reference system).
-
-```{r}
-library(readr)
-library(dplyr)
-flights_2019_12 <- read_csv("notebooks/data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
-flights_2020_03 <- read_csv("notebooks/data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
-
-col_subset <- c("ECTRL ID", "ADEP", "ADES", "ADEP Latitude", "ADEP Longitude",
-                "ADES Latitude", "ADES Longitude", "ICAO Flight Type",
-                "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME")
-
-flights_dec19 <- flights_2019_12 %>%
-  select(all_of(col_subset)) %>%
-  filter(`ICAO Flight Type` %in% c("S", "N")) # Scheduled or Non-scheduled
-
-flights_mar20 <- flights_2020_03 %>%
-  select(all_of(col_subset)) %>%
-  filter(`ICAO Flight Type` %in% c("S", "N")) 
-
-```
-
-
-```{r}
-# ICAO Airports builder 
-airports <- read_csv("notebooks/data/raw/OurAirpots/airports.csv")
-spec(airports)
-print(airports$iso_country)
-
-
-china_hk_macao_airports <- airports %>%
-  filter(iso_country %in% c("CN", "HK", "MO"), !is.na(icao_code)) %>%
-  select(icao_code) %>%
-  distinct()
-
-eurocontrol_countries <- c("BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR", 
-                           "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI", 
-                           "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES", 
-                           "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM", 
-                           "LT", "ME", "LV", "GE", "EE")
-
-eurocontrol_airports <- airports %>%
-  filter(iso_country %in% eurocontrol_countries, !is.na(icao_code)) %>%
-  select(icao_code) %>%
-  distinct()
-```
-
-```{r}
-# Filter to only include flights from China/HK/Macao to Eurocontrol airports
-flights_dec19_filtered <- flights_dec19 %>%
-  filter(ADEP %in% china_hk_macao_airports$icao_code,
-         ADES %in% eurocontrol_airports$icao_code)
-
-flights_mar20_filtered <- flights_mar20 %>%
-  filter(ADEP %in% china_hk_macao_airports$icao_code,
-         ADES %in% eurocontrol_airports$icao_code)
+  distinct(iso2, iso3, country_name, date)
 ```

@@ -73,9 +73,7 @@ Several studies investigating the spread of COVID-19 have used crowdsourced ADS-
 
 In the early conceptual phase of this thesis, OpenSky data were considered as a primary source for reconstructing early pandemic mobility patterns. However, preliminary analysis revealed substantial gaps in flight records for direct China-to-Europe connections during December 2019 and the early months of 2020. Many direct flights, particularly those departing from Chinese airports, were either missing or incomplete in the OpenSky dataset. Given these limitations, this thesis instead relied exclusively on verified Eurocontrol operational air traffic data, which provide comprehensive coverage of European airspace and flight operations. OpenSky data were used solely for illustrative purposes and to highlight known coverage deficiencies (see Appendix, Figure X).
 
-Yes, combining them into a single **“Data Sources & Preparation”** section often reads more smoothly. It avoids the “double mention” of data sources in one subheading and the actual filtering in another. For a concise, academic style, you can merge them like this:
 
----
 
 ## Analytical Framework & Correlation Method
 
@@ -104,7 +102,6 @@ This thesis draws on two primary datasets and applies tailored filtering and agg
 
 > *(Note: The choice of 05 May aligns with the WHO’s declaration ending COVID-19 as a Public Health Emergency of International Concern on **5 May 2023** [@who2023end]. Consistency across years was maintained by selecting 05 May in each preceding year.)*
 
-By combining these two datasets, we obtain a comparative measure of **early flight exposure** and **excess mortality** at the **country level**, forming the basis for the subsequent correlation analysis.
 
 ## Results
 
@@ -201,8 +198,6 @@ Correlation analyses repeated separately for December 2019 and March 2020 to exp
 *Table 4.6: Sensitivity analysis results.*
 
 ### Summary of Key Patterns
-
-Here, briefly summarizes the key findings of the results:
 
 - Overview of which month(s) exhibited stronger correlation signals
 - Geographic patterns in exposure and mortality

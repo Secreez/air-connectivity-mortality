@@ -13,6 +13,8 @@ docs/thesis/_freeze/
 
 data/*
 docs/proposal/data/*
+notebooks/data/*
+
 .github/*
 .Rproj.user
 
