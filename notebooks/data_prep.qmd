@@ -8,267 +8,156 @@ editor: source
 
 ```{r}
 library(tidyverse)
-library(tibble)
+library(lubridate)
 ```
 
-## Load & Inspect the OWID COVID-19 Data
+## Load & Prepare Excess Mortality Data (OWID)
 
-**Goal**: Filter to the 4 date snapshots, focus on `excess_mortality_cumulative_per_million`, and see which countries are missing data.
+Based on the OWID + WMD/HMD sources, many countries report mortality weekly or monthly.  
+To create comparable annual snapshots for 2020–2023, we use a ±7-day window around **5 May**, keeping the **closest non-NA value**.
+
+Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 18 conventions.  
+
 ```{r}
-# Load full OWID COVID data
+# Load OWID dataset
 covid_data <- read_csv("data/raw/owid/owid-covid-data.csv")
 
-# Inspect columns
-spec(covid_data)
+# Define target snapshot dates and ±7-day tolerance
+target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
+tolerance <- 7
 
-# 4 date snapshots only
-selected_dates <- c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05")
-
-owid_filtered <- covid_data %>%
-  filter(date %in% selected_dates) %>%
-  select(
-    iso_code,
-    location,
-    date,
-    excess_mortality_cumulative_per_million
+# Build ±7-day windows for each target date
+expanded_dates <- map_dfr(target_dates, function(date) {
+  tibble(
+    target_date = date,
+    date = seq(date - tolerance, date + tolerance, by = "days")
   )
+})
 
-# Quick missingness check
-owid_filtered %>%
-  summarize(
-    n_missing_iso_code = sum(is.na(iso_code)),
-    n_missing_mortality = sum(is.na(excess_mortality_cumulative_per_million))
-  )
-
-# Which countries/dates have missing mortality data?
-owid_filtered %>%
-  filter(is.na(excess_mortality_cumulative_per_million)) %>%
-  distinct(iso_code, location, date) %>%
-  arrange(location)
-
-colnames(owid_filtered)
-
-
+owid_snapshots <- covid_data %>%
+  select(iso_code, location, date, excess_mortality_cumulative_per_million) %>%
+  inner_join(expanded_dates, by = "date") %>%
+  filter(!is.na(excess_mortality_cumulative_per_million)) %>%  # filter out NAs early!
+  mutate(day_diff = abs(as.integer(date - target_date))) %>%
+  group_by(iso_code, location, target_date) %>%
+  slice_min(day_diff, with_ties = FALSE) %>%
+  ungroup()
 ```
 
 ```{r}
-# check excess_mortality_cumulative_per_million how many values are na vs not na differenz
+# Sanity Check
+# Count valid countries per snapshot
+owid_snapshots %>% count(target_date)
 
-covid_data %>%
-  summarize(
-    n_missing = sum(is.na(excess_mortality_cumulative_per_million)),
-    n_not_missing = sum(!is.na(excess_mortality_cumulative_per_million)),
-    total = n()
-  ) %>%
-  mutate(
-    difference = n_missing - n_not_missing
-  )
+# Preview: what got matched, and how close
+owid_snapshots %>%
+  arrange(location, target_date) %>%
+  select(location, target_date, date, day_diff, excess_mortality_cumulative_per_million)
 
-owid_filtered %>%
-  summarize(
-    n_missing = sum(is.na(excess_mortality_cumulative_per_million)),
-    n_not_missing = sum(!is.na(excess_mortality_cumulative_per_million)),
-    total = n()
-  ) %>%
-  mutate(
-    difference = n_missing - n_not_missing
-  )
+# Date range across all selected entries
+owid_snapshots %>%
+  summarise(min_date = min(date), max_date = max(date))
+
 ```
-## Load & Partially Filter the EUROCONTROL Flight Data
 
-**Goal**: read the December 2019 and March 2020 flight data, select needed columns, filter by flight type S/N, then save smaller CSVs.
+## Load & Filter EUROCONTROL Flight Data
 
 ```{r}
-# Load big CSV for December 2019
 flights_2019_12 <- read_csv("data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
-
-# Load big CSV for March 2020
 flights_2020_03 <- read_csv("data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
 
-col_subset <- c(
-  "ECTRL ID",
-  "ADEP",
-  "ADES",
-  "ADEP Latitude",
-  "ADEP Longitude",
-  "ADES Latitude",
-  "ADES Longitude",
-  "ICAO Flight Type",
-  "ACTUAL OFF BLOCK TIME",
-  "ACTUAL ARRIVAL TIME"
-)
+col_subset <- c("ECTRL ID", "ADEP", "ADES", "ADEP Latitude", "ADEP Longitude",
+                "ADES Latitude", "ADES Longitude", "ICAO Flight Type",
+                "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME")
 
-# December 2019 flights, select columns, filter flight types
 flights_dec19 <- flights_2019_12 %>%
   select(all_of(col_subset)) %>%
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
-# March 2020 flights
 flights_mar20 <- flights_2020_03 %>%
   select(all_of(col_subset)) %>%
   filter(`ICAO Flight Type` %in% c("S", "N"))
 ```
 
-## Load & Prepare Airport Reference (OurAirports)
-
-**Goal**: Identify which airports are in Mainland China/HK/Macau vs. which are in Eurocontrol countries (by ISO2 code).
+## Load & Filter Airport Reference Data
 
 ```{r}
 airports <- read_csv("data/raw/OurAirpots/airports.csv")
-spec(airports)
 
-# Mainland China, HK, Macao airports
 china_hk_macao_airports <- airports %>%
-  filter(iso_country %in% c("CN", "HK", "MO"),
-         !is.na(icao_code)) %>%
+  filter(iso_country %in% c("CN", "HK", "MO"), !is.na(icao_code)) %>%
   distinct(icao_code)
 
-# Eurocontrol countries (2-letter codes)
-eurocontrol_countries <- c(
-  "BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR",
-  "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI",
-  "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES",
-  "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM",
-  "LT", "ME", "LV", "GE", "EE"
-)
+eurocontrol_countries <- read_csv("data/eurocontrol_iso_map.csv") %>% pull(iso2)
 
 eurocontrol_airports <- airports %>%
-  filter(iso_country %in% eurocontrol_countries,
-         !is.na(icao_code)) %>%
+  filter(iso_country %in% eurocontrol_countries, !is.na(icao_code)) %>%
   distinct(icao_code)
 
 ```
 
-## Subset Flight Data to (CN/HK/MO) → (Eurocontrol)
-
-**Goal**: keep only flights from the relevant origins to relevant destinations in each monthly dataset.
+## Subset Flight Data to CN/HK/MO → EUROCONTROL Routes
 
 ```{r}
 flights_dec19_filtered <- flights_dec19 %>%
-  filter(
-    ADEP %in% china_hk_macao_airports$icao_code,
-    ADES %in% eurocontrol_airports$icao_code
-  )
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code)
 
 flights_mar20_filtered <- flights_mar20 %>%
-  filter(
-    ADEP %in% china_hk_macao_airports$icao_code,
-    ADES %in% eurocontrol_airports$icao_code
-  )
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code)
+
 ```
 
-Now `flights_dec19_filtered` and `flights_mar20_filtered` each contain only the flights you care about.
+## Summarize Flight Exposure by Country
 
-## Map Destination Airports to Countries & Summarize
-
-**Goal**: For each flight, see which **country** it arrives in. Then group/summarize for flight counts.
 ```{r}
-# We'll left_join to airports again, matching ADES to icao_code
 flights_dec19_country <- flights_dec19_filtered %>%
   left_join(airports, by = c("ADES" = "icao_code")) %>%
   group_by(iso_country) %>%
-  summarise(
-    total_inbound_flights_dec19 = n()
-  ) %>%
+  summarise(total_inbound_flights_dec19 = n()) %>%
   ungroup()
 
 flights_mar20_country <- flights_mar20_filtered %>%
   left_join(airports, by = c("ADES" = "icao_code")) %>%
   group_by(iso_country) %>%
-  summarise(
-    total_inbound_flights_mar20 = n()
-  ) %>%
+  summarise(total_inbound_flights_mar20 = n()) %>%
   ungroup()
-```
 
-## Merge December & March Stats + Create Combined Exposure
-
-```{r}
-flight_exposure <- full_join(
-  flights_dec19_country,
-  flights_mar20_country,
-  by = "iso_country"
-) %>%
+flight_exposure <- full_join(flights_dec19_country, flights_mar20_country, by = "iso_country") %>%
   mutate(
     total_inbound_flights_dec19 = replace_na(total_inbound_flights_dec19, 0),
     total_inbound_flights_mar20 = replace_na(total_inbound_flights_mar20, 0),
     total_inbound_flights_combined = total_inbound_flights_dec19 + total_inbound_flights_mar20
   )
+
 ```
 
-## Create a 2→3 Letter Mapping & Merge with OWID
-We want to join with OWID, which uses `iso_code` in 3 letters. So:
+## Merge Exposure with ISO Mapping & Mortality Data
 
 ```{r}
-eurocontrol_iso_map <- tribble(
-  ~country_name,                ~iso2, ~iso3,
-  "Belgium",                    "BE",  "BEL",
-  "France",                     "FR",  "FRA",
-  "Germany",                    "DE",  "DEU",
-  "Luxembourg",                 "LU",  "LUX",
-  "The Netherlands",            "NL",  "NLD",
-  "United Kingdom",             "GB",  "GBR",
-  "Ireland",                    "IE",  "IRL",
-  "Portugal",                   "PT",  "PRT",
-  "Greece",                     "GR",  "GRC",
-  "Malta",                      "MT",  "MLT",
-  "Türkiye",                    "TR",  "TUR",
-  "Cyprus",                     "CY",  "CYP",
-  "Hungary",                    "HU",  "HUN",
-  "Switzerland",                "CH",  "CHE",
-  "Austria",                    "AT",  "AUT",
-  "Denmark",                    "DK",  "DNK",
-  "Norway",                     "NO",  "NOR",
-  "Slovenia",                   "SI",  "SVN",
-  "Sweden",                     "SE",  "SWE",
-  "Czech Republic",             "CZ",  "CZE",
-  "Italy",                      "IT",  "ITA",
-  "Romania",                    "RO",  "ROU",
-  "Bulgaria",                   "BG",  "BGR",
-  "Croatia",                    "HR",  "HRV",
-  "Monaco",                     "MC",  "MCO",
-  "Slovakia",                   "SK",  "SVK",
-  "Spain",                      "ES",  "ESP",
-  "North Macedonia",            "MK",  "MKD",
-  "Republic of Moldova",        "MD",  "MDA",
-  "Finland",                    "FI",  "FIN",
-  "Albania",                    "AL",  "ALB",
-  "Bosnia and Herzegovina",     "BA",  "BIH",
-  "Poland",                     "PL",  "POL",
-  "Ukraine",                    "UA",  "UKR",
-  "Serbia",                     "RS",  "SRB",
-  "Armenia",                    "AM",  "ARM",
-  "Lithuania",                  "LT",  "LTU",
-  "Montenegro",                 "ME",  "MNE",
-  "Latvia",                     "LV",  "LVA",
-  "Georgia",                    "GE",  "GEO",
-  "Estonia",                    "EE",  "EST"
-)
+eurocontrol_iso_map <- read_csv("data/eurocontrol_iso_map.csv")
 
-# Merge flight_exposure with the iso_map
 flight_exposure_mapped <- flight_exposure %>%
   left_join(eurocontrol_iso_map, by = c("iso_country" = "iso2"))
 
-# Then merge with OWID
 analysis_df <- flight_exposure_mapped %>%
-  left_join(
-    owid_filtered,
-    by = c("iso3" = "iso_code")
-  )
+  left_join(owid_snapshots, by = c("iso3" = "iso_code"))
+
 ```
 
-Now each row corresponds to **one country** + **one of the 4 date snapshots**. You’ll see columns like:
 
-- `total_inbound_flights_dec19`
-- `total_inbound_flights_mar20`
-- `total_inbound_flights_combined`
-- `excess_mortality_cumulative_per_million`
-- `date` (the snapshot date)
-
-## Check Missing Data or Countries Not Matched
+## Sanity Check: Missing Data
 
 ```{r}
 analysis_df %>%
   filter(is.na(excess_mortality_cumulative_per_million)) %>%
   distinct(iso2, iso3, country_name, date)
+
+```
+
+
+## Save the Data
+```{r}
+write_csv(analysis_df, "data/processed/exposure_mortality_2020-23.csv")
 ```
