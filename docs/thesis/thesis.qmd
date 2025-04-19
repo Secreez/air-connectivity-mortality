@@ -102,6 +102,16 @@ This thesis combines a structured **origin–destination flight dataset** with a
 * **Deliverable:**  
   A harmonised country-level flight exposure table saved as `...`.
 
+**Geographic Scope Justification**
+
+Although Eurocontrol lists Israel, Morocco, and Iceland among its member states, these countries were excluded from this analysis due to the following reasons:
+
+- Geographic detachment from mainland Europe, implying differing air corridor dynamics and reduced relevance to continental flight patterns.
+
+- Iceland's accession occurred in 2025, outside the temporal scope of this thesis.
+
+Accordingly, the analysis focuses exclusively on continental Eurocontrol member states with available and relevant flight and mortality data.
+
 #### Excess Mortality Data (OWID → WMD + HMD–STMF) [@karlinsky2021; @owidExcess2024]
 
 * **Indicator used:**  

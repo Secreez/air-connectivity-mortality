@@ -46,19 +46,26 @@ owid_snapshots <- covid_data %>%
 
 ```{r}
 # Sanity Check
-# Count valid countries per snapshot
-owid_snapshots %>% count(target_date)
-
-# Preview: what got matched, and how close
 owid_snapshots %>%
+  count(target_date)
+
+owid_snapshots %>%
+  summarise(
+    min_date = min(date),
+    max_date = max(date)
+  )
+
+owid_snapshots %>%
+  filter(location %in% c("Germany", "France", "Italy")) %>%
   arrange(location, target_date) %>%
   select(location, target_date, date, day_diff, excess_mortality_cumulative_per_million)
 
-# Date range across all selected entries
-owid_snapshots %>%
-  summarise(min_date = min(date), max_date = max(date))
 
 ```
+
+
+
+
 
 ## Load & Filter EUROCONTROL Flight Data
 
@@ -82,7 +89,7 @@ flights_mar20 <- flights_2020_03 %>%
 ## Load & Filter Airport Reference Data
 
 ```{r}
-airports <- read_csv("data/raw/OurAirpots/airports.csv")
+airports <- read_csv("data/raw/OurAirports/airports.csv")
 
 china_hk_macao_airports <- airports %>%
   filter(iso_country %in% c("CN", "HK", "MO"), !is.na(icao_code)) %>%
@@ -147,17 +154,243 @@ analysis_df <- flight_exposure_mapped %>%
 ```
 
 
-## Sanity Check: Missing Data
+## Sanity Checks
 
 ```{r}
-analysis_df %>%
-  filter(is.na(excess_mortality_cumulative_per_million)) %>%
-  distinct(iso2, iso3, country_name, date)
+owid_countries <- owid_snapshots %>%
+  distinct(iso_code) %>%
+  arrange(iso_code)
+
+print(owid_countries)
+```
+
+### Which Countries Appear in Flight Exposure Data?
+
+```{r}
+flight_exposure_countries <- flight_exposure_mapped %>%
+  filter(!is.na(iso3)) %>%
+  distinct(iso3) %>%
+  arrange(iso3)
+
+print(flight_exposure_countries)
 
 ```
 
+### Compare to Expected Eurocontrol Members
 
-## Save the Data
 ```{r}
-write_csv(analysis_df, "data/processed/exposure_mortality_2020-23.csv")
+expected_iso3 <- eurocontrol_iso_map$iso3
+actual_iso3 <- flight_exposure_countries$iso3
+
+setdiff(expected_iso3, actual_iso3)
 ```
+
+These countries are Eurocontrol members but received no direct flights from CN/HK/MO in the filtered data (Dec 2019 / Mar 2020).
+
+### Case Study: Albania (AL)
+
+```{r}
+albanian_airports <- airports %>%
+  filter(iso_country == "AL") %>%
+  pull(icao_code)
+
+# Check how many flights in Dec 2019 and Mar 2020 had ADES in Albania
+flights_to_albania_dec19 <- flights_dec19 %>%
+  filter(ADES %in% albanian_airports)
+
+flights_to_albania_mar20 <- flights_mar20 %>%
+  filter(ADES %in% albanian_airports)
+
+# Print counts
+nrow(flights_to_albania_dec19)
+nrow(flights_to_albania_mar20)
+
+# Were any of these flights FROM CN / HK / MO?
+flights_to_albania_dec19 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code)
+
+flights_to_albania_mar20 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code)
+
+```
+
+- Albania (LATI) received 443 flights in total across the two time windows.
+- However, none of these flights originated from Mainland China, Hong Kong, or Macao.
+- Therefore, Albania is excluded from the final exposure dataset, which only tracks direct CN/HK/MO → EUROCONTROL routes.
+
+### ISO Code Mapping Issue?
+
+```{r}
+flights_dec19_filtered %>%
+  filter(!ADES %in% airports$icao_code) %>%
+  distinct(ADES)
+```
+- No missing ICAO codes in the filtered data.
+
+## China/HK/Macao Origin Airports — Coverage
+
+### Which of CN/HK/MO Airports Were Actually Used?
+
+```{r}
+# Unique ADEP codes used in Dec 2019 & Mar 2020
+used_adeps_dec <- flights_dec19_filtered %>% distinct(ADEP)
+used_adeps_mar <- flights_mar20_filtered %>% distinct(ADEP)
+
+# Combine and count distinct airports used as ADEP
+used_adeps_all <- bind_rows(used_adeps_dec, used_adeps_mar) %>%
+  distinct(ADEP)
+
+# Count how many of the total defined CN/HK/MO airports were actually used
+total_defined_airports <- nrow(china_hk_macao_airports)
+actually_used_airports <- nrow(used_adeps_all)
+
+# How many were never used?
+unused_airports <- setdiff(china_hk_macao_airports$icao_code, used_adeps_all$ADEP)
+num_unused <- length(unused_airports)
+
+# Output
+cat("Defined CN/HK/MO Airports:", total_defined_airports, "\n") # 251
+cat("Actually Used as ADEP:", actually_used_airports, "\n") # 26
+cat("Never Used as ADEP:", num_unused, "\n") # 225
+```
+- Out of 251 registered airports in Mainland China, Hong Kong, and Macao (as listed in the OurAirports dataset):
+
+- 26 airports were actually used as origin (ADEP) for flights to EUROCONTROL destinations in December 2019 or March 2020.
+
+- 225 airports were never used as origin points in this context.
+
+### Macao Check VMMC
+
+```{r}
+airports %>% filter(icao_code == "VMMC")
+
+any(flights_dec19$ADEP == "VMMC")
+any(flights_mar20$ADES == "VMMC")
+```
+- Although Macao International (VMMC) appears as a destination, it was not used as origin in any commercial flights to Eurocontrol countries. Hence, excluded from exposure.
+
+
+## Flight Count by Country & Plot
+
+### Flight Totals by Destination Country
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+used_adep_codes <- bind_rows(flights_dec19_filtered, flights_mar20_filtered) %>%
+  distinct(ADEP)
+
+used_airports_info <- used_adep_codes %>%
+  left_join(airports, by = c("ADEP" = "icao_code")) %>%
+  count(iso_country, sort = TRUE)
+```
+
+```{r}
+# test for Macao
+airports %>% filter(icao_code == "VMMC")
+
+airports %>%
+  filter(str_detect(name, "Macau|Macao")) %>%
+  select(name, icao_code, iso_country)
+any(flights_dec19$ADEP == "VMMC")  # or flights_mar20
+any(flights_mar20$ADES == "VMMC")  # or flights_mar20 -> True! its ADES ..
+
+airports %>% filter(str_detect(name, "Macau|Macao"), !is.na(icao_code))
+
+
+# Although Macao International Airport (VMMC) appears as a destination in the EUROCONTROL data, no commercial flights originating from Macao to EUROCONTROL member states were recorded for December 2019 or March 2020. As a result, Macao does not contribute to the flight exposure metric and is excluded from the final country set.
+
+```
+
+## Which CN HK MO were actually used as ADEP?
+
+```{r}
+flights_dec19 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code) %>%
+  count(ADEP, sort = TRUE)
+
+used_adeps <- flights_dec19_filtered %>% distinct(ADEP)
+setdiff(china_hk_macao_airports$icao_code, used_adeps$ADEP)
+
+flights_mar20 %>%
+  filter(ADEP %in% china_hk_macao_airports$icao_code,
+         ADES %in% eurocontrol_airports$icao_code) %>%
+  count(ADEP, sort = TRUE)
+
+used_adeps <- flights_mar20_filtered %>% distinct(ADEP)
+setdiff(china_hk_macao_airports$icao_code, used_adeps$ADEP)
+
+# Although Macau (VMMC) was included in the airport reference, no outbound flights to EUROCONTROL destinations were recorded in the filtered data. A similar pattern holds for the majority of Mainland Chinese airports — only ~25 were actually used as origins (ADEP), aligning with known hub activity (e.g., PEK, PVG, CAN).
+
+#"While the total number of direct flights from China/HK/Macao to continental EUROCONTROL member states appears limited, this reflects the nature of transcontinental air travel — where indirect routes via Middle Eastern or Eurasian hubs dominate the corridor. This focused dataset enables an uncluttered view of direct exposure, avoiding confounding rerouting factors...."
+
+```
+```{r}
+
+plot_data <- flight_exposure_mapped %>%
+  select(country_name, total_inbound_flights_dec19, total_inbound_flights_mar20) %>%
+  pivot_longer(
+    cols = starts_with("total_inbound_flights"),
+    names_to = "month",
+    values_to = "flights"
+  ) %>%
+  mutate(
+    month = recode(month,
+                   "total_inbound_flights_dec19" = "Dec 2019",
+                   "total_inbound_flights_mar20" = "Mar 2020")
+  )
+
+# Plot
+ggplot(plot_data, aes(x = reorder(country_name, flights), y = flights, fill = month)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Inbound Flights from CN/HK/MO -> EUROCONTROL",
+    subtitle = "December 2019 vs March 2020 (Eurocontrol Data)",
+    x = "Destination Country",
+    y = "Number of Inbound Flights",
+    fill = "Month"
+  ) +
+  theme_minimal(base_size = 13)
+
+```
+```{r}
+# How many flights ended in Türkiye?
+eurocontrol_iso_map %>% filter(country_name == "Türkiye")
+# Should be "TR"
+
+flights_dec19_filtered %>% 
+  left_join(airports, by = c("ADES" = "icao_code")) %>%
+  filter(iso_country == "TR") %>%
+  count(ADES, sort = TRUE)
+
+flights_mar20_filtered %>% 
+  left_join(airports, by = c("ADES" = "icao_code")) %>%
+  filter(iso_country == "TR") %>%
+  count(ADES, sort = TRUE)
+
+```
+Interesting:
+
+- Despite Türkiye’s size and centrality, especially for Europeans. China–Türkiye direct air traffic was low in Dec 2019 / Mar 2020 — at least in commercial passenger flights classified as “S” or “N” in Eurocontrol records.
+
+Inbound flights from China to Türkiye were primarily directed to Istanbul Airport (LTFM).
+- A significant decline from 159 flights in December 2019 to 15 in March 2020 reflects the early pandemic disruptions.
+- The presence of LTBA (Atatürk Airport) in late 2019 likely reflects its decommissioning transition to LTFM.
+- One anomalous flight to LTCG (Giresun) may reflect a non-typical charter or redirection.
+
+
