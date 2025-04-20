@@ -269,7 +269,11 @@ This thesis deliberately applies an exploratory, correlation-based approach to i
 
 - **Country-level aggregation:** National-level analysis may obscure subnational differences in both exposure and vulnerability.
 
-- **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric.
+- **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric. 
+
+- **Eurocontrol data limitations:** The dataset also tracks ADEP and ADES that get communicated but not Shanghai -> Dubai -> Vienna. Which whould therefore count as Dubai -> Vienna. This could lead to undercounting of flights.
+
+> While airports like Dubai or Doha were important global transfer points in February, this thesis focuses on **direct seeding from China** and **intra-European flows**. Modeling later pandemic phases or full global mobility networks exceeds the practical scope of this project.
 
 - **Mortality data quality:** Excess mortality estimates vary in completeness across countries due to differences in death registration systems. (https://www.nature.com/articles/s41586-022-05522-2)
 
