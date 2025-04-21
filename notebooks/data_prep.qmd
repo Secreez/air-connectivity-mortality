@@ -9,6 +9,9 @@ editor: source
 ```{r}
 library(tidyverse)
 library(lubridate)
+library(broom)
+library(purrr)
+library(ggrepel)
 ```
 
 ## Load & Prepare Excess Mortality Data (OWID)
@@ -524,32 +527,39 @@ correlation_df <- analysis_df %>%
 ```
 
 ## Compute Spearman Rank Correlation
+
 ```{r}
 spearman_by_month <- function(colname) {
   correlation_df %>%
     group_by(target_date) %>%
     summarise(
-      var = colname,
-      rho = cor(.data[[colname]], excess_mortality_cumulative_per_million, method = "spearman"),
+      test = list(cor.test(.data[[colname]], excess_mortality_cumulative_per_million, method = "spearman", exact = FALSE)),
+      n = sum(!is.na(.data[[colname]]) & !is.na(excess_mortality_cumulative_per_million)),
       .groups = "drop"
-    )
+    ) %>%
+    mutate(
+      var = colname,
+      tidy_result = map(test, broom::tidy)
+    ) %>%
+    unnest(tidy_result) %>%  # flatten results
+    select(target_date, var, n, estimate, p.value) %>%
+    rename(rho = estimate)
 }
 
-bind_rows(
-  spearman_by_month("total_inbound_flights_dec19"),
-  spearman_by_month("total_inbound_flights_mar20"),
-  spearman_by_month("total_inbound_flights_combined")
-)
-
+# Run and label
 spearman_results_total <- bind_rows(
   spearman_by_month("total_inbound_flights_dec19"),
   spearman_by_month("total_inbound_flights_mar20"),
   spearman_by_month("total_inbound_flights_combined")
 ) %>%
-  mutate(var = recode(var,
-                      "total_inbound_flights_dec19" = "Dec 2019",
-                      "total_inbound_flights_mar20" = "Mar 2020",
-                      "total_inbound_flights_combined" = "Combined"))
+  mutate(
+    var = recode(var,
+                 "total_inbound_flights_dec19" = "Dec 2019",
+                 "total_inbound_flights_mar20" = "Mar 2020",
+                 "total_inbound_flights_combined" = "Combined"),
+    year = lubridate::year(target_date)
+  ) %>%
+  relocate(year)
 
 ```
 
@@ -569,13 +579,16 @@ ggplot(spearman_results_total, aes(x = target_date, y = rho, color = var)) +
     color = "Flight Window"
   ) +
   theme_minimal(base_size = 13)
+
+spearman_results_total <- spearman_results_total %>%
+  mutate(year = year(target_date)) %>%
+  relocate(year)
+
 ```
 
 ## Scatterplot of Correlation Results
 
 ```{r}
-library(ggrepel)
-
 correlation_df %>%
   filter(target_date == as.Date("2020-05-05")) %>%
   ggplot(aes(x = total_inbound_flights_combined, y = excess_mortality_cumulative_per_million)) +
@@ -583,13 +596,86 @@ correlation_df %>%
   geom_text_repel(aes(label = iso3), max.overlaps = 20, size = 3) +
   labs(
     title = "Flight Exposure vs. Excess Mortality",
-    subtitle = "Combined Dec 2019 & Mar 2020 Flights | 5 May 2020",
+    subtitle = "Combined Dec 2019 & Mar 2020 Flights | Snapshot: 5 May ±7 days",
     x = "Total Inbound Flights from CN/HK/MO",
     y = "Excess Mortality (per Million)",
     caption = "No regression line shown due to non-causal, rank-based comparison"
   ) +
   theme_minimal(base_size = 13)
 ```
-....
+.. The scatterplot reveals a partial alignment between early flight exposure and excess mortality, especially for countries such as Spain, Italy, and the UK as expected. However, the relationship is not strictly monotonic, as exemplified by Germany, which despite having the highest flight exposure, exhibited comparatively low early excess mortality. These divergences suggest that factors beyond international flight volume — such as healthcare capacity, testing infrastructure, and early containment measures — likely played a pivotal role in shaping early pandemic outcomes.
 
+```{r}
+# Filter for only combined flights
+plot_df <- correlation_df %>%
+  filter(!is.na(excess_mortality_cumulative_per_million),
+         !is.na(total_inbound_flights_combined)) %>%
+  mutate(label = iso3)
+
+# Create facetted scatterplot for each reference date
+ggplot(plot_df, aes(x = total_inbound_flights_combined, 
+                    y = excess_mortality_cumulative_per_million)) +
+  geom_point() +
+  geom_text(aes(label = label), hjust = 1.1, vjust = 0.5, size = 3) +
+  facet_wrap(~ target_date, scales = "free") +
+  labs(
+    title = "Flight Exposure vs. Excess Mortality (per Million)",
+    subtitle = "Combined Dec 2019 & Mar 2020 Flights | Snapshot: 5 May ±7 days",
+    x = "Total Inbound Flights from CN/HK/MO",
+    y = "Excess Mortality (per Million)",
+    caption = "No regression line shown due to non-causal, rank-based comparison."
+  )
+  theme_minimal(base_size = 12)
+```
+
+## Sum Table
+
+```{r}
+# Extract year and prepare relevant columns
+wide_df <- correlation_df %>%
+  filter(!is.na(excess_mortality_cumulative_per_million),
+         !is.na(total_inbound_flights_combined)) %>%
+  mutate(year = year(target_date)) %>%
+  select(
+    Country = country_name,
+    ISO3 = iso3,
+    year,
+    Total_Flights = total_inbound_flights_combined,
+    Excess_Mortality = excess_mortality_cumulative_per_million
+  )
+
+# Pivot to wide format
+wide_table <- wide_df %>%
+  pivot_wider(
+    names_from = year,
+    values_from = c(Total_Flights, Excess_Mortality),
+    names_glue = "{.value}_{year}"
+  ) %>%
+  arrange(Country)
+
+# View table
+print(wide_table, n = 100)
+
+```
+
+```{r}
+write_csv(wide_table, "data/processed/summary_country_table.csv")
+write_csv(spearman_results_total, "data/processed/correlation_spearman_total.csv")
+```
+
+# Visualizations - Chapter 4 Descirptive Patterns 
+
+TODO
+- Choropleth
+- Top 10 inbound countries barplot
+- Sankey
+- Density of exposure
+
+## Choropleth Map: Active Countries
+TODO:
+- Shading EUROCONTROL countries based on total inbound flights (Dec + Mar)
+- Highlighting countries with 0 flights
+- Maybe grey-out Ukraine / annotate excluded countries
+
+## Sankey Diagram 
 
