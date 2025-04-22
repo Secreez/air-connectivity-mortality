@@ -1,15 +1,17 @@
 project:
   type: manuscript
 
-execute:
-  freeze: auto
 
 format:
   html:
     toc: true
-    theme: slate
+    theme: spacelab
     comments:
       hypothesis: true
 
 manuscript:
   article: proposal.qmd
+  # resources: 
+  #- ..
+
+bibliography: proposal_ref.bib

@@ -1,15 +1,26 @@
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-
-/.quarto/
-/_manuscript
-
-_freeze/
-docs/proposal/_freeze/
-docs/thesis/_freeze/
-/trackchanges.sty
-
+# Temporary / IDE / System Files
+.Rproj.user/
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+trackchanges.sty
 /.luarc.json
 
-data/*
-.github/*
+# Quarto & Freeze Output
+**/.quarto/
+_freeze/
+docs/**/_freeze/
+
+
+# GitHub & Project Metadata
+.github/
+.Rhistory
+.RData
+
+# All Raw Data (sensitive or large)
+data/raw/
+notebooks/data/
+docs/proposal/data/
+docs/thesis/data/
+
+# Processed Data Derived from Raw (e.g. EUROCONTROL or OWID)
+data/processed/

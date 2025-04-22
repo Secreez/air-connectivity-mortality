@@ -1,5 +1,0 @@
-# Report for Global Mobility Network (GMN) Data for COVID-19 Analysis - Key Limitations, Literature Insights, and Recommendations
-
-## Coverage Gaps in Open Aviation Data
-
-Crowdsourced aviation datasets (e.g., OpenSky Network, ADS-B Exchange) are heavily dependent on ADS-B technology. They exhibit substantial geographic biases, offering good coverage in North America and Europe but sparse or no coverage in critical regions like China, Africa, and parts of Asia. In 2019, these open datasets captured only about 45% of global flights, missing data due to limited ground receivers, regulatory restrictions (particularly in China), and aircraft lacking ADS-B technology, especially older fleets in Africa (Strohmeier et al., 2021; Iacus et al., 2020).

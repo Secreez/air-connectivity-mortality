@@ -1,51 +1,174 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="generator" content="quarto-1.5.54">
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="author" content="Maximilian Elixhauser">
+    <meta name="dcterms.date" content="2025-03-27">
+    <meta name="keywords" content="Mobility Modeling, Network Epidemiology, Spatiotemporal Spread, Excess Mortality, SIR Model">
 
-<meta name="author" content="Maximilian Elixhauser">
-<meta name="dcterms.date" content="2025-03-27">
-<meta name="keywords" content="Mobility Modeling, Network Epidemiology, Spatiotemporal Spread, Excess Mortality, SIR Model">
+    <title>Proposal: Early Seeding of COVID-19 via Air Travel: A Europe-Centric Network Model and Exploratory Correlation with Excess Mortality</title>
+    <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      ul.task-list{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+        vertical-align: middle;
+      }
+      /* CSS for syntax highlighting */
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+        }
+      pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      /* CSS for citations */
+      div.csl-bib-body { }
+      div.csl-entry {
+        clear: both;
+        margin-bottom: 0em;
+      }
+      .hanging-indent div.csl-entry {
+        margin-left:2em;
+        text-indent:-2em;
+      }
+      div.csl-left-margin {
+        min-width:2em;
+        float:left;
+      }
+      div.csl-right-inline {
+        margin-left:2em;
+        padding-left:1em;
+      }
+      div.csl-indent {
+        margin-left: 2em;
+      }    </style>
 
-<title>Proposal: Early Seeding of COVID-19 via Air Travel: A Europe-Centric Network Model and Exploratory Correlation with Excess Mortality</title>
-<style>
-code{white-space: pre-wrap;}
-span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
-}
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+    <style>
+      body.hypothesis-enabled #quarto-embed-header {
+        padding-right: 36px;
+      }
 
+      #quarto-embed-header {
+        height: 3em;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: solid 1px;
+      }
 
+      #quarto-embed-header h6 {
+        font-size: 1.1em;
+        padding-top: 0.6em;
+        margin-left: 1em;
+        margin-right: 1em;
+        font-weight: 400;
+      }
+
+      #quarto-embed-header a.quarto-back-link,
+      #quarto-embed-header a.quarto-download-embed {
+        font-size: 0.8em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 1em;
+        margin-right: 1em;
+      }
+
+      .quarto-back-container {
+        padding-left: 0.5em;
+        display: flex;
+      }
+
+      .headroom {
+          will-change: transform;
+          transition: transform 200ms linear;
+      }
+
+      .headroom--pinned {
+          transform: translateY(0%);
+      }
+
+      .headroom--unpinned {
+          transform: translateY(-100%);
+      }      
+    </style>
+
+    <script>
+    window.document.addEventListener("DOMContentLoaded", function () {
+
+      var header = window.document.querySelector("#quarto-embed-header");
+      const titleBannerEl = window.document.querySelector("body > #title-block-header");
+      if (titleBannerEl) {
+        titleBannerEl.style.paddingTop = header.clientHeight + "px";
+      }
+      const contentEl = window.document.getElementById('quarto-content');
+      for (const child of contentEl.children) {
+        child.style.paddingTop = header.clientHeight + "px";
+        child.style.marginTop = "1em";
+      }
+
+      // Use the article root if the `back` call doesn't work. This isn't perfect
+      // but should typically work
+      window.quartoBackToArticle = () => {
+        var currentUrl = window.location.href;
+        window.history.back();
+        setTimeout(() => {
+            // if location was not changed in 100 ms, then there is no history back
+            if(currentUrl === window.location.href){              
+                // redirect to site root
+                window.location.href = "index.html";
+            }
+        }, 100);
+      }
+
+      const headroom = new window.Headroom(header, {
+        tolerance: 5,
+        onPin: function () {
+        },
+        onUnpin: function () {
+        },
+      });
+      headroom.init();
+    });
+    </script>
+
+    
+<script src="site_libs/manuscript-notebook/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -59,15 +182,13 @@ div.csl-indent {
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
-<script async="" src="https://hypothes.is/embed.js"></script>
+     <script async="" src="https://hypothes.is/embed.js"></script>
 <script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
     document.body.classList.add('hypothesis-enabled');
   });
-</script>
-
-
-<meta name="citation_title" content="Proposal: Early Seeding of COVID-19 via Air Travel: A Europe-Centric Network Model and Exploratory Correlation with Excess Mortality">
+</script>  
+      <meta name="citation_title" content="Proposal: Early Seeding of COVID-19 via Air Travel: A Europe-Centric Network Model and Exploratory Correlation with Excess Mortality">
 <meta name="citation_keywords" content="Mobility Modeling,Network Epidemiology,Spatiotemporal Spread,Excess Mortality,SIR Model">
 <meta name="citation_author" content="Maximilian Elixhauser">
 <meta name="citation_publication_date" content="2025-03-27">
@@ -110,9 +231,16 @@ div.csl-indent {
 <meta name="citation_reference" content="citation_title=Tracking covid-19 excess deaths across countries;,citation_author=The Economist;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://www.economist.com/graphic-detail/coronavirus-excess-deaths-tracker;,citation_publisher=Online article;">
 </head>
 
-<body>
+  <body class="quarto-notebook">
+    <div id="quarto-embed-header" class="headroom fixed-top bg-primary">
+      
+      <a onclick="window.quartoBackToArticle(); return false;" class="btn btn-primary quarto-back-link" href=""><i class="bi bi-caret-left"></i> Back to Article</a>
+      <h6><i class="bi bi-journal-code"></i> Article Notebook</h6>
 
-<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+            <a href="./proposal.qmd" class="btn btn-primary quarto-download-embed" download="proposal.qmd">Download Source</a>
+          </div>
+
+     <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Proposal: Early Seeding of COVID-19 via Air Travel: A Europe-Centric Network Model and Exploratory Correlation with Excess Mortality</h1>
@@ -206,18 +334,13 @@ div.csl-indent {
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">7</span> References</a></li>
   </ul>
-<div class="quarto-alternate-notebooks"><h2>Notebooks</h2><ul><li><a href="proposal-preview.html"><i class="bi bi-journal-code"></i>Article Notebook</a></li></ul></div></nav>
+</nav>
 </div>
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
 </div>
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">      
 
-
-
-  
-
-
-<section id="introduction" class="level2" data-number="1">
+       <section id="introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
 <p>In January 2020, a single infected traveler on a long-haul flight could spark an outbreak thousands of kilometers away—turning global aviation into a high-speed conveyor belt for COVID-19. Early analyses demonstrated that aviation can drastically reduce effective distances between cities, accelerating worldwide transmission <span class="citation" data-cites="chinazzi2020 sun2022_a">(<a href="#ref-chinazzi2020" role="doc-biblioref">Chinazzi et al. 2020</a>; <a href="#ref-sun2022_a" role="doc-biblioref">Sun, Wandelt, and Zhang 2022a</a>)</span>. At the same time, countries exhibited substantial variation in excess mortality, often shaped by demographic factors (e.g., population age, life expectancy) and economic variables (e.g., GDP, healthcare capacity). For example, <span class="citation" data-cites="rahmanian2024">Rahmanian Haghighi et al. (<a href="#ref-rahmanian2024" role="doc-biblioref">2024</a>)</span> clustered 21 countries based on excess mortality trajectories and identified government effectiveness, vaccination coverage, and population age structure as key determinants of pandemic-related death rates. Similarly, <span class="citation" data-cites="matveeva2023">Matveeva and Shabalina (<a href="#ref-matveeva2023" role="doc-biblioref">2023</a>)</span> observed that among European countries, lower GDP per capita and slower vaccination rates were associated with higher excess mortality—highlighting the compounding effect of economic capacity and healthcare infrastructure in reducing COVID-19–related deaths.</p>
 <p>A less investigated aspect, however, is <strong>epidemic arrival time</strong>: Did countries “hit first” by the virus—when non-pharmaceutical interventions (NPI) were still immature—face worse overall mortality outcomes? This project aims to explore how early seeding of COVID-19 might have compounded the effects of the aforementioned demographic and economic predictors, ultimately shaping the global variability in excess mortality.</p>
@@ -250,7 +373,94 @@ div.csl-indent {
 <section id="february-2020-flight-data" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="february-2020-flight-data"><span class="header-section-number">2.1</span> February 2020 Flight Data</h3>
 <p>During February 2020, the raw OpenSky dataset contained <strong>2,648,835 flight records</strong> (<a href="#fig-plot1" class="quarto-xref">Figure&nbsp;2</a>, top panel). After discarding incomplete entries—flights lacking either an origin or a destination—<strong>1,617,962 records</strong> remained, reflecting a data reduction of <strong>38.92%</strong> (<a href="#fig-plot1" class="quarto-xref">Figure&nbsp;2</a>, bottom panel). Among these cleaned entries, <strong>674 flights</strong> originated in <strong>Mainland China, Hong Kong, or Macau</strong> and terminated within the <a href="https://www.eurocontrol.int/our-member-and-comprehensive-agreement-states">Eurocontrol zone’s member states</a> (excluding Iceland, which joined in 2025). This modest number illustrates the <strong>limited direct connectivity</strong> captured by OpenSky during this critical month. While likely an <strong>underestimate</strong> of actual passenger flows due to regional coverage gaps, this subset nonetheless provides a valuable <strong>baseline</strong> for modeling early epidemic arrival into Europe.</p>
-<div id="cell-fig-result_feb_table" class="cell">
+<div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.0.4     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'patchwork' was built under R version 4.4.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/opensky/opensky_2020_02.csv.gz"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 2648835 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (7): callsign, number, icao24, registration, typecode, origin, destination
+dbl  (6): latitude_1, longitude_1, altitude_1, latitude_2, longitude_2, alti...
+dttm (3): firstseen, lastseen, day
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>airports <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/airports.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 82729 Columns: 19
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (15): ident, type, name, continent, iso_country, iso_region, municipalit...
+dbl  (4): id, latitude_deg, longitude_deg, elevation_ft
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>eurocontrol_countries <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"BE"</span>, <span class="st">"FR"</span>, <span class="st">"DE"</span>, <span class="st">"LU"</span>, <span class="st">"NL"</span>, <span class="st">"GB"</span>, <span class="st">"IE"</span>, <span class="st">"PT"</span>, <span class="st">"GR"</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"MT"</span>, <span class="st">"TR"</span>, <span class="st">"CY"</span>, <span class="st">"HU"</span>, <span class="st">"CH"</span>, <span class="st">"AT"</span>, <span class="st">"DK"</span>, <span class="st">"NO"</span>, <span class="st">"SI"</span>, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"SE"</span>, <span class="st">"CZ"</span>, <span class="st">"IT"</span>, <span class="st">"RO"</span>, <span class="st">"BG"</span>, <span class="st">"HR"</span>, <span class="st">"MC"</span>, <span class="st">"SK"</span>, <span class="st">"ES"</span>, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"MK"</span>, <span class="st">"MD"</span>, <span class="st">"FI"</span>, <span class="st">"AL"</span>, <span class="st">"BA"</span>, <span class="st">"PL"</span>, <span class="st">"UA"</span>, <span class="st">"RS"</span>, <span class="st">"AM"</span>, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"LT"</span>, <span class="st">"ME"</span>, <span class="st">"LV"</span>, <span class="st">"GE"</span>, <span class="st">"EE"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract ICAO codes for China, HK, MO</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>china_airports <span class="ot">&lt;-</span> airports <span class="sc">%&gt;%</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(iso_country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"CN"</span>, <span class="st">"HK"</span>, <span class="st">"MO"</span>), <span class="sc">!</span><span class="fu">is.na</span>(icao_code)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(icao_code)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>europe_airports <span class="ot">&lt;-</span> airports <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(iso_country <span class="sc">%in%</span> eurocontrol_countries, <span class="sc">!</span><span class="fu">is.na</span>(icao_code)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(icao_code)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>df_cleaned <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(origin), <span class="sc">!</span><span class="fu">is.na</span>(destination))</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>total_flights <span class="ot">&lt;-</span> <span class="fu">nrow</span>(df)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>cleaned_flights <span class="ot">&lt;-</span> <span class="fu">nrow</span>(df_cleaned)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>removed_pct <span class="ot">&lt;-</span> <span class="fu">round</span>((<span class="dv">1</span> <span class="sc">-</span> cleaned_flights <span class="sc">/</span> total_flights) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">2</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize flights from China -&gt; Europe</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>china_to_europe_flights <span class="ot">&lt;-</span> df_cleaned <span class="sc">%&gt;%</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(origin <span class="sc">%in%</span> china_airports, destination <span class="sc">%in%</span> europe_airports) <span class="sc">%&gt;%</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>raw_counts <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">count</span>(day)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>cleaned_counts <span class="ot">&lt;-</span> df_cleaned <span class="sc">%&gt;%</span> <span class="fu">count</span>(day)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="cell-fig-result_feb_table" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>summary_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Total flights (raw)"</span>, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Total flights (cleaned)"</span>, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Percentage removed"</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"China → Eurocontrol flights"</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="fu">c</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    total_flights, </span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    cleaned_flights, </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(removed_pct, <span class="st">"%"</span>), </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    china_to_europe_flights</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_data, <span class="at">caption =</span> <span class="st">"Summary of flight data for February 2020."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="fig-result_feb_table" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-result_feb_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -286,12 +496,21 @@ Figure&nbsp;1: Summary of flight data for February 2020.
 </figcaption>
 </figure>
 </div>
-<a class="quarto-notebook-link" id="nblink-1" href="proposal-preview.html#cell-fig-result_feb_table">Source: Article Notebook</a></div>
-<div id="cell-fig-plot1" class="cell">
+</div></div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [3]:</pre></div><div id="cell-fig-plot1" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>p_raw <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(raw_counts, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Daily Flight Counts (Raw Data)"</span>, <span class="at">x =</span> <span class="st">"Date"</span>, <span class="at">y =</span> <span class="st">"Flights"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>p_cleaned <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cleaned_counts, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Daily Flight Counts (Cleaned Data)"</span>, <span class="at">x =</span> <span class="st">"Date"</span>, <span class="at">y =</span> <span class="st">"Flights"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p_raw <span class="sc">/</span> p_cleaned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-plot1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-plot1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="fig-plot1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="">
 <a href="proposal_files/figure-html/fig-plot1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2: Daily flight counts in February 2020 before (top) and after (bottom) data cleaning. The raw dataset (red line) included flights with missing origins or destinations, while the cleaned dataset (blue line) excludes incomplete entries."><img src="proposal_files/figure-html/fig-plot1-1.png" class="img-fluid figure-img" width="672"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -300,7 +519,7 @@ Figure&nbsp;2: Daily flight counts in February 2020 before (top) and after (bott
 </figure>
 </div>
 </div>
-</div>
+</div></div>
 <p>Given these challenges, a pragmatic adjustment to the original modeling framework is necessary. To overcome these limitations, I propose integrating <strong>multiple complementary data sources</strong>. Specifically, the <strong>OpenSky</strong> dataset from February 2020—despite its limited volume—will serve as a <strong>baseline</strong> for the early epidemic arrival phase. <strong>Eurocontrol</strong> data (starting March 2020), offering comprehensive European flight records, will help validate February’s flight numbers and fill key gaps. For months lacking explicit records, <strong>linear interpolation</strong> and <strong>seasonal normalization</strong> methods may be employed, ensuring continuity in flight data for the initial seeding period. Recognizing early travel restrictions in China (e.g., Wuhan’s lockdown—see <a href="#wavetime">here</a>) further highlights the importance of including multiple major Chinese airports, rather than focusing on Wuhan alone.</p>
 </section>
 <section id="crowdsourced-ads-b-strengths-and-weaknesses" class="level3" data-number="2.2">
@@ -686,10 +905,8 @@ Zhu, Zhenran, Anming Zhang, and Yahua Zhang. 2019. <span>“Measuring Multi-Moda
 </div>
 </div>
 </section>
-
-</main>
-<!-- /main column -->
-<script id="quarto-html-after-body" type="application/javascript">
+     </main>
+<!-- /main column -->  <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -1108,9 +1325,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-</div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","openEffect":"zoom","closeEffect":"zoom","selector":".lightbox","loop":false});
+</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","loop":false,"openEffect":"zoom","descPosition":"bottom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {
@@ -1141,9 +1356,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   };
   
 })();
-          </script>
-
-
-
-
+          </script> 
+  
 </body></html>
