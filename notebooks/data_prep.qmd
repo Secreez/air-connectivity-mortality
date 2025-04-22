@@ -70,8 +70,12 @@ owid_snapshots %>%
 
 ```
 
+To enable a consistent cross-country comparison of cumulative excess mortality per million for the years 2020 to 2023, we defined 5 May as a fixed annual reference date. This date was chosen due to its symbolic significance in many countries as the period around which COVID-19 emergency measures were lifted or reevaluated, and it coincides with ISO Week 18, a recurring reporting point for many datasets.
 
+Since not all countries report mortality data exactly on 5 May, and reporting frequency varies (weekly, biweekly, monthly), we applied a ±7-day window around each year's reference date.
+For each country and year, the closest available non-missing value within this window was selected. This ensures temporal consistency while respecting national reporting lags.
 
+The absolute difference in days between the selected date and the reference date (day_diff) was recorded to assess potential deviations in timing and reporting alignment. Most matches were within a range of ±2–3 days, typically falling on dates such as 30 April, 3 May, or 7 May, which aligns well with reporting conventions across the EUROCONTROL zone.
 
 
 ## Load & Filter EUROCONTROL Flight Data
