@@ -114,37 +114,35 @@ Accordingly, the analysis focuses exclusively on continental Eurocontrol member 
 
 #### Excess Mortality Data (OWID → WMD + HMD–STMF) [@karlinsky2021; @owidExcess2024]
 
-* **Indicator used:**  
-`excess_mortality_cumulative_per_million` — cumulative all-cause excess deaths per 1 million inhabitants since **1 January 2020**, benchmarked against a counterfactual baseline derived from modeled 2015–2019 trends.
+*Indicator used.* `excess_mortality_cumulative_per_million` — the cumulative
+difference between reported all-cause deaths and an **expected baseline**
+modelled as a linear extrapolation of 2015-2019 weekly trends.
 
-* **Harmonisation:**  
-Mortality records are harmonised by **ISO‑3 country code** to align with flight exposure data. Country populations from the same OWID release are retained for optional normalisation.
+*Why per million?*  
+1. Enables cross-country comparison regardless of population size.  
+2. Aligns with the flights-per-million robustness metric.
 
-* **Reference dates & ISO calendar alignment:**  
-To enable year-over-year comparability, excess mortality is extracted for the following annual snapshots:
+> **Data caveats.** Excess-mortality estimates inherit reporting delays and may
+> capture non-COVID events (heatwaves, war). Ukraine is therefore excluded after
+> 2021; country-specific caveats are listed in HMD STMF Metadata §3.
 
-- **5 May 2020**
-- **5 May 2021**
-- **5 May 2022**
-- **5 May 2023**
+* **Harmonisation:** Mortality records are matched by **ISO-3** code to the flight-exposure table.  
+  OWID population figures are retained for optional normalisation.
 
-However, because many countries report deaths on a **weekly or monthly basis**, an exact match for 5 May is often unavailable. Most weekly series follow the **ISO 8601 calendar**, where weeks end on **Sundays**, and **Week 18** typically includes 5 May. This variability is detailed in the [OWID Excess Mortality repository](https://github.com/owid/covid-19-data/tree/master/public/data/excess_mortality), which sources data from the **Human Mortality Database (HMD STMF)** and the **World Mortality Dataset (WMD)**.
+* **Reference dates & ISO calendar alignment:** Snapshots closest to **5 May**  
+  (± 7 days) in **2020 – 2023**. Most weekly series follow ISO week 18, which
+  typically includes 5 May.
 
-* **Implementation:**  
-The dataset is filtered to include only the **closest available reporting date within ±7 days** of 5 May in each year. This approach accommodates countries with weekly reporting cycles and ensures cross-national consistency. If multiple records fall within the window, the **closest non-missing value** is retained. All selection decisions are reproducibly logged in the `data_prep.R` script.
+* **Implementation:** Within each ± 7-day window the **closest non-missing value**
+  is selected; choices are logged in `data_prep.R`.
 
-* **Justification for using 5 May / ±7-day window:**  
-- Aligns each year’s snapshot with **comparable seasonal context**, avoiding biases from winter flu or summer dips [Source if i want that in the thesis].  
-- Ensures coverage even for countries with **monthly or delayed weekly reporting**.  
-- The final point (5 May 2023) aligns with the **WHO’s formal end** of the COVID‑19 Public Health Emergency of International Concern [@who2023end].
+* **Justification for using 5 May:**  
+  – Comparable seasonal context (avoids winter-flu spikes).  
+  – Ensures coverage for countries with monthly or delayed weekly reporting.  
+  – Aligns 2023 snapshot with the **WHO** declaration ending the PHEIC [@who2023end].
 
-#### Output Table for Analysis
+*A full robustness check using weekly P-scores and flights-per-million ...
 
-The final merged dataset `...` includes the following variables for each EUROCONTROL country:
-
-...
-
-This table serves as the analytical input for the correlation analysis described in Chapter X.
 
 ## Results
 

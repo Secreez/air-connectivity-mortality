@@ -1,26 +1,26 @@
-# Temporary / IDE / System Files
+# System / IDE miscellany
 .Rproj.user/
+.Rhistory
+.RData
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 trackchanges.sty
 /.luarc.json
 
-# Quarto & Freeze Output
+# Quarto build artefacts
 **/.quarto/
 _freeze/
 docs/**/_freeze/
 
-
-# GitHub & Project Metadata
+# GitHub config (not required for analysis)
 .github/
-.Rhistory
-.RData
 
-# All Raw Data (sensitive or large)
+# Data 
+# 1) Raw source files (large / licensed)
 data/raw/
-notebooks/data/
-docs/proposal/data/
-docs/thesis/data/
 
-# Processed Data Derived from Raw (e.g. EUROCONTROL or OWID)
+# 2) Processed derivatives (can be rebuilt)
 data/processed/
+
+# 3) Legacy proposal data (archived, unused)
+archive/proposal/data/
