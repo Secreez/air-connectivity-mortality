@@ -43,7 +43,24 @@ Scripts **01-03** build the data; notebooks **04-05** make the figures and corre
 
 ## Quick start
 
-...
+```bash
+#!/usr/bin/env bash
+set -euo pipefail # abort on any error
+
+# clone and cd …
+
+# DATA BUILD
+Rscript notebooks/01_excess_snapshots.R
+Rscript notebooks/02_flight_filter.R
+Rscript notebooks/03_merge_exposure.R
+
+# PLOTS & CORRELATIONS
+quarto render notebooks/04_descriptive_plots.qmd
+quarto render notebooks/05_correlation.qmd
+
+# COMPILE THESIS
+quarto render thesis.qmd
+```
 
 > **Note:** EUROCONTROL flight CSVs (\~2 GB) are **not** tracked by Git.\
 > Place them under `data/raw/flight_data/YYYYMM/` as described in *02_flight_filter.R*.
