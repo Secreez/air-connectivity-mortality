@@ -27,7 +27,7 @@ Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 1
 
 ```{r}
 # Load OWID dataset
-covid_data <- read_csv("data/raw/owid/owid-covid-data.csv")
+covid_data <- read_csv("../data/raw/owid/owid-covid-data.csv")
 
 # Define target snapshot dates and ±7-day tolerance
 target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
@@ -81,8 +81,8 @@ The absolute difference in days between the selected date and the reference date
 ## Load & Filter EUROCONTROL Flight Data
 
 ```{r}
-flights_2019_12 <- read_csv("data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
-flights_2020_03 <- read_csv("data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
+flights_2019_12 <- read_csv("../data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
+flights_2020_03 <- read_csv("../data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
 
 col_subset <- c("ECTRL ID", "ADEP", "ADES", "ADEP Latitude", "ADEP Longitude",
                 "ADES Latitude", "ADES Longitude", "ICAO Flight Type",
@@ -102,7 +102,7 @@ flights_mar20 <- flights_2020_03 %>%
 ```{r}
 ## Load airport reference table (OurAirports)
 airports <- read_csv(
-  "data/raw/OurAirports/airports.csv",
+  "../data/raw/OurAirports/airports.csv",
   show_col_types = FALSE
 ) %>%
   select(icao_code, iso_country, name, iata_code = any_of("iata_code"))
@@ -113,7 +113,7 @@ china_hk_macao_airports <- airports %>%
   pull(icao_code)                               # vector of ICAO codes
 
 ## Eurocontrol member airports – destination set
-eurocontrol_countries <- read_csv("data/eurocontrol_iso_map.csv",
+eurocontrol_countries <- read_csv("../data/eurocontrol_iso_map.csv",
                                   show_col_types = FALSE) %>%
   pull(iso2)
 
@@ -156,7 +156,7 @@ check_airports <- function(flights_df, airports_df, iso_map) {
   list(missing = miss, unmapped = wrong)
 }
 
-iso_map   <- read_csv("data/eurocontrol_iso_map.csv")
+iso_map   <- read_csv("../data/eurocontrol_iso_map.csv")
 
 dec_check <- check_airports(flights_dec19_filtered, airports, iso_map)
 mar_check <- check_airports(flights_mar20_filtered, airports, iso_map)
@@ -189,7 +189,7 @@ flights_country <- flights_filtered %>%
 ## Merge Exposure with ISO Mapping & Mortality Data !!! 
 
 ```{r}
-euro_map <- read_csv("data/eurocontrol_iso_map.csv",
+euro_map <- read_csv("../data/eurocontrol_iso_map.csv",
                      show_col_types = FALSE)
 
 flight_exposure_mapped <- flights_country %>%
@@ -348,9 +348,9 @@ unused_airports <- setdiff(
 )
 num_unused <- length(unused_airports) # 225
 
-cat("Defined CN/HK/MO airports :", total_defined_airports, "\n",
-    "Actually used as ADEP     :", actually_used_airports, "\n",
-    "Never used                :", num_unused, "\n")
+cat("Defined CN/HK/MO airports:", total_defined_airports, "\n",
+    "Actually used as ADEP:", actually_used_airports, "\n",
+    "Never used:", num_unused, "\n")
 
 # Quick glance at the top origin hubs
 top5 <- bind_rows(flights_dec19_filtered, flights_mar20_filtered) |>

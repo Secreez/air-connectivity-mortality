@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-source(file.path("R", "00_load_libs.R"))
+source(here::here("R","00_load_libs.R"))
 
 ## Load & Prepare Excess Mortality Data (OWID)
 
@@ -9,7 +9,7 @@ source(file.path("R", "00_load_libs.R"))
 
 
 # Load OWID dataset
-covid_data <- read_csv("data/raw/owid/owid-covid-data.csv")
+covid_data <- read_csv( here::here("data","raw","owid","owid-covid-data.csv") )
 
 # Define target snapshot dates and ±7-day tolerance
 target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
@@ -54,8 +54,8 @@ owid_snapshots %>%
 
 ## export
 write_csv(owid_snapshots,
-          "data/processed/owid_excess_snapshots.csv")
-write_rds (owid_snapshots,
-          "data/processed/owid_excess_snapshots.rds")
-message("owid_excess_snapshots written (",
-        nrow(owid_snapshots), " rows)")
+          here::here("data","processed","owid_excess_snapshots.csv"))
+write_rds(owid_snapshots,
+          here::here("data","processed","owid_excess_snapshots.rds"))
+message("✓ owid_excess_snapshots written: ",
+        nrow(owid_snapshots), " rows")

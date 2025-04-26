@@ -36,6 +36,7 @@ bachelor-thesis/
 ├─ thesis.qmd # main write-up (Quarto)
 ├─ thesis_ref.bib # references (BibTeX)
 ├─ _quarto.yml # Quarto config
+├─ run_pipeline.sh # bash script to run the pipeline
 └─ README.md
 ```
 
