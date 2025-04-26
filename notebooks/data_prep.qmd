@@ -5,7 +5,6 @@ editor: source
 ---
 
 ## Libraries & Setup
-
 ```{r}
 library(tidyverse)
 library(kableExtra)
@@ -16,18 +15,19 @@ library(ggrepel)
 library(scales)
 library(sf)
 library(rnaturalearth)
+library(viridis)
 ```
 
 ## Load & Prepare Excess Mortality Data (OWID)
 
-Based on the OWID + WMD/HMD sources, many countries report mortality weekly or monthly.  
+Based on the OWID + WMD/HMD sources, many countries report mortality weekly or monthly.
 To create comparable annual snapshots for 2020–2023, we use a ±7-day window around **5 May**, keeping the **closest non-NA value**.
 
-Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 18 conventions.  
+Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 18 conventions.
 
 ```{r}
 # Load OWID dataset
-covid_data <- read_csv("data/raw/owid/owid-covid-data.csv")
+covid_data <- read_csv("../data/raw/owid/owid-covid-data.csv")
 
 # Define target snapshot dates and ±7-day tolerance
 target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
@@ -81,8 +81,8 @@ The absolute difference in days between the selected date and the reference date
 ## Load & Filter EUROCONTROL Flight Data
 
 ```{r}
-flights_2019_12 <- read_csv("data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
-flights_2020_03 <- read_csv("data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
+flights_2019_12 <- read_csv("../data/raw/flight_data/201912/Flights_20191201_20191231.csv.gz")
+flights_2020_03 <- read_csv("../data/raw/flight_data/202003/Flights_20200301_20200331.csv.gz")
 
 col_subset <- c("ECTRL ID", "ADEP", "ADES", "ADEP Latitude", "ADEP Longitude",
                 "ADES Latitude", "ADES Longitude", "ICAO Flight Type",
@@ -102,7 +102,7 @@ flights_mar20 <- flights_2020_03 %>%
 ```{r}
 ## Load airport reference table (OurAirports)
 airports <- read_csv(
-  "data/raw/OurAirports/airports.csv",
+  "../data/raw/OurAirports/airports.csv",
   show_col_types = FALSE
 ) %>%
   select(icao_code, iso_country, name, iata_code = any_of("iata_code"))
@@ -113,7 +113,7 @@ china_hk_macao_airports <- airports %>%
   pull(icao_code)                               # vector of ICAO codes
 
 ## Eurocontrol member airports – destination set
-eurocontrol_countries <- read_csv("data/eurocontrol_iso_map.csv",
+eurocontrol_countries <- read_csv("../data/eurocontrol_iso_map.csv",
                                   show_col_types = FALSE) %>%
   pull(iso2)
 
@@ -129,7 +129,7 @@ eurocontrol_airports <- airports %>%
 flights_filtered <- bind_rows(
   dec19 = flights_dec19,
   mar20 = flights_mar20,
-  .id    = "month"
+  .id = "month"
 ) %>% # month = dec19 / mar20
   filter(
     ADEP %in% china_hk_macao_airports,
@@ -156,7 +156,7 @@ check_airports <- function(flights_df, airports_df, iso_map) {
   list(missing = miss, unmapped = wrong)
 }
 
-iso_map   <- read_csv("data/eurocontrol_iso_map.csv")
+iso_map   <- read_csv("../data/eurocontrol_iso_map.csv")
 
 dec_check <- check_airports(flights_dec19_filtered, airports, iso_map)
 mar_check <- check_airports(flights_mar20_filtered, airports, iso_map)
@@ -189,7 +189,7 @@ flights_country <- flights_filtered %>%
 ## Merge Exposure with ISO Mapping & Mortality Data !!! 
 
 ```{r}
-euro_map <- read_csv("data/eurocontrol_iso_map.csv",
+euro_map <- read_csv("../data/eurocontrol_iso_map.csv",
                      show_col_types = FALSE)
 
 flight_exposure_mapped <- flights_country %>%
@@ -348,9 +348,9 @@ unused_airports <- setdiff(
 )
 num_unused <- length(unused_airports) # 225
 
-cat("Defined CN/HK/MO airports :", total_defined_airports, "\n",
-    "Actually used as ADEP     :", actually_used_airports, "\n",
-    "Never used                :", num_unused, "\n")
+cat("Defined CN/HK/MO airports:", total_defined_airports, "\n",
+    "Actually used as ADEP:", actually_used_airports, "\n",
+    "Never used:", num_unused, "\n")
 
 # Quick glance at the top origin hubs
 top5 <- bind_rows(flights_dec19_filtered, flights_mar20_filtered) |>
@@ -390,7 +390,7 @@ plot_data <- flight_exposure_mapped %>%
   select(country_name, total_inbound_flights_dec19, total_inbound_flights_mar20) %>%
   mutate(max_flights = pmax(total_inbound_flights_dec19, total_inbound_flights_mar20)) %>%
   pivot_longer(starts_with("total_inbound_flights"),
-               names_to  = "month",
+               names_to = "month",
                values_to = "flights") %>%
   mutate(month = recode(month,
                         total_inbound_flights_dec19 = "Dec 2019",
@@ -421,7 +421,7 @@ ggplot(plot_data,
 turk_counts <- bind_rows(
   Dec19 = flights_dec19_filtered,
   Mar20 = flights_mar20_filtered,
-  .id    = "month"
+  .id = "month"
 ) %>%
   left_join(airports, by = c("ADES" = "icao_code")) %>%
   filter(iso_country == "TR") %>%
@@ -446,7 +446,7 @@ cn_hk_mo_airports <- airports %>%
 adep_counts <- bind_rows(
   dec19 = flights_dec19_filtered,
   mar20 = flights_mar20_filtered,
-  .id    = "month"
+  .id = "month"
 ) %>%
   count(month, ADEP, name = "flights") %>% # n per month
   pivot_wider(names_from = month, # -> flights_dec19 / flights_mar20
@@ -485,7 +485,7 @@ plot_df <- adep_usage_clean |>
   mutate(name = fct_reorder(name, total_flights)) |>
   pivot_longer(
     cols = c(flights_dec19, flights_mar20),
-    names_to  = "month",
+    names_to = "month",
     values_to = "flights"
   ) |>
   mutate(month = recode(month,
@@ -500,7 +500,7 @@ ggplot(plot_df,
                                "Mar 2020" = "#bdbdbd")) +
   scale_y_continuous(labels = scales::comma) +
   labs(
-    title    = "Direct Flights from China / HK / Macao to EUROCONTROL States",
+    title = "Direct Flights from China / HK / Macao to EUROCONTROL States",
     subtitle = "Stacked counts per origin airport (Dec 2019 vs Mar 2020)",
     x = NULL, y = "Number of flights",
     fill = NULL,
@@ -556,11 +556,11 @@ spearman_by_month <- function(colname) {
       rho = cor(.data[[colname]],
                 excess_mortality_cumulative_per_million,
                 method = "spearman",
-                use    = "complete.obs"),
+                use = "complete.obs"),
       p.value = cor.test(.data[[colname]],
                          excess_mortality_cumulative_per_million,
                          method = "spearman",
-                         exact  = FALSE)$p.value,
+                         exact = FALSE)$p.value,
       n = sum(!is.na(.data[[colname]]) &
               !is.na(excess_mortality_cumulative_per_million)),
       .groups = "drop"
@@ -575,8 +575,8 @@ spearman_results <- bind_rows(
 ) %>%
   mutate(
     var = recode(var,
-      total_inbound_flights_dec19    = "Dec 2019",
-      total_inbound_flights_mar20    = "Mar 2020",
+      total_inbound_flights_dec19 = "Dec 2019",
+      total_inbound_flights_mar20 = "Mar 2020",
       total_inbound_flights_combined = "Combined"),
     year = lubridate::year(target_date)
   ) %>%
@@ -599,7 +599,7 @@ ggplot(spearman_results,
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
   scale_x_date(date_labels = "%Y") +
   labs(
-    title    = "Spearman rank correlation: flight exposure vs excess mortality",
+    title = "Spearman rank correlation: flight exposure vs excess mortality",
     subtitle = "Point estimate (ρ) at 5 May snapshots — 95 % CI not available for Spearman right now",
     x = NULL, y = "Spearman ρ",
     colour = "Flight window"
@@ -627,7 +627,7 @@ correlation_df %>%
                   max.overlaps = 15, size = 3, family = "mono") +
   scale_x_continuous(labels = scales::comma) +
   labs(
-    title    = "Early flight exposure vs. first-wave excess mortality",
+    title = "Early flight exposure vs. first-wave excess mortality",
     subtitle = "Combined Dec 2019 + Mar 2020 direct flights - snapshot ≈ 5 May 2020",
     x = "Inbound flights from China / HK / Macao (count)",
     y = "Excess deaths per million (cum. to 5 May 2020)",
@@ -640,14 +640,6 @@ correlation_df %>%
 The scatter confirms a positive rank‑order pattern in the first wave (Spearman ρ ≈ 0.53). Spain, Italy, and the UK combine high direct exposure with early excess mortality. Germany, however, illustrates that high exposure does not guarantee high mortality, hinting at moderating factors such as ICU capacity and rapid NPIs. These deviations motivate the sensitivity checks in Section ...
 
 
-
-
-
-
-
-
-
-
 TODO FOR TOMORROW! 
 - Optimize Chroopleth Prep
 - Sankey
@@ -657,6 +649,11 @@ TODO FOR TOMORROW!
 
 ## Facet Plot of Correlation Results
 ```{r}
+plot_df <- correlation_df %>% 
+  filter(!is.na(excess_mortality_cumulative_per_million),
+         !is.na(total_inbound_flights_combined)) %>% 
+  mutate(label = iso3,
+         facet = format(target_date, "%Y"))
 
 plot_facets <- ggplot(plot_df,
        aes(x = total_inbound_flights_combined,
@@ -664,30 +661,31 @@ plot_facets <- ggplot(plot_df,
   geom_point(size = 2.2, colour = "#2b8cbe") +
   geom_text_repel(aes(label = label),
                   max.overlaps = 12, size = 3, family = "mono") +
-  facet_wrap(~ facet, nrow = 2) +
+  facet_wrap(~ facet, nrow = 2) +                      # facet now found
   scale_x_log10(labels = comma_format(accuracy = 1)) +
   scale_y_continuous(labels = comma,
-                     expand  = expansion(mult = c(.06, .10))) + # extra headroom
+                     expand = expansion(mult = c(.06, .10))) +
   labs(
-    title    = "Direct flights vs. excess mortality across four pandemic years",
-    subtitle = "Combined Dec 2019 + Mar 2020 exposure | snapshots ≈ 5 May ± 7 days",
-    x = "Inbound flights from China / HK / Macao (log‑scale count)",
+    title = "Direct flights vs. excess mortality across four pandemic years",
+    subtitle = "Combined Dec 2019 + Mar 2020 exposure  •  snapshots ≈ 5 May ± 7 days",
+    x = "Inbound flights from China / HK / Macao (log-scale count)",
     y = "Excess deaths per million",
     caption = "Spearman ρ by panel: 2020 → +0.53 | 2021 → –0.31 | 2022 → –0.46 | 2023 → –0.42"
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    legend.position   = "none",
+    legend.position = "none",
     plot.title.position = "plot",
-    panel.spacing     = unit(2, "lines"),   # <-- more space between rows
-    plot.subtitle     = element_text(size = 10),
-    plot.caption      = element_text(size = 9)
+    panel.spacing = unit(2, "lines"),
+    plot.subtitle = element_text(size = 10),
+    plot.caption = element_text(size = 9)
   )
 
 print(plot_facets)
 
-# high‑res export
-ggsave("scatter_facets.png", plot_facets, width = 7, height = 9, dpi = 300)
+ggsave("scatter_facets.png", plot_facets,
+       width = 7, height = 9, dpi = 300)
+
 ```
 
 ## Sum Table
@@ -708,9 +706,9 @@ wide_df <- correlation_df %>%
 
 wide_table <- wide_df %>%
   pivot_wider(
-    names_from  = year,
+    names_from = year,
     values_from = c(Total_Flights, Excess_Mortality),
-    names_glue  = "{str_replace(.value, '_', ' ')} {year}"
+    names_glue = "{str_replace(.value, '_', ' ')} {year}"
   ) %>%
   arrange(desc(`Excess Mortality 2020`)) %>%
   mutate(across(starts_with("Total"), scales::comma))
@@ -768,34 +766,29 @@ TODO:
 - Maybe grey-out Ukraine / annotate excluded countries
 
 ```{r}
-## Base map of continental Eurocontrol members only
 europe_map <- rnaturalearth::ne_countries(scale = "medium",
+                                          type  = "map_units", 
                                           returnclass = "sf") %>%
-  filter(iso_a2 %in% eurocontrol_countries) # reuse the vector
+  mutate(iso2_fix = ifelse(iso_a2 == "-99", iso_a2_eh, iso_a2)) %>%
+  filter(iso2_fix %in% eurocontrol_countries) 
 
-## Prep exposure data
 exposure_map_df <- flight_exposure_mapped %>%
   mutate(has_flights = total_inbound_flights_combined > 0) %>%
   select(iso3, total_inbound_flights_combined, has_flights)
 
-## Join + flag Ukraine
 map_data <- europe_map %>%
   left_join(exposure_map_df, by = c("iso_a3" = "iso3")) %>%
-  mutate(
-    plot_fill = ifelse(is.na(total_inbound_flights_combined), 0,
-                       total_inbound_flights_combined),
-    excluded  = iso_a3 == "UKR" # highlight Ukraine
-  )
+  mutate(plot_fill = replace_na(total_inbound_flights_combined, 0),
+         excluded  = iso_a3 == "UKR")
 
-##  Plot
 ggplot(map_data) +
   geom_sf(aes(fill = plot_fill), colour = "white", linewidth = 0.2) +
-  geom_sf(data = subset(map_data, excluded), # hatched Ukraine
-          fill  = "grey70", colour = "grey40", linewidth = 0.2,
-          alpha = .4, linetype = "33") +
-  scale_fill_viridis_c(
+  geom_sf(data = subset(map_data, excluded),
+          fill = "grey70", colour = "grey40", linewidth = 0.2,
+          alpha = .6, linetype = "33") +
+  scale_fill_viridis(
     option  = "plasma",
-    trans   = "log10", # compress long tail (0 → treated separately)
+    trans   = "log10",
     breaks  = c(1, 10, 100, 1000),
     labels  = scales::comma,
     na.value = "lightgrey",
@@ -806,60 +799,47 @@ ggplot(map_data) +
     subtitle = "Combined Dec 2019 + Mar 2020 (log-scale legend)",
     caption  = "Light-grey = zero direct flights · Hatched = Ukraine (data excluded)"
   ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    legend.position     = c(.05, .3),
-    legend.justification = c(0, 0),
-    plot.title.position = "plot"
-  )
+  theme_minimal()
+
 ```
 
 ## Sankey Diagram 
 
+...
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# Few other Ideas for Analysis:
-
-- Population-normalise flights (flights per million) - Which brings farier comparison for microstates like Luxembourg Malta depending on density of flights .. Ergo: mutate(flights_pm = total_inbound_flights_combiend / population_millions)
+## Top 10 inbound barplot
 
 ```{r}
-pop_df <- read_csv("data/...")  # iso3, population (from owid)
-analysis_df <- analysis_df %>%
-  left_join(pop_df, by = "iso3") %>%
-  mutate(
-    flights_pm = total_inbound_flights_combined / (population / 1e6)
-  )
+top10 <- flights_country %>% 
+  slice_max(total_inbound_flights_combined, n = 10) %>%
+  pivot_longer(
+    cols = c(total_inbound_flights_dec19,
+              total_inbound_flights_mar20,
+              total_inbound_flights_combined),
+    names_to = "month",
+    values_to = "flights"
+  ) %>%
+  mutate(month = recode(month,
+    total_inbound_flights_dec19 = "Dec 2019",
+    total_inbound_flights_mar20 = "Mar 2020",
+    total_inbound_flights_combined = "Combined total"))
+
+ggplot(top10,
+       aes(x = reorder(iso_country, flights), y = flights, fill = month)) +
+  geom_col(position = position_dodge(width = .8), width = .7) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c("Dec 2019" = "#4d4d4d",
+                               "Mar 2020" = "#bababa",
+                               "Combined total" = "#d95f02")) +
+  labs(title = "Top-10 Eurocontrol destinations by direct CN/HK/MO flights",
+       y = "Flights (count)", x = NULL, fill = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top",
+        plot.title.position = "plot")
 ```
-
-Then: Re‑run spearman_by_month("flights_pm") to see if ρ stays positive in 2020.
-
-
-- Add vax coverage / GDP per capita columns - Got enough time for it.. Showing visually that 2022-23 esp. mrotality aligns mroe with structural variables or atleast a trend. Ergo: left_join(ovid_wax, by = iso3)
-
-```{r}
-gdp <- read_csv("data/...")  # iso3, gdp_ppp_2020
-vax <- read_csv("data/...")  # iso3, vax_share
-
-analysis_df <- analysis_df %>%
-  left_join(gdp, by = "iso3") %>%
-  left_join(vax, by = "iso3")
-```
-
-- Cluster heat-map of z-scored flights + four-year mortality - To see if there are any clusters of countries that are similar in terms of flight exposure and mortality. This could help identify patterns or outliers. - pheatmap() (https://www.rdocumentation.org/packages/pheatmap/versions/1.0.12/topics/pheatmap) on scaled matrix.
-
-- Is Excess_cum_mort really the data and not just an estimation?
 
 

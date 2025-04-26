@@ -2,6 +2,7 @@ project:
   type: manuscript
 
 execute:
+  dir: .
   freeze: auto
 
 format:
