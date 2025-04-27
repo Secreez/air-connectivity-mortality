@@ -1,4 +1,10 @@
 #!/usr/bin/env Rscript
+# Takes the country‐level flight exposures (from 02) and the OWID snapshots (from 01),
+# maps ISO‐2 → ISO‐3, merge them together, QC for exactly four snapshots per country,
+# and export both:
+# - analysis_df.{csv,rds} (full join: exposures + mortality)
+# - flight_exposure_mapped.{csv,rds} (exposures only, plus ISO3)
+# Usage: Rscript notebooks/03_merge_exposure.R
 source(here::here("R", "00_load_libs.R"))
 
 # Read in processed tables

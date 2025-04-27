@@ -1,0 +1,121 @@
+---
+title: "Descriptive patterns — early CN/HK/MO → EUROCONTROL flights"
+author: "M. Elixhauser"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+freeze: auto
+execute:
+  echo: false 
+---
+
+```{r setup, include=FALSE}
+source(here::here("R", "00_load_libs.R"))
+fig_dir <- here::here("data", "figures")
+dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
+
+# load processed inputs
+flights_country <- read_rds(here("data","processed","flights_country.rds"))
+flight_exposure <- read_rds(here("data","processed","flight_exposure_mapped.rds"))
+flows_pairwise  <- read_rds(here("data","processed","flows_pairwise.rds"))
+airports <- read_rds(here("data","processed","airports.rds"))
+```
+
+```{r}
+# look at the first few rows of each
+knitr::kable(
+  head(flights_country, 6),
+  caption = "`flights_country` (first 6 rows)"
+)
+knitr::kable(
+  head(flight_exposure, 6),
+  caption = "`flight_exposure_mapped` (first 6 rows)"
+)
+knitr::kable(
+  head(flows_pairwise, 6),
+  caption = "`flows_pairwise` (first 6 rows)"
+)
+```
+
+## Inbound flight volumes (country level)
+```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=4}
+top10 <- flights_country |>
+  slice_max(total_inbound_flights_combined, n = 10) |>
+  pivot_longer(
+    starts_with("total_"),
+    names_to = "month", 
+    values_to = "flights"
+  ) |>
+  mutate(
+    month = recode(
+      month,
+      total_inbound_flights_dec19 = "Dec 2019",
+      total_inbound_flights_mar20 = "Mar 2020",
+      total_inbound_flights_combined = "Total"
+    )
+  )
+
+ggplot(top10, aes(reorder(iso_country, flights), flights, fill = month)) +
+  geom_col(position = position_dodge(.8), width = .7) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(
+    values = c(
+      "Dec 2019" = "#4d4d4d",
+      "Mar 2020" = "#bababa",
+      "Total" = "#d95f02"
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Flights",
+    fill = "Time window"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top")
+
+ggsave(file.path(fig_dir,"top10_bar.png"), width = 6, height = 4, dpi = 300)
+```
+
+## Choropleth (log-scale) (pending, needs work ... really annoying issue with iso_eh 
+```{r choropleth_fixed, cache=TRUE, fig.cap="Direct inbound flights (Dec 2019 + Mar 2020) — log scale", fig.asp=0.6}
+
+```
+
+## Great-circle flow map (≥ 10 flights)
+```{r flow_map, cache=TRUE, fig.cap="Main CN/HK/MO → EUROCONTROL flows"}
+
+```
+
+## Origin-airport totals
+
+```{r origin_stack, fig.cap="Flight counts per CN/HK/MO origin"}
+origin_df <- flows_pairwise |>
+  group_by(ADEP) |>
+  summarise(total_flights = sum(n_flights), .groups = "drop") |>
+  left_join(airports, by = c("ADEP" = "icao_code")) |>
+  arrange(desc(total_flights)) |>
+  slice_head(n = 25)
+
+ggplot(origin_df, aes(
+    reorder(name, total_flights),
+    total_flights,
+    fill = iso_country
+  )) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = NULL, y = "Total flights") +
+  theme_minimal(base_size = 10)
+
+ggsave(file.path(fig_dir,"origin_airports_stack.png"),
+       width = 6, height = 6, dpi = 300)
+```
+
+## Distribution of flight exposure (appendix)
+
+```{r hist_log, fig.cap="Distribution of total flights (log-10)"}
+
+```

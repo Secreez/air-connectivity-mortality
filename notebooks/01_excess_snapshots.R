@@ -1,12 +1,9 @@
 #!/usr/bin/env Rscript
+# Loads the OWID raw COVID dataset and extracts annual “5 May ± 7 days” 
+# snapshots of cumulative excess deaths per million for 2020–2023.
+# Writes: data/processed/owid_excess_snapshots.{csv,rds}
+# Usage: Rscript notebooks/01_excess_snapshots.R
 source(here::here("R","00_load_libs.R"))
-
-## Load & Prepare Excess Mortality Data (OWID)
-
-# Based on the OWID + WMD/HMD sources, many countries report mortality weekly or monthly.
-# To create comparable annual snapshots for 2020–2023, we use a ±7-day window around **5 May**, keeping the **closest non-NA value**.
-# Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 18 conventions.
-
 
 # Load OWID dataset
 covid_data <- read_csv( here::here("data","raw","owid","owid-covid-data.csv") )

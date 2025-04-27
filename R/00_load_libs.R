@@ -1,3 +1,4 @@
+# Needed packages for the analysis
 suppressPackageStartupMessages({
   library(tidyverse)
   library(lubridate)
