@@ -19,7 +19,7 @@ dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 # load processed inputs
 flights_country <- read_rds(here("data","processed","flights_country.rds"))
 flight_exposure <- read_rds(here("data","processed","flight_exposure_mapped.rds"))
-flows_pairwise  <- read_rds(here("data","processed","flows_pairwise.rds"))
+flows_pairwise <- read_rds(here("data","processed","flows_pairwise.rds"))
 airports <- read_rds(here("data","processed","airports.rds"))
 ```
 
@@ -40,81 +40,234 @@ knitr::kable(
 ```
 
 ## Inbound flight volumes (country level)
-```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=4}
-top10 <- flights_country |>
-  slice_max(total_inbound_flights_combined, n = 10) |>
+```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=6}
+top10 <- flights_country %>% 
+  slice_max(total_inbound_flights_combined, n = 10) %>%
   pivot_longer(
     starts_with("total_"),
-    names_to = "month", 
+    names_to = "window",
     values_to = "flights"
-  ) |>
-  mutate(
-    month = recode(
-      month,
-      total_inbound_flights_dec19 = "Dec 2019",
-      total_inbound_flights_mar20 = "Mar 2020",
-      total_inbound_flights_combined = "Total"
-    )
-  )
+  ) %>%
+  mutate(window = recode(
+    window,
+    total_inbound_flights_dec19 = "Dec 2019",
+    total_inbound_flights_mar20 = "Mar 2020",
+    total_inbound_flights_combined = "Combined"
+  ))
 
-ggplot(top10, aes(reorder(iso_country, flights), flights, fill = month)) +
-  geom_col(position = position_dodge(.8), width = .7) +
+ggplot(top10, aes(
+    x = reorder(iso_country, flights),
+    y = flights,
+    fill = window
+  )) +
+  geom_col(position = position_dodge(width = .8), width = .7) +
   coord_flip() +
   scale_y_continuous(labels = scales::comma) +
   scale_fill_manual(
-    values = c(
-      "Dec 2019" = "#4d4d4d",
-      "Mar 2020" = "#bababa",
-      "Total" = "#d95f02"
-    )
+    values = c("Dec 2019" = "#4d4d4d",
+               "Mar 2020" = "#bababa",
+               "Combined" = "#d95f02")
   ) +
   labs(
     x = NULL,
-    y = "Flights",
+    y = "Number of direct flights",
     fill = "Time window"
   ) +
   theme_minimal(base_size = 11) +
   theme(legend.position = "top")
 
-ggsave(file.path(fig_dir,"top10_bar.png"), width = 6, height = 4, dpi = 300)
 ```
 
-## Choropleth (log-scale) (pending, needs work ... really annoying issue with iso_eh 
-```{r choropleth_fixed, cache=TRUE, fig.cap="Direct inbound flights (Dec 2019 + Mar 2020) — log scale", fig.asp=0.6}
+## Full 26 country list
+
+```{r bar_full, fig.cap="All 26 EUROCONTROL states: Dec 2019 vs Mar 2020", fig.height=6}
+full_df <- flight_exposure %>%
+  select(
+    country_name,
+    total_inbound_flights_combined,
+    total_inbound_flights_dec19,
+    total_inbound_flights_mar20
+  ) %>%
+  pivot_longer(
+    # pivot only the two snapshot columns
+    cols = c(total_inbound_flights_dec19, total_inbound_flights_mar20),
+    names_to = "window",
+    values_to = "flights"
+  ) %>%
+  mutate(
+    window = recode(
+      window,
+      total_inbound_flights_dec19 = "Dec 2019",
+      total_inbound_flights_mar20 = "Mar 2020"
+    )
+  )
+
+ggplot(full_df, aes(
+    # reorder by the combined total
+    x = reorder(country_name, total_inbound_flights_combined),
+    y = flights,
+    fill = window
+  )) +
+  geom_col(position = position_dodge(width = .8), width = .7) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(
+    values = c("Dec 2019" = "#4d4d4d",
+               "Mar 2020" = "#bababa"),
+    guide = guide_legend(title = NULL)
+  ) +
+  labs(
+    title = "All 26 EUROCONTROL States: Dec 2019 vs Mar 2020",
+    x = NULL,
+    y = "Number of direct flights",
+    subtitle = "Sorted by combined Dec+Mar  exposures",
+    caption = paste0(
+      "Total direct flights — Dec 2019: ", dec_tot,
+      " | Mar 2020: ", mar_tot
+    )
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "top")
 
 ```
+
+## Choropleth map of flight exposure
+
+... pending
 
 ## Great-circle flow map (≥ 10 flights)
-```{r flow_map, cache=TRUE, fig.cap="Main CN/HK/MO → EUROCONTROL flows"}
 
-```
+... pending
 
-## Origin-airport totals
-
+## Origin stacked barplot
 ```{r origin_stack, fig.cap="Flight counts per CN/HK/MO origin"}
-origin_df <- flows_pairwise |>
-  group_by(ADEP) |>
-  summarise(total_flights = sum(n_flights), .groups = "drop") |>
-  left_join(airports, by = c("ADEP" = "icao_code")) |>
-  arrange(desc(total_flights)) |>
-  slice_head(n = 25)
+origin_df <- flows_pairwise %>%
+  group_by(ADEP) %>%
+  summarise(total_flights = sum(n_flights), .groups = "drop") %>%
+  left_join(airports, by = c("ADEP" = "icao_code")) %>%
+  arrange(desc(total_flights)) %>%
+  slice_head(n = 25) %>%
+  mutate(
+    # remove "International Airport" (or "Airport") suffix
+    short_name = str_remove(name, " (International )?Airport$")
+  )
 
 ggplot(origin_df, aes(
-    reorder(name, total_flights),
-    total_flights,
+    x = reorder(short_name, total_flights),
+    y = total_flights,
     fill = iso_country
   )) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
-  scale_y_continuous(labels = scales::comma) +
-  labs(x = NULL, y = "Total flights") +
+  scale_y_continuous(labels = comma) +
+  labs(
+    x = NULL,
+    y = "Total direct flights from CN/HK/MO"
+  ) +
   theme_minimal(base_size = 10)
-
-ggsave(file.path(fig_dir,"origin_airports_stack.png"),
-       width = 6, height = 6, dpi = 300)
 ```
 
-## Distribution of flight exposure (appendix)
+## Number of distinct CN/HK/MO origin airports per destination
+```{r}
+origins_per_dest <- flows_pairwise %>%
+  distinct(ADEP, ADES) %>%
+  count(ADES, name = "n_origins") %>%
+  left_join(airports, by = c("ADES" = "icao_code")) %>%
+  arrange(desc(n_origins)) %>%
+  slice_head(n = 20)
+
+ggplot(origins_per_dest, aes(
+    x = reorder(name, n_origins),
+    y = n_origins
+  )) +
+  geom_col(fill = "#2b8cbe") +
+  coord_flip() +
+  labs(
+    title = "Number of Unique CN/HK/MO Origin Airports\nper Destination (top 20)",
+    x = NULL,
+    y = "distinct origins"
+  ) +
+  theme_minimal(base_size = 11)
+ggsave(file.path(fig_dir,"origins_per_dest.png"),
+       width = 6, height = 5, dpi = 300)
+```
+
+# Pct change in flight exposure min 5 Dec flights
+
+```{r pct_change_filtered, fig.cap="Pct change (filtered): Dec 2019→Mar 2020 (min 5 Dec flights)", fig.height=6}
+pct_df2 <- flight_exposure %>%
+  transmute(
+    country_name,
+    dec = total_inbound_flights_dec19,
+    mar = total_inbound_flights_mar20,
+    abs_change = mar - dec,
+    pct_change = 100 * abs_change / dec
+  ) %>%
+  filter(dec >= 5) %>%
+  arrange(pct_change) %>%
+  mutate(country_name = factor(country_name, levels = country_name))
+
+ggplot(pct_df2, aes(
+    x = country_name,
+    y = pct_change,
+    fill = pct_change > 0
+  )) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(
+    label = paste0("Dec:", dec, " → Mar:", mar)
+  ),
+    hjust = ifelse(pct_df2$pct_change > 0, -0.05, 1.05),
+    size = 3,
+    color = "gray20"
+  ) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(
+    labels = percent_format(scale = 1),
+    expand = expansion(add = c(5, 10))
+  ) +
+  scale_fill_manual(values = c(`TRUE` = "#2b8cbe", `FALSE` = "#de2d26")) +
+  labs(
+    x = NULL,
+    y = "% change",
+    title = "Pct Change in Direct CN/HK/MO → EUROCONTROL Flights",
+    subtitle = "Dec 2019 vs Mar 2020 (only countries with ≥5 Dec flights)"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(plot.margin = margin(5, 40, 5, 5))
+  
+ggsave(file.path(fig_dir, "pct_change_filtered.png"),
+       width = 7, height = 6, dpi = 300)
+
+```
+- At the beginning there was a interesting trend in the below countries.. then again. see table:
+
+```{r}
+targets <- c("SK","IE","LV","LT","BE")
+
+read_rds(here("data","processed","flight_exposure_mapped.rds")) %>%
+  filter(iso_country %in% targets) %>%
+  select(
+    iso_country,
+    Country = country_name,
+    `Dec 2019` = total_inbound_flights_dec19,
+    `Mar 2020` = total_inbound_flights_mar20,
+    Combined = total_inbound_flights_combined
+  ) %>%
+  arrange(match(iso_country, targets)) %>%
+  select(-iso_country) %>%
+  kable()
+
+
+```
+
+## Create a percentage between March and December 
+
+A percentage‐change plot
+%Δ = ((Mar2020 − Dec2019) / Dec2019) ×100 ? 
+
+- Top 10 biggest drops and Top 10 increases side by side
+- ...
+
 
 ```{r hist_log, fig.cap="Distribution of total flights (log-10)"}
 
