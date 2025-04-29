@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
-# Loads the OWID raw COVID dataset and extracts annual “5 May ± 7 days” 
+# Loads the OWID raw COVID dataset and extracts annual “5 May ± 7 days”
 # snapshots of cumulative excess deaths per million for 2020–2023.
 # Writes: data/processed/owid_excess_snapshots.{csv,rds}
 # Usage: Rscript notebooks/01_excess_snapshots.R
-source(here::here("R","00_load_libs.R"))
+source(here::here("R", "00_load_libs.R"))
 
 # Load OWID dataset
-covid_data <- read_csv( here::here("data","raw","owid","owid-covid-data.csv") )
+covid_data <- read_csv(here::here("data", "raw", "owid", "owid-covid-data.csv"))
 
 # Define target snapshot dates and ±7-day tolerance
 target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
@@ -23,7 +23,7 @@ expanded_dates <- map_dfr(target_dates, function(date) {
 owid_snapshots <- covid_data %>%
   select(iso_code, location, date, excess_mortality_cumulative_per_million) %>%
   inner_join(expanded_dates, by = "date") %>%
-  filter(!is.na(excess_mortality_cumulative_per_million)) %>%  # filter out NAs early!
+  filter(!is.na(excess_mortality_cumulative_per_million)) %>% # filter out NAs early!
   mutate(day_diff = abs(as.integer(date - target_date))) %>%
   group_by(iso_code, location, target_date) %>%
   slice_min(day_diff, with_ties = FALSE) %>%
@@ -50,9 +50,15 @@ owid_snapshots %>%
 # The absolute difference in days between the selected date and the reference date (day_diff) was recorded to assess potential deviations in timing and reporting alignment. Most matches were within a range of ±2–3 days, typically falling on dates such as 30 April, 3 May, or 7 May, which aligns well with reporting conventions across the EUROCONTROL zone.
 
 ## export
-write_csv(owid_snapshots,
-          here::here("data","processed","owid_excess_snapshots.csv"))
-write_rds(owid_snapshots,
-          here::here("data","processed","owid_excess_snapshots.rds"))
-message("✓ owid_excess_snapshots written: ",
-        nrow(owid_snapshots), " rows")
+write_csv(
+  owid_snapshots,
+  here::here("data", "processed", "owid_excess_snapshots.csv")
+)
+write_rds(
+  owid_snapshots,
+  here::here("data", "processed", "owid_excess_snapshots.rds")
+)
+message(
+  "✓ owid_excess_snapshots written: ",
+  nrow(owid_snapshots), " rows"
+)

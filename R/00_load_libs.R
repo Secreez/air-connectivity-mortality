@@ -1,5 +1,7 @@
 # Needed packages for the analysis
 suppressPackageStartupMessages({
+  library(styler)
+  library(rnaturalearth)
   library(tidyverse)
   library(lubridate)
   library(sf)
@@ -9,6 +11,7 @@ suppressPackageStartupMessages({
   library(ggrepel)
   library(kableExtra)
   library(scales)
+  library(stringr)
   library(here)
-  library(giscoR)
+  library(forcats)
 })

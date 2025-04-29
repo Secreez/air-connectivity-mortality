@@ -18,21 +18,23 @@ glimpse(airports)
 # Bulgaria, Croatia, Monaco, Slovakia, Spain, North Macedonia, Republic of Moldova,
 # Finland, Albania, Bosnia and Herzegovina, Poland, Ukraine, Serbia, Armenia,
 # Lithuania, Montenegro, Latvia, Georgia, Estonia.
-eurocontrol_countries <- c("BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR", 
-                            "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI", 
-                            "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES", 
-                            "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM", 
-                            "LT", "ME", "LV", "GE", "EE")
+eurocontrol_countries <- c(
+  "BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR",
+  "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI",
+  "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES",
+  "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM",
+  "LT", "ME", "LV", "GE", "EE"
+)
 
 # Extract ICAO codes for China: includes mainland China ("CN") plus Hong Kong ("HK") and Macau ("MO")
 china_airports <- airports %>%
-  filter(iso_country %in% c("CN", "HK", "MO")) %>% 
+  filter(iso_country %in% c("CN", "HK", "MO")) %>%
   filter(!is.na(icao_code)) %>%
   pull(icao_code)
 
 # Extract ICAO codes for the Eurocontrol zone of Europe
 europe_airports <- airports %>%
-  filter(iso_country %in% eurocontrol_countries) %>%  
+  filter(iso_country %in% eurocontrol_countries) %>%
   filter(!is.na(icao_code)) %>%
   pull(icao_code)
 

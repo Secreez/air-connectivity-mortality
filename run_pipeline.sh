@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Step 1: Clean up old outputs (optional)..."
+echo "Step 0: Format all R code..."
+Rscript style_all.R
+
+echo "Step 1: Clean up old outputs"
 rm -rf data/processed/* data/figures/* notebooks/*_cache
 
 echo "Step 2: Run data preparation scripts..."

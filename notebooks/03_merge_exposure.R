@@ -37,21 +37,33 @@ year_counts <- analysis_df %>%
   count(iso3) %>%
   filter(n != 4)
 if (nrow(year_counts) > 0) {
-  warning("Unexpected snapshot counts for iso3: ",
-          paste(year_counts$iso3, collapse = ", "))
+  warning(
+    "Unexpected snapshot counts for iso3: ",
+    paste(year_counts$iso3, collapse = ", ")
+  )
 }
 
 # Export final analysis table
 # so that your QMD can load either the full analysis_df *or* just the exposure
-write_rds(analysis_df,
-          here::here("data","processed","analysis_df.rds"))
-write_csv(analysis_df,
-          here::here("data","processed","analysis_df.csv"))
+write_rds(
+  analysis_df,
+  here::here("data", "processed", "analysis_df.rds")
+)
+write_csv(
+  analysis_df,
+  here::here("data", "processed", "analysis_df.csv")
+)
 message("✓ analysis_df written (", nrow(analysis_df), " rows)")
 
-write_rds(flight_exposure_mapped,
-          here::here("data","processed","flight_exposure_mapped.rds"))
-write_csv(flight_exposure_mapped,
-          here::here("data","processed","flight_exposure_mapped.csv"))
-message("✓ flight_exposure_mapped written (",
-        nrow(flight_exposure_mapped), " rows)")
+write_rds(
+  flight_exposure_mapped,
+  here::here("data", "processed", "flight_exposure_mapped.rds")
+)
+write_csv(
+  flight_exposure_mapped,
+  here::here("data", "processed", "flight_exposure_mapped.csv")
+)
+message(
+  "✓ flight_exposure_mapped written (",
+  nrow(flight_exposure_mapped), " rows)"
+)
