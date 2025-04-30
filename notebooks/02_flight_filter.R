@@ -4,7 +4,6 @@
 # Usage: Rscript notebooks/02_flight_filter.R
 source(here::here("R", "00_load_libs.R"))
 
-# read
 flights_2019_12 <- read_csv(
   here(
     "data", "raw", "flight_data", "201912",
@@ -37,14 +36,13 @@ flights_mar20 <- flights_2020_03 %>%
   select(all_of(col_subset)) %>%
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
-# load airport reference & identify origin/dest sets
 airports_full <- read_csv(
   here("data", "raw", "OurAirports", "airports.csv"),
   show_col_types = FALSE
 ) %>% 
   select(
     icao_code, iso_country, name,
-    latitude_deg, longitude_deg,   # ← keep them
+    latitude_deg, longitude_deg,
     iata_code = any_of("iata_code")
   )
 
@@ -62,7 +60,6 @@ eurocontrol_airports <- airports_full %>%
   filter(iso_country %in% eurocontrol_countries) %>%
   pull(icao_code)
 
-# bind & filter to direct CN/HK/MO → EUROCONTROL
 flights_filtered <- bind_rows(
   dec19 = flights_dec19,
   mar20 = flights_mar20,
@@ -73,11 +70,9 @@ flights_filtered <- bind_rows(
     ADES %in% eurocontrol_airports
   )
 
-# keep each month separately
 flights_dec19_filtered <- filter(flights_filtered, month == "dec19")
 flights_mar20_filtered <- filter(flights_filtered, month == "mar20")
 
-# country-level summary
 flights_country <- flights_filtered %>%
   left_join(airports_full, by = c("ADES" = "icao_code")) %>%
   count(month, iso_country, name = "n_flights") %>%
@@ -98,7 +93,6 @@ flows_pairwise <- flights_filtered %>%
   count(ADEP, ADES, name = "n_flights") %>%
   arrange(desc(n_flights))
 
-# slim down airport lookup
 # only EUROCONTROL dest-airports + CN/HK/MO origin airports actually used
 needed_icaos <- union(
   eurocontrol_airports,
@@ -109,7 +103,7 @@ airports_slim <- airports_full %>%
   filter(icao_code %in% needed_icaos) %>% 
   select(
     icao_code, iso_country, name,
-    latitude_deg, longitude_deg,   # <-- add these two
+    latitude_deg, longitude_deg,
     iata_code
   )
 

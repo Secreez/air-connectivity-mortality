@@ -166,6 +166,8 @@ This section summarizes the characteristics of the inbound flight data used for 
 
 ### Early Air Connectivity Patterns
 
+> **Note on visual encoding:** To avoid unintended cultural or emotional interpretations, color palettes in maps and flow diagrams were deliberately selected to avoid connotations such as red = danger/blame. Additionally, all figures were designed to be accessible to readers with color vision deficiencies by using colorblind-safe palettes and clear labeling. These choices support neutral, inclusive, and responsible data visualization.
+
 This section illustrates the spatial and temporal distribution of early international flight exposure.
 
 - **Bar chart** of top 10–15 European countries by inbound flight volume (separately for December & March)
@@ -256,6 +258,8 @@ The following chapter discusses these findings in the broader context of structu
 
 ### Relation to Broader Structural Factors
 
+While factors such as GDP per capita, healthcare capacity, and vaccination coverage are widely considered to influence pandemic mortality [SOURCES!], these were not included as covariates in the correlation analysis to preserve interpretive clarity. This thesis focuses on early air connectivity as an exploratory lens, rather than constructing a multivariate explanatory model. Future work could meaningfully expand on this analysis by integrating these additional dimensions.
+
 [Now, how things like GDP, vaccination, age structure, or healthcare could interact.]
 
 ### Limitations 
@@ -280,16 +284,14 @@ This thesis deliberately applies an exploratory, correlation-based approach to i
 
 Early versions of this research design included dynamic modeling approaches such as a network-based SIR simulation [@brockmann2013] or SEIR extensions [@abou2020; @rozan2024]. However, incomplete flight records for January–February 2020, combined with uneven global data coverage and the practical time constraints of a Bachelor's thesis (~300 hours), rendered such approaches infeasible. A simplified, descriptive correlation analysis was chosen to maintain feasibility and transparency while stillallowing meaningful insights into early pandemic exposure patterns.
 
-
-### Final Thoughts
-
 ## Conclusion
 
 ### Key Findings
 
 ### Implications & Future Work
 
-### Final Thoughts
+### Why Exploratory Work Matters
+Although this thesis does not make causal claims, its findings demonstrate the value of transparent, reproducible exploratory analysis. When approached with methodological humility and critical awareness, even basic statistical patterns—such as the timing and structure of early international flight exposure—can yield insights into complex public health events. In a field often pressured by urgent narratives or overstated certainty, exploratory studies like this play a role in grounding interpretation and informing future research directions.
 
 ## References
 

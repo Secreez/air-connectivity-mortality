@@ -1,4 +1,3 @@
-# Needed packages for the analysis
 suppressPackageStartupMessages({
   library(styler)
   library(rnaturalearth)
