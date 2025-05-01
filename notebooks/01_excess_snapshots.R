@@ -1,64 +1,51 @@
 #!/usr/bin/env Rscript
-# Loads the OWID raw COVID dataset and extracts annual “5 May ± 7 days”
-# snapshots of cumulative excess deaths per million for 2020–2023.
-# Writes: data/processed/owid_excess_snapshots.{csv,rds}
-# Usage: Rscript notebooks/01_excess_snapshots.R
+# 01_excess_snapshots.R
+# – From the OWID COVID CSV, pick the row closest to 5-May (±7 d)
+#   for 2020, 2021, 2022, 2023 and write tidy snapshots.
+# Usage:  Rscript notebooks/01_excess_snapshots.R
+
 source(here::here("R", "00_load_libs.R"))
 
-# Load OWID dataset
-covid_data <- read_csv(here::here("data", "raw", "owid", "owid-covid-data.csv"))
+# read
+covid_raw <- read_csv(
+  here("data", "raw", "owid", "owid-covid-data.csv"),
+  show_col_types = FALSE
+)
 
-# Define target snapshot dates and ±7-day tolerance
-target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
-tolerance <- 7
+# build ±7-day windows around 5 May for 4 years
+ref_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
+win_tbl <- map_dfr(ref_dates, \(d)
+tibble(target_date = d, date = seq(d - 7, d + 7, by = "days")))
 
-# Build ±7-day windows for each target date
-expanded_dates <- map_dfr(target_dates, function(date) {
-  tibble(
-    target_date = date,
-    date = seq(date - tolerance, date + tolerance, by = "days")
-  )
-})
-
-owid_snapshots <- covid_data %>%
-  select(iso_code, location, date, excess_mortality_cumulative_per_million) %>%
-  inner_join(expanded_dates, by = "date") %>%
-  filter(!is.na(excess_mortality_cumulative_per_million)) %>% # filter out NAs early!
+# pick closest non-NA excess-mortality row per country/year
+owid_snapshots <- covid_raw %>%
+  select(
+    iso_code, location, date,
+    excess_mortality_cumulative_per_million
+  ) %>%
+  inner_join(win_tbl, by = "date") %>%
+  filter(!is.na(excess_mortality_cumulative_per_million)) %>%
   mutate(day_diff = abs(as.integer(date - target_date))) %>%
   group_by(iso_code, location, target_date) %>%
   slice_min(day_diff, with_ties = FALSE) %>%
   ungroup()
 
-# Sanity Check
-owid_snapshots %>%
-  count(target_date)
-
-owid_snapshots %>%
-  summarise(
-    min_date = min(date),
-    max_date = max(date)
-  )
-
-owid_snapshots %>%
-  filter(location %in% c("Germany", "France", "Italy")) %>%
-  arrange(location, target_date) %>%
-  select(location, target_date, date, day_diff, excess_mortality_cumulative_per_million)
+# quick sanity: every country ≤ 4 rows; min/max date in window
+stopifnot(max(owid_snapshots$day_diff) <= 7)
 
 # To enable a consistent cross-country comparison of cumulative excess mortality per million for the years 2020 to 2023, we defined 5 May as a fixed annual reference date. This date was chosen due to its symbolic significance in many countries as the period around which COVID-19 emergency measures were lifted or reevaluated, and it coincides with ISO Week 18, a recurring reporting point for many datasets.
 # Since not all countries report mortality data exactly on 5 May, and reporting frequency varies (weekly, biweekly, monthly), we applied a ±7-day window around each year's reference date.
 # For each country and year, the closest available non-missing value within this window was selected. This ensures temporal consistency while respecting national reporting lags.
 # The absolute difference in days between the selected date and the reference date (day_diff) was recorded to assess potential deviations in timing and reporting alignment. Most matches were within a range of ±2–3 days, typically falling on dates such as 30 April, 3 May, or 7 May, which aligns well with reporting conventions across the EUROCONTROL zone.
 
-## export
-write_csv(
-  owid_snapshots,
-  here::here("data", "processed", "owid_excess_snapshots.csv")
-)
+# export
 write_rds(
   owid_snapshots,
-  here::here("data", "processed", "owid_excess_snapshots.rds")
+  here("data", "processed", "owid_excess_snapshots.rds")
 )
-message(
-  "✓ owid_excess_snapshots written: ",
-  nrow(owid_snapshots), " rows"
+write_csv(
+  owid_snapshots,
+  here("data", "processed", "owid_excess_snapshots.csv")
 )
+
+message("✓ owid_excess_snapshots: ", nrow(owid_snapshots), " rows")

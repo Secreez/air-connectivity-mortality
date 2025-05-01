@@ -4,6 +4,7 @@
 # Usage: Rscript notebooks/02_flight_filter.R
 source(here::here("R", "00_load_libs.R"))
 
+# read
 flights_2019_12 <- read_csv(
   here(
     "data", "raw", "flight_data", "201912",
@@ -19,29 +20,25 @@ flights_2020_03 <- read_csv(
   show_col_types = FALSE
 )
 
-# subset to scheduled (S) & non-scheduled (N) commercial
-col_subset <- c(
-  "ECTRL ID", "ADEP", "ADES",
-  "ADEP Latitude", "ADEP Longitude",
-  "ADES Latitude", "ADES Longitude",
-  "ICAO Flight Type",
+keep_cols <- c(
+  "ECTRL ID", "ADEP", "ADES", "ICAO Flight Type",
   "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME"
 )
 
 flights_dec19 <- flights_2019_12 %>%
-  select(all_of(col_subset)) %>%
+  select(all_of(keep_cols)) %>%
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
 flights_mar20 <- flights_2020_03 %>%
-  select(all_of(col_subset)) %>%
+  select(all_of(keep_cols)) %>%
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
+# airport reference (OurAirports)
 airports_full <- read_csv(
   here("data", "raw", "OurAirports", "airports.csv"),
   show_col_types = FALSE
-) %>% 
-  select(
-    icao_code, iso_country, name,
+) %>%
+  select(icao_code, iso_country, name,
     latitude_deg, longitude_deg,
     iata_code = any_of("iata_code")
   )
@@ -53,13 +50,13 @@ china_hk_macao_airports <- airports_full %>%
 eurocontrol_countries <- read_csv(
   here("data", "eurocontrol_iso_map.csv"),
   show_col_types = FALSE
-) %>%
-  pull(iso2)
+) %>% pull(iso2)
 
 eurocontrol_airports <- airports_full %>%
   filter(iso_country %in% eurocontrol_countries) %>%
   pull(icao_code)
 
+# bind & filter to direct CN/HK/MO → EUROCONTROL
 flights_filtered <- bind_rows(
   dec19 = flights_dec19,
   mar20 = flights_mar20,
@@ -70,68 +67,43 @@ flights_filtered <- bind_rows(
     ADES %in% eurocontrol_airports
   )
 
-flights_dec19_filtered <- filter(flights_filtered, month == "dec19")
-flights_mar20_filtered <- filter(flights_filtered, month == "mar20")
-
+# country-level exposure table
 flights_country <- flights_filtered %>%
   left_join(airports_full, by = c("ADES" = "icao_code")) %>%
   count(month, iso_country, name = "n_flights") %>%
   pivot_wider(
-    names_from   = month,
-    values_from  = n_flights,
-    names_prefix = "total_inbound_flights_",
-    values_fill  = 0
+    names_from = month, values_from = n_flights,
+    names_prefix = "total_inbound_flights_", values_fill = 0
   ) %>%
   mutate(
     total_inbound_flights_combined =
-      total_inbound_flights_dec19 +
-        total_inbound_flights_mar20
+      total_inbound_flights_dec19 + total_inbound_flights_mar20
   )
 
-# airport‐to‐airport flow
+stopifnot(!any(is.na(flights_country$iso_country))) # sanity
+
+# airport-to-airport flow table
 flows_pairwise <- flights_filtered %>%
   count(ADEP, ADES, name = "n_flights") %>%
   arrange(desc(n_flights))
 
-# only EUROCONTROL dest-airports + CN/HK/MO origin airports actually used
+# slim airport lookup (destinations + used origins)
 needed_icaos <- union(
-  eurocontrol_airports,
-  unique(flights_filtered$ADEP)
+  unique(flights_filtered$ADEP),
+  unique(flights_filtered$ADES)
 )
 
-airports_slim <- airports_full %>% 
-  filter(icao_code %in% needed_icaos) %>% 
-  select(
-    icao_code, iso_country, name,
-    latitude_deg, longitude_deg,
-    iata_code
-  )
+airports_slim <- airports_full %>%
+  filter(icao_code %in% needed_icaos)
 
-## export
-write_rds(
-  flows_pairwise,
-  here("data", "processed", "flows_pairwise.rds")
-)
-message("✓ flows_pairwise written: ", nrow(flows_pairwise), " rows")
+# export
+write_rds(flows_pairwise, here("data", "processed", "flows_pairwise.rds"))
+write_rds(flights_country, here("data", "processed", "flights_country.rds"))
+write_csv(flights_country, here("data", "processed", "flights_country.csv"))
+write_rds(airports_slim, here("data", "processed", "airports.rds"))
+write_rds(flights_filtered, here("data", "processed", "flights_filtered.rds"))
 
-write_rds(
-  flights_country,
-  here("data", "processed", "flights_country.rds")
-)
-write_csv(
-  flights_country,
-  here("data", "processed", "flights_country.csv")
-)
-message("✓ flights_country written: ", nrow(flights_country), " rows")
-
-write_rds(
-  airports_slim,
-  here("data", "processed", "airports.rds")
-)
-message("✓ airports_slim written: ", nrow(airports_slim), " rows")
-
-write_rds(
-  flights_filtered,
-  here("data", "processed", "flights_filtered.rds")
-)
-message("✓ flights_filtered written: ", nrow(flights_filtered), " rows")
+message("✓ flows_pairwise: ", nrow(flows_pairwise))
+message("✓ flights_country: ", nrow(flights_country))
+message("✓ airports_slim: ", nrow(airports_slim))
+message("✓ flights_filtered: ", nrow(flights_filtered))
