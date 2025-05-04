@@ -1,4 +1,4 @@
-suppressPackageStartupMessages({
+suppressPackageStartupMessages({ # quite a lot. Need to reduce after complete analysis done.
   library(styler)
   library(rnaturalearth)
   library(tidyverse)
@@ -13,4 +13,6 @@ suppressPackageStartupMessages({
   library(stringr)
   library(here)
   library(forcats)
+  library(wpp2024)
+  library(countrycode)
 })
