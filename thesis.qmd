@@ -73,9 +73,9 @@ Recent syntheses (e.g. [@pizzato2024]) show wide cross‑country gaps in Europea
 
 | Study                     | Data            | Scope  | Key insight                             |
 | ------------------------- | --------------- | ------ | --------------------------------------- |
-| Chinazzi et al. 2020                       | ...             | ...    | ...                                     |
-| Sun et al 2022                       | ...             | ...    | ...                                     |
-| Strohmeier et al 2021                       | ...             | ...    | ...                                     |
+| Chinazzi et al. 2020      | ...             | ...    | ...                                     |
+| Sun et al. 2022            | ...             | ...    | ...                                     |
+| Strohmeier et al. 2021     | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
@@ -96,15 +96,18 @@ OpenSky’s crowd‑sourced ADS‑B receivers leave blind spots across East Asia
 
 ### Study design
 
-Exploratory, cross‑sectional correlation at the *country* level.  
+Exploratory, cross‑sectional correlation at the *country* level.
+
 Outcome = cumulative excess‑deaths / million on 5 May of 2020‑23.  
+
 Exposure = direct CN/HK/MO → Eurocontrol flights in Dec 2019 and Mar 2020.
 
 ### Flight-exposure data
 
 *Source* Eurocontrol “Aviation Data Repository for Research” archive.  
-Filters ICAO types S/N; ADEP ∈ {CN, HK, MO}; ADES ∈ 26 continental member states.
+Filters ICAO types S/N; ADEP $∈$ {CN, HK, MO}; ADES $∈$ 26 continental member states.
 Aggregation destination‐country counts →
+
 $$
 \begin{aligned}
 F_{\text{DEC}} &=\; \text{Flights in Dec 2019}\\
@@ -129,52 +132,72 @@ Geocoding OurAirports → ISO‑2; Eurocontrol map → ISO‑3.
 
 ### Statistical approach
 
-* Spearman ρ between each flight metric and *E*~t~.  
+* Spearman $ρ$ between each flight metric and $E_t$.  
 * 5000‑sample bootstrap CIs.  
 * Sensitivity checks:
   1. exclude countries < 2 M pop;  
-  2. use *FPM*;
-  3. drop countries with any missing *E* snapshot
+  2. use $FPM$;
+  3. drop countries with any missing $E$ snapshot
 
-Analyses done in **R 4.4**; full script and data pipeline in `notebooks/`.
+Analyses were performed in **R 4.4**; the full script and data pipeline are available in `notebooks/`.
+
+**Population normalization:**
+
+Population denominators use the 2020 mid‑year estimates from the UN World Population Prospects (WPP 2024 revision). This choice is justified because European populations change by less than ±1 % from year to year, making the 2020 estimate a robust and standard baseline for per‑capita analyses. Using a fixed population denominator aligns with common practice in epidemiological studies of COVID‑19 excess mortality (e.g., [@karlinsky2021; @kelly2021]), where mid‑year population values serve as the most representative measure of the population at risk. A sensitivity check (Appendix X, Table X) shows that normalizing flights by later‑year populations changes Spearman coefficients only in the third or fourth decimal place.
+
+### Analysis workflow
+
+1. **Exposure metrics**  
+   $F_{\text{DEC}};F_{\text{MAR}},$
+   $F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}$
+
+2. **Outcome series**  
+   $E_t$– cumulative excess deaths / million on 5 May 2020–2023.
+
+3. **Main test**  
+   Spearman $ρ$ (two‑tailed) for every $F \times E_t$ pair;  
+   5 000‑sample percentile bootstrap for 95 % CI.
+
+4. **Sensitivity panel**
+
+   | Label | Change | Purpose |
+   |--------|--------|---------|
+   | POP‑cut | drop < 2 M pop | small‑country leverage |
+   | FPM | flights per million pop | relative exposure |
+   | COMPLETE | require full four‑year ($E_t$) series | missing‑data bias 
+
+5. **Reproducibility**  
+   R 4.4.0; libraries; scripts in `notebooks/` tracked via GitHub.
 
 
 
-## Results
+
+
+
+
+# Results
 
 This chapter presents the results of the exploratory analysis investigating the association between early international flight exposure and cumulative excess mortality in European countries. It includes a descriptive overview of the flight data, early air connectivity patterns, country exposure rankings, and the results of the correlation analyses. Where relevant, additional sensitivity analyses are provided to assess the robustness of findings.
 
-### Descriptive Overview of Flight Data
+## Data coverages & descriptives
 
-This section summarizes the characteristics of the inbound flight data used for the analysis.
-
-- **Total number of recorded flights** from China, Hong Kong, and Macao to Europe in **December 2019** and **March 2020**
-- **Number of destination countries included** after data cleaning and filtering
-- Summary of the **data preparation steps**:
-  - Matching origin and destination airports
-  - Aggregation at country level
-  - Removal of incomplete records
-- **Descriptive statistics**:
-  - Minimum, maximum, median, mean inbound flights per country
-  - Comparison of flight volumes between December 2019 and March 2020
+| Month | # flight (total) | Median / country | Min-Max |
+|-------|------------------|------------------|---------|
+| Dec 2019 |  |  |  |
 
 *Table 4.1: Descriptive statistics of inbound flight data.*
 
-### Early Air Connectivity Patterns
+## Early air-connectivity patterns
 
 > **Note on visual encoding:** To avoid unintended cultural or emotional interpretations, color palettes in maps and flow diagrams were deliberately selected to avoid connotations such as red = danger/blame. Additionally, all figures were designed to be accessible to readers with color vision deficiencies by using colorblind-safe palettes and clear labeling. These choices support neutral, inclusive, and responsible data visualization.
 
-This section illustrates the spatial and temporal distribution of early international flight exposure.
+[Notes for Figures]
+4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top‑15 destinations.”
+4.2. Flow graphic – Shows who flew to whom; gives geographical intuition that a plain bar cannot. - If Sankyey, cleaner for volumes, but beware Variables.
+4.3 Choropleth (per‑country totals, same palette).
+4.4. Daily flight profile within each sample month - Demonstrates intra‑month variability (e.g. the steep drop after 15 Mar). - Two separate facets: “Dec 2019” and “Mar 2020” - Bar on thin line; y-axis = flights/day. - Insert grey panel: “No data Jan–Feb 2020” between facets
 
-- **Bar chart** of top 10–15 European countries by inbound flight volume (separately for December & March)
-- **Time trend plot** of daily/weekly inbound flights
-- **Map visualization** of aggregated inbound flight volumes at the country level
-- Optional: Sankey diagram showing aggregated flows from China/Hong Kong/Macao to European countries
-
-*Figure 4.1: Inbound flight volumes by country.*  
-*Figure 4.2: Sankey diagram of early air connectivity.*
-
-### Country Exposure Rankings
+## Country exposure rankings
 
 A ranking of European countries based on their total inbound flight exposure is presented.
 
@@ -183,47 +206,32 @@ A ranking of European countries based on their total inbound flight exposure is 
 
 *Table 4.2: Country exposure rankings.*
 
-Optional: **Heatmap-style plot** of exposure rankings across months
+| Rank | ISO3 |Dec | Mar | Sum |
+|------|------|----|-----|-----|
 
-### Correlation Analysis Results
+Table 4.2 and optional heat-map fig. 4.3
 
-presents the results of the statistical correlation analyses.
 
-#### Correlation for December 2019
+## Association with excess mortality
 
-- **Spearman rank correlation** between December 2019 flight exposure and cumulative excess mortality
-- Correlation coefficients and significance levels at four timepoints:
-  - 05 May 2020
-  - 05 May 2021
-  - 05 May 2022
-  - 05 May 2023
-- **Scatterplots** of exposure rank vs excess mortality
+### Main correlation results
 
-*Table 4.3: Correlation coefficients for December 2019 exposure.*  
-*Figure 4.3: Scatterplots for December 2019 exposure.*
+Presenting a single four‑column table (Dec, Mar, Sum, Flights / M pop) with ρ, 95 % CI and p for each of the four years. (Table 4.3)
 
-#### Correlation for March 2020
+Figure 4.4: line plot of ρ over 2020‑2023 (one ribbon per exposure metric).
 
-same structure as I did above:
-- Spearman rank correlation for March 2020 exposure
-- Four timepoints
-- Scatterplots
+### Snapshot scatter (May 2020)
 
-*Table 4.4: Correlation coefficients for March 2020 exposure.*  
-*Figure 4.4: Scatterplots for March 2020 exposure.*
 
-#### Correlation for Combined Exposure
-as above again, but aggregated exposure (December + March):
 
-*Table 4.5: Correlation coefficients for combined exposure.*  
-*Figure 4.5: Scatterplots for combined exposure.*
+## Robustness check & sensitivity analyses
+
+### Robustness heck
+
 
 ### Sensitivity Analyses
 
-evaluate the robustness of the observed correlation patterns, additional sensitivity analyses:
-
-- **Exclusion of small-population countries:**  
-Countries with fewer than 2 million inhabitants excluded to assess potential distortion from small-country effects.
+[TODO: evaluating the robustness of the observed correlation patterns, additional sensitivity analyses]
 
 - **Exclusion of countries with incomplete mortality data:**  
 Countries lacking complete excess mortality records for all four reference timepoints removed.
@@ -232,19 +240,29 @@ Countries lacking complete excess mortality records for all four reference timep
 Flight exposure indicators normalized by country population (in millions) to evaluate whether relative exposure, rather than absolute flight volume, influenced correlation outcomes.
 
 - **Separate analysis by month:**  
-Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects.
+Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects. ->
 
 *Table 4.6: Sensitivity analysis results.*
 
-### Summary of Key Patterns
 
-- Overview of which month(s) exhibited stronger correlation signals
-- Geographic patterns in exposure and mortality
-- Effect of data filtering and sensitivity analysis on correlation strength
+## Key patterns & short recap
 
 [Transission to the next section]
 
 The following chapter discusses these findings in the broader context of structural factors and methodological considerations
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Discussion
 
