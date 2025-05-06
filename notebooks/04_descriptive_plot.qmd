@@ -151,7 +151,7 @@ library(rnaturalearth)
 library(dplyr)
 library(scales)
 
-routes_top <- routes_sf %>% 
+routes_top <- routes_sf %>%
   slice_max(n_flights, n = 30) %>% # top 30 airport pairs
   mutate(origin_hub = factor(ADEP))
 
@@ -167,25 +167,35 @@ hub_cols <- c(
 
 # basemap
 eu <- ne_countries(scale = 50, returnclass = "sf") |>
-        filter(continent == "Europe")
+  filter(continent == "Europe")
 
 ggplot() +
   geom_sf(data = eu, fill = "grey92", colour = "white") +
-  geom_sf(data = routes_top,
-          aes(size = n_flights,
-              colour = origin_hub),
-          show.legend = "point",
-          alpha = .7) +
-  scale_size(range = c(.4, 1.8),
-             breaks = c(10, 50, 100, 250),
-             name = "Direct flights\nDec 2019 + Mar 2020") +
+  geom_sf(
+    data = routes_top,
+    aes(
+      size = n_flights,
+      colour = origin_hub
+    ),
+    show.legend = "point",
+    alpha = .7
+  ) +
+  scale_size(
+    range = c(.4, 1.8),
+    breaks = c(10, 50, 100, 250),
+    name = "Direct flights\nDec 2019 + Mar 2020"
+  ) +
   scale_colour_manual(values = hub_cols, name = "Origin hub") +
   coord_sf(xlim = c(-15, 45), ylim = c(25, 65), expand = FALSE) +
-  labs(title = "Main direct CN/HK → EUROCONTROL flows",
-       subtitle = "Top 30 airport-pairs; line width α total flights") +
+  labs(
+    title = "Main direct CN/HK → EUROCONTROL flows",
+    subtitle = "Top 30 airport-pairs; line width α total flights"
+  ) +
   theme_void(base_size = 11) +
-  theme(legend.position = "left",
-        plot.title.position = "plot")
+  theme(
+    legend.position = "left",
+    plot.title.position = "plot"
+  )
 ```
 
 
