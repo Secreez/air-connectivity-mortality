@@ -1,0 +1,135 @@
+---
+title:  "Inbound flights × excess mortality — correlation results"
+author: "M. Elixhauser"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+freeze: auto
+execute:
+  echo: false 
+---
+
+```{r setup, include = FALSE}
+source(here::here("R", "00_load_libs.R"))
+
+fig_dir <- here("data/figures")
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
+
+analysis_df <- read_rds(here("data/processed/analysis_df.rds"))
+
+pop_df <- read_csv(
+  here("data/raw/owid/owid-covid-data.csv"),
+  show_col_types = FALSE,
+  col_select     = c(iso_code, date, population)
+) |>
+  filter(lubridate::year(date) == 2020) |>
+  group_by(iso_code) |>
+  slice_max(date, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(iso3 = iso_code, population)
+```
+
+## Analysis data set
+
+```{r}
+corr_df <- analysis_df |>
+  semi_join(analysis_df |> count(iso3) |> filter(n == 4), by = "iso3") |>
+  left_join(pop_df, by = "iso3") |>
+  mutate(flights_pm = total_inbound_flights_combined / (population / 1e6))
+stopifnot(!anyNA(corr_df$flights_pm))
+```
+
+## Spearman's rank correlation (baseline)
+
+```{r}
+boot_rho <- function(data, idx, xvar)
+  with(data[idx, ],
+       cor(get(xvar),
+           excess_mortality_cumulative_per_million,
+           method = "spearman",
+           use   = "complete.obs"))
+
+spearman_by_year <- function(xvar, B = 5000) { # Bootstrap = 5000 - Default .. need a reasoning though.
+
+  corr_df %>% 
+    group_by(target_date) %>% 
+    group_modify(\(d, key) {
+
+      ok <- complete.cases(d[[xvar]],
+                           d$excess_mortality_cumulative_per_million)
+      dd <- d[ok, ]
+      n  <- nrow(dd)
+
+      if (n < 3 ||
+          sd(dd[[xvar]]) == 0 ||
+          sd(dd$excess_mortality_cumulative_per_million) == 0)
+        return(tibble(rho = NA, ci_lo = NA, ci_hi = NA,
+                      p = NA, n = n))
+
+      rho  <- cor(dd[[xvar]], dd$excess_mortality_cumulative_per_million,
+                  method = "spearman")
+      pval <- cor.test(dd[[xvar]], dd$excess_mortality_cumulative_per_million,
+                       method = "spearman", exact = FALSE)$p.value
+
+      set.seed(42)
+      ci <- if (n >= 4) {
+        boot(dd, boot_rho, R = B, xvar = xvar) |>
+          (\(b) quantile(b$t, c(.025, .975), na.rm = TRUE))() # .025, .975 CI (why used!)
+      } else c(NA, NA)
+
+      tibble(rho   = rho,
+             ci_lo = ci[1],
+             ci_hi = ci[2],
+             p     = pval,
+             n     = n)
+    }) %>% 
+    ungroup() %>%
+    mutate(variable = xvar,
+           year     = lubridate::year(target_date))
+}
+
+spearman_res <- purrr::map_dfr(
+  c("total_inbound_flights_dec19",
+    "total_inbound_flights_mar20",
+    "total_inbound_flights_combined",
+    "flights_pm"),
+  spearman_by_year
+) %>% 
+  mutate(variable = dplyr::recode(variable,
+    total_inbound_flights_dec19    = "Dec 2019",
+    total_inbound_flights_mar20    = "Mar 2020",
+    total_inbound_flights_combined = "Combined",
+    flights_pm                     = "Flights / M pop"))
+
+```
+
+```{r}
+knitr::kable(
+  spearman_res |>
+    select(year, variable, rho, ci_lo, ci_hi, p, n) |>
+    mutate(across(where(is.numeric), \(x) round(x, 3))),
+  caption = "Table 4-1 Spearman ρ between early flight exposure and cumulative excess mortality."
+)
+```
+
+**Key patterns:**
+- Early air conenctivity explains a sizeable share of the cross-country variation in first-wave excess mortality. (p ≈ -0.45, 95 % CI 0.18-0.80; p < 0.01).
+- From 2021 onwards the simple rank correlation vanishes; by 2022-23 it turns modestly negative (p ≈ -0.45, 95 % CI -0.79-0.00).
+- The sign change is larger than the bootstrap confidence intervals, indicating that it is unlikely to be due to sampling noise in a 25-country sample.
+
+**Interpretation:**
+International flights mattered only during the narrow "pre-transmission window" (need better term). Once SARS-CoV-2 was seeded "everywhere", subsequent excess mrotality was driven by domestic factors (age structure, public-health response, vaccination, health-system strain) rather than by additional import pressure. This finding is ... (search for SOURCE in: diminishing return or not of border closures after local circulation is established.. could be interesting)
+
+# Visualizing the trend
+
+## p over time
+
+## Snapshot scatter (05 May 2020)
+
+## Scater by year
+
+# Robustness check
+
+# Takeaway

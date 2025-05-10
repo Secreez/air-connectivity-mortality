@@ -6,6 +6,7 @@ suppressPackageStartupMessages({ # quite a lot. Need to reduce after complete an
   library(sf)
   library(viridis)
   library(broom)
+  library(boot)
   library(purrr)
   library(ggrepel)
   library(kableExtra)
