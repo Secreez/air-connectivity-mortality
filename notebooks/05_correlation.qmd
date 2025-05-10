@@ -44,65 +44,83 @@ stopifnot(!anyNA(corr_df$flights_pm))
 ## Spearman's rank correlation (baseline)
 
 ```{r}
-boot_rho <- function(data, idx, xvar)
-  with(data[idx, ],
-       cor(get(xvar),
-           excess_mortality_cumulative_per_million,
-           method = "spearman",
-           use   = "complete.obs"))
+boot_rho <- function(data, idx, xvar) {
+  with(
+    data[idx, ],
+    cor(get(xvar),
+      excess_mortality_cumulative_per_million,
+      method = "spearman",
+      use = "complete.obs"
+    )
+  )
+}
 
 spearman_by_year <- function(xvar, B = 5000) { # Bootstrap = 5000 - Default .. need a reasoning though.
 
-  corr_df %>% 
-    group_by(target_date) %>% 
+  corr_df %>%
+    group_by(target_date) %>%
     group_modify(\(d, key) {
-
-      ok <- complete.cases(d[[xvar]],
-                           d$excess_mortality_cumulative_per_million)
+      ok <- complete.cases(
+        d[[xvar]],
+        d$excess_mortality_cumulative_per_million
+      )
       dd <- d[ok, ]
-      n  <- nrow(dd)
+      n <- nrow(dd)
 
       if (n < 3 ||
-          sd(dd[[xvar]]) == 0 ||
-          sd(dd$excess_mortality_cumulative_per_million) == 0)
-        return(tibble(rho = NA, ci_lo = NA, ci_hi = NA,
-                      p = NA, n = n))
+        sd(dd[[xvar]]) == 0 ||
+        sd(dd$excess_mortality_cumulative_per_million) == 0) {
+        return(tibble(
+          rho = NA, ci_lo = NA, ci_hi = NA,
+          p = NA, n = n
+        ))
+      }
 
-      rho  <- cor(dd[[xvar]], dd$excess_mortality_cumulative_per_million,
-                  method = "spearman")
+      rho <- cor(dd[[xvar]], dd$excess_mortality_cumulative_per_million,
+        method = "spearman"
+      )
       pval <- cor.test(dd[[xvar]], dd$excess_mortality_cumulative_per_million,
-                       method = "spearman", exact = FALSE)$p.value
+        method = "spearman", exact = FALSE
+      )$p.value
 
       set.seed(42)
       ci <- if (n >= 4) {
         boot(dd, boot_rho, R = B, xvar = xvar) |>
           (\(b) quantile(b$t, c(.025, .975), na.rm = TRUE))() # .025, .975 CI (why used!)
-      } else c(NA, NA)
+      } else {
+        c(NA, NA)
+      }
 
-      tibble(rho   = rho,
-             ci_lo = ci[1],
-             ci_hi = ci[2],
-             p     = pval,
-             n     = n)
-    }) %>% 
+      tibble(
+        rho = rho,
+        ci_lo = ci[1],
+        ci_hi = ci[2],
+        p = pval,
+        n = n
+      )
+    }) %>%
     ungroup() %>%
-    mutate(variable = xvar,
-           year     = lubridate::year(target_date))
+    mutate(
+      variable = xvar,
+      year = lubridate::year(target_date)
+    )
 }
 
 spearman_res <- purrr::map_dfr(
-  c("total_inbound_flights_dec19",
+  c(
+    "total_inbound_flights_dec19",
     "total_inbound_flights_mar20",
     "total_inbound_flights_combined",
-    "flights_pm"),
+    "flights_pm"
+  ),
   spearman_by_year
-) %>% 
+) %>%
   mutate(variable = dplyr::recode(variable,
     total_inbound_flights_dec19    = "Dec 2019",
     total_inbound_flights_mar20    = "Mar 2020",
     total_inbound_flights_combined = "Combined",
-    flights_pm                     = "Flights / M pop"))
-
+    flights_pm                     = "Flights / M pop"
+  ))
 ```
 
 ```{r}

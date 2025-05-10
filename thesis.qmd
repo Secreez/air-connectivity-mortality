@@ -31,51 +31,51 @@ format:
 
 ### Context & motivation
 
-When SARS‑CoV‑2 emerged in late 2019, the global airline network compressed inter‑city travel times to hours, not weeks. Modelling studies show that long‑haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections [@chinazzi2020; @sun2022_a].
+When SARS-CoV-2 emerged in late 2019, the global airline network compressed inter-city travel times to hours, not weeks. Modelling studies show that long-haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections [@chinazzi2020; @sun2022_a].
 
-Yet European countries later displayed wide gaps in excess mortality. Analysts have linked those gaps to demography, health‑system capacity, and policy timing [@rahmanian2024; @matveeva2023]. How much of the early mortality spread can be traced to initial exposure via direct flights from China and its two SARs? The question remains largely descriptive—and unanswered.
+Yet European countries later displayed wide gaps in excess mortality. Analysts have linked those gaps to demography, health-system capacity, and policy timing [@rahmanian2024; @matveeva2023]. How much of the early mortality spread can be traced to initial exposure via direct flights from China and its two SARs? The question remains largely descriptive—and unanswered.
 
 ### Research Question
 
 > Among continental Eurocontrol member states, is a higher volume of direct inbound flights from China/HongKong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
 
-Snapshots for 2021‑2023 are analysed as robustness checks.
+Snapshots for 2021-2023 are analysed as robustness checks.
 
 ### Objectives
 
-**1. Measure exposure:** Create a country‑level index of inbound IFR flights (Dec 2019, Mar 2020, sum) from EUROCONTROL data.
+**1. Measure exposure:** Create a country-level index of inbound IFR flights (Dec 2019, Mar 2020, sum) from EUROCONTROL data.
 
-**2. Rank & correlate:** Compute Spearman ρ between exposure ranks and excess‑mortality ranks on 5 May 2020; repeat for 2021‑2023.
+**2. Rank & correlate:** Compute Spearman ρ between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021-2023.
 
 **3. Appraise validity:** Discuss strengths and limits of flight counts as a proxy for epidemic seeding.
 
 ### Road-map
 
-- Chapter 2 reviews work on mobility‑driven seeding and excess‑mortality metrics.
+- Chapter 2 reviews work on mobility-driven seeding and excess-mortality metrics.
 - Chapter 3 details data cleaning and the correlation method.
 - Chapter 4 presents exposure rankings, maps, and ρ results.
 - Chapter 5 interprets the patterns, weighs confounders, and tests sensitivity.
-- Chapter 6 summarises key findings and outlines next‑step research.
+- Chapter 6 summarises key findings and outlines next-step research.
 
 ## Literature Review {#litrev}
 
-Recent syntheses (e.g. [@pizzato2024]) show wide cross‑country gaps in European excess‑mortality and point to socio‑economic gradients, health‑system capacity and vaccination uptake as major drivers. This thesis adds an early‑mobility angle that those studies treat only tangentially.
+Recent syntheses (e.g. [@pizzato2024]) show wide cross-country gaps in European excess-mortality and point to socio-economic gradients, health-system capacity and vaccination uptake as major drivers. This thesis adds an early-mobility angle that those studies treat only tangentially.
 
 ### Excess mortality as benchmark
 
-[TODO: Brief paragraph: why excess deaths capture the full health burden better than case or COVID‑death counts; citation to WMD, HMD‑STMF.]
+[TODO: Brief paragraph: why excess deaths capture the full health burden better than case or COVID-death counts; citation to WMD, HMD-STMF.]
 
-### Mobility‑driven seeding
+### Mobility-driven seeding
 
-[TODO: One paragraph: network epidemiology concept of “effective distance” [cite Brockmann & Helbing 2013]; empirical links between flight volume and first‑wave seeding (e.g. [@chinazzi2020] global; [@sun2022_a] intra‑EU).]
+[TODO: One paragraph: network epidemiology concept of “effective distance” [cite Brockmann & Helbing 2013]; empirical links between flight volume and first-wave seeding (e.g. [@chinazzi2020] global; [@sun2022_a] intra-EU).]
 
-### Air‑traffic studies during COVID‑19
+### Air-traffic studies during COVID-19
 
 | Study                     | Data            | Scope  | Key insight                             |
 | ------------------------- | --------------- | ------ | --------------------------------------- |
 | Chinazzi et al. 2020      | ...             | ...    | ...                                     |
-| Sun et al. 2022            | ...             | ...    | ...                                     |
-| Strohmeier et al. 2021     | ...             | ...    | ...                                     |
+| Sun et al. 2022           | ...             | ...    | ...                                     |
+| Strohmeier et al. 2021    | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
 | ...                       | ...             | ...    | ...                                     |
@@ -88,7 +88,7 @@ Recent syntheses (e.g. [@pizzato2024]) show wide cross‑country gaps in Europea
 
 ### Why Eurocontrol, not OpenSky
 
-OpenSky’s crowd‑sourced ADS‑B receivers leave blind spots across East Asia; many CN → EU flights in Dec‑19 are simply absent (Appendix Fig X). Eurocontrol, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (Eurocontrol), not scheduled seats or partial ADS‑B traces. OpenSky appears only to illustrate its coverage bias.
+OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). Eurocontrol, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (Eurocontrol), not scheduled seats or partial ADS-B traces. OpenSky appears only to illustrate its coverage bias.
 
 [TODO: Create Opensky map again...]
 
@@ -96,9 +96,9 @@ OpenSky’s crowd‑sourced ADS‑B receivers leave blind spots across East Asia
 
 ### Study design
 
-Exploratory, cross‑sectional correlation at the *country* level.
+Exploratory, cross-sectional correlation at the *country* level.
 
-Outcome = cumulative excess‑deaths / million on 5 May of 2020‑23.  
+Outcome = cumulative excess-deaths / million on 5 May of 2020-23.  
 
 Exposure = direct CN/HK/MO → Eurocontrol flights in Dec 2019 and Mar 2020.
 
@@ -115,14 +115,14 @@ F_{\text{MAR}} &=\; \text{Flights in Mar 2020}\\
 F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 \end{aligned}
 $$
-Geocoding OurAirports → ISO‑2; Eurocontrol map → ISO‑3.
+Geocoding OurAirports → ISO-2; Eurocontrol map → ISO-3.
 
 
 ### Excess mortality snapshots
 
 *Source* OWID (WMD + HMD–STMF). 
 
-*Reference date* closest non‑NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
+*Reference date* closest non-NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
 
 ### Analytical variables
 
@@ -133,7 +133,7 @@ Geocoding OurAirports → ISO‑2; Eurocontrol map → ISO‑3.
 ### Statistical approach
 
 * Spearman $ρ$ between each flight metric and $E_t$.  
-* 5000‑sample bootstrap CIs.  
+* 5000-sample bootstrap CIs. (Need a why here)
 * Sensitivity checks:
   1. exclude countries < 2 M pop;  
   2. use $FPM$;
@@ -143,7 +143,7 @@ Analyses were performed in **R 4.4**; the full script and data pipeline are avai
 
 **Population normalization:**
 
-Population denominators use the 2020 mid‑year estimates from the UN World Population Prospects (WPP 2024 revision). This choice is justified because European populations change by less than ±1 % from year to year, making the 2020 estimate a robust and standard baseline for per‑capita analyses. Using a fixed population denominator aligns with common practice in epidemiological studies of COVID‑19 excess mortality (e.g., [@karlinsky2021; @kelly2021]), where mid‑year population values serve as the most representative measure of the population at risk. A sensitivity check (Appendix X, Table X) shows that normalizing flights by later‑year populations changes Spearman coefficients only in the third or fourth decimal place.
+Population denominators use the 2020 mid-year estimates from the UN World Population Prospects (WPP 2024 revision). This choice is justified because European populations change by less than ±1 % from year to year, making the 2020 estimate a robust and standard baseline for per-capita analyses. Using a fixed population denominator aligns with common practice in epidemiological studies of COVID-19 excess mortality (e.g., [@karlinsky2021; @kelly2021]), where mid-year population values serve as the most representative measure of the population at risk. A sensitivity check (Appendix X, Table X) shows that normalizing flights by later-year populations changes Spearman coefficients only in the third or fourth decimal place.
 
 ### Analysis workflow
 
@@ -155,16 +155,16 @@ Population denominators use the 2020 mid‑year estimates from the UN World Popu
    $E_t$– cumulative excess deaths / million on 5 May 2020–2023.
 
 3. **Main test**  
-   Spearman $ρ$ (two‑tailed) for every $F \times E_t$ pair;  
-   5 000‑sample percentile bootstrap for 95 % CI.
+   Spearman $ρ$ (two-tailed) for every $F \times E_t$ pair;  
+   5000-sample percentile bootstrap for 95 % CI (boot library)
 
 4. **Sensitivity panel**
 
    | Label | Change | Purpose |
    |--------|--------|---------|
-   | POP‑cut | drop < 2 M pop | small‑country leverage |
+   | POP-cut | drop < 2 M pop | small-country leverage |
    | FPM | flights per million pop | relative exposure |
-   | COMPLETE | require full four‑year ($E_t$) series | missing‑data bias 
+   | COMPLETE | require full four-year ($E_t$) series | missing-data bias 
 
 5. **Reproducibility**  
    R 4.4.0; libraries; scripts in `notebooks/` tracked via GitHub.
@@ -181,9 +181,9 @@ This chapter presents the results of the exploratory analysis investigating the 
 
 ## Data coverages & descriptives
 
-| Month | # flight (total) | Median / country | Min-Max |
-|-------|------------------|------------------|---------|
-| Dec 2019 |  |  |  |
+| Month | # flight (total)    | Median / country | Min-Max |
+|----------|------------------|------------------|---------|
+| Dec 2019 |                  |                  |         |
 
 *Table 4.1: Descriptive statistics of inbound flight data.*
 
@@ -192,10 +192,10 @@ This chapter presents the results of the exploratory analysis investigating the 
 > **Note on visual encoding:** To avoid unintended cultural or emotional interpretations, color palettes in maps and flow diagrams were deliberately selected to avoid connotations such as red = danger/blame. Additionally, all figures were designed to be accessible to readers with color vision deficiencies by using colorblind-safe palettes and clear labeling. These choices support neutral, inclusive, and responsible data visualization.
 
 [Notes for Figures]
-4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top‑15 destinations.”
+4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top-15 destinations.”
 4.2. Flow graphic – Shows who flew to whom; gives geographical intuition that a plain bar cannot. - If Sankyey, cleaner for volumes, but beware Variables.
-4.3 Choropleth (per‑country totals, same palette).
-4.4. Daily flight profile within each sample month - Demonstrates intra‑month variability (e.g. the steep drop after 15 Mar). - Two separate facets: “Dec 2019” and “Mar 2020” - Bar on thin line; y-axis = flights/day. - Insert grey panel: “No data Jan–Feb 2020” between facets
+4.3 Choropleth (per-country totals, same palette).
+4.4. Daily flight profile within each sample month - Demonstrates intra-month variability (e.g. the steep drop after 15 Mar). - Two separate facets: “Dec 2019” and “Mar 2020” - Bar on thin line; y-axis = flights/day. - Insert grey panel: “No data Jan–Feb 2020” between facets
 
 ## Country exposure rankings
 
@@ -216,9 +216,9 @@ Table 4.2 and optional heat-map fig. 4.3
 
 ### Main correlation results
 
-Presenting a single four‑column table (Dec, Mar, Sum, Flights / M pop) with ρ, 95 % CI and p for each of the four years. (Table 4.3)
+Presenting a single four-column table (Dec, Mar, Sum, Flights / M pop) with ρ, 95 % CI and p for each of the four years. (Table 4.3)
 
-Figure 4.4: line plot of ρ over 2020‑2023 (one ribbon per exposure metric).
+Figure 4.4: line plot of ρ over 2020-2023 (one ribbon per exposure metric).
 
 ### Snapshot scatter (May 2020)
 
