@@ -69,11 +69,13 @@ library(patchwork)
 df <- read_csv("data/opensky/opensky_2020_02.csv.gz")
 airports <- read_csv("data/airports.csv")
 
-eurocontrol_countries <- c("BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR", 
-                            "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI", 
-                            "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES", 
-                            "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM", 
-                            "LT", "ME", "LV", "GE", "EE")
+eurocontrol_countries <- c(
+  "BE", "FR", "DE", "LU", "NL", "GB", "IE", "PT", "GR",
+  "MT", "TR", "CY", "HU", "CH", "AT", "DK", "NO", "SI",
+  "SE", "CZ", "IT", "RO", "BG", "HR", "MC", "SK", "ES",
+  "MK", "MD", "FI", "AL", "BA", "PL", "UA", "RS", "AM",
+  "LT", "ME", "LV", "GE", "EE"
+)
 
 # Extract ICAO codes for China, HK, MO
 china_airports <- airports %>%
@@ -98,7 +100,6 @@ china_to_europe_flights <- df_cleaned %>%
 
 raw_counts <- df %>% count(day)
 cleaned_counts <- df_cleaned %>% count(day)
-
 ```
 
 
@@ -109,15 +110,15 @@ cleaned_counts <- df_cleaned %>% count(day)
 
 summary_data <- data.frame(
   Metric = c(
-    "Total flights (raw)", 
-    "Total flights (cleaned)", 
-    "Percentage removed", 
+    "Total flights (raw)",
+    "Total flights (cleaned)",
+    "Percentage removed",
     "China → Eurocontrol flights"
   ),
   Value = c(
-    total_flights, 
-    cleaned_flights, 
-    paste0(removed_pct, "%"), 
+    total_flights,
+    cleaned_flights,
+    paste0(removed_pct, "%"),
     china_to_europe_flights
   )
 )
@@ -139,7 +140,6 @@ p_cleaned <- ggplot(cleaned_counts, aes(x = day, y = n)) +
   labs(title = "Daily Flight Counts (Cleaned Data)", x = "Date", y = "Flights")
 
 print(p_raw / p_cleaned)
-
 ```
 
 Given these challenges, a pragmatic adjustment to the original modeling framework is necessary. To overcome these limitations, I propose integrating **multiple complementary data sources**. Specifically, the **OpenSky** dataset from February 2020—despite its limited volume—will serve as a **baseline** for the early epidemic arrival phase. **Eurocontrol** data (starting March 2020), offering comprehensive European flight records, will help validate February’s flight numbers and fill key gaps. For months lacking explicit records, **linear interpolation** and **seasonal normalization** methods may be employed, ensuring continuity in flight data for the initial seeding period. Recognizing early travel restrictions in China (e.g., Wuhan’s lockdown—see [here](#wavetime)) further highlights the importance of including multiple major Chinese airports, rather than focusing on Wuhan alone.

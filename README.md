@@ -32,11 +32,12 @@ bachelor-thesis/
 │ ├─ 03_merge_exposure.R 
 │ ├─ 04_descriptive_plots.qmd 
 │ └─ 05_correlation.qmd 
-├─ R/ # helper functions (utils_*.R) 
+├─ R/ # QA scripts & functions
 ├─ thesis.qmd # main write-up (Quarto)
 ├─ thesis_ref.bib # references (BibTeX)
 ├─ _quarto.yml # Quarto config
 ├─ run_pipeline.sh # bash script to run the pipeline
+├─ style_all.R # styler for all scripts
 └─ README.md
 ```
 

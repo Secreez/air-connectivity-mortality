@@ -1,61 +1,60 @@
 #!/usr/bin/env Rscript
-source(here::here("R","00_load_libs.R"))
+# Picks the row closest to 5‑May (± 7 d) for 2020‑2023 from OWID
+# Compares OWID mid‑2020 population with UN‑WPP mid‑2020
+# Usage: Rscript notebooks/02_flight_filter.R
 
-## Load & Prepare Excess Mortality Data (OWID)
+source(here::here("R", "00_load_libs.R"))
 
-# Based on the OWID + WMD/HMD sources, many countries report mortality weekly or monthly.
-# To create comparable annual snapshots for 2020–2023, we use a ±7-day window around **5 May**, keeping the **closest non-NA value**.
-# Most matched dates fall on `30 April` or `03–07 May`, aligning with ISO Week 18 conventions.
+# helpers
+euro_ISO3 <- readr::read_csv(
+  here::here("data/eurocontrol_iso_map.csv"),
+  show_col_types = FALSE
+)$iso3
 
+owid_path <- here::here("data/raw/owid/owid-covid-data.csv")
 
-# Load OWID dataset
-covid_data <- read_csv( here::here("data","raw","owid","owid-covid-data.csv") )
+# excess‑mortality snapshots
+covid_raw <- readr::read_csv(
+  owid_path,
+  show_col_types = FALSE
+) |>
+  dplyr::filter(iso_code %in% euro_ISO3)
 
-# Define target snapshot dates and ±7-day tolerance
-target_dates <- ymd(c("2020-05-05", "2021-05-05", "2022-05-05", "2023-05-05"))
-tolerance <- 7
+ref_dates <- lubridate::ymd(c(
+  "2020-05-05", "2021-05-05",
+  "2022-05-05", "2023-05-05"
+))
 
-# Build ±7-day windows for each target date
-expanded_dates <- map_dfr(target_dates, function(date) {
-  tibble(
-    target_date = date,
-    date = seq(date - tolerance, date + tolerance, by = "days")
+win_tbl <- purrr::map_dfr(
+  ref_dates,
+  \(d) tibble::tibble(
+    target_date = d,
+    date = seq(d - 7, d + 7, by = "days")
   )
-})
+)
 
-owid_snapshots <- covid_data %>%
-  select(iso_code, location, date, excess_mortality_cumulative_per_million) %>%
-  inner_join(expanded_dates, by = "date") %>%
-  filter(!is.na(excess_mortality_cumulative_per_million)) %>%  # filter out NAs early!
-  mutate(day_diff = abs(as.integer(date - target_date))) %>%
-  group_by(iso_code, location, target_date) %>%
-  slice_min(day_diff, with_ties = FALSE) %>%
-  ungroup()
+owid_snapshots <- covid_raw |>
+  dplyr::select(
+    iso_code, location, date,
+    excess_mortality_cumulative_per_million
+  ) |>
+  dplyr::inner_join(win_tbl, by = "date") |>
+  dplyr::filter(!is.na(excess_mortality_cumulative_per_million)) |>
+  dplyr::mutate(day_diff = abs(as.integer(date - target_date))) |>
+  dplyr::group_by(iso_code, location, target_date) |>
+  dplyr::slice_min(day_diff, with_ties = FALSE) |>
+  dplyr::ungroup()
 
-# Sanity Check
-owid_snapshots %>%
-  count(target_date)
+stopifnot(max(owid_snapshots$day_diff) <= 7)
 
-owid_snapshots %>%
-  summarise(
-    min_date = min(date),
-    max_date = max(date)
-  )
+# save
+readr::write_rds(
+  owid_snapshots,
+  here::here("data/processed/owid_excess_snapshots.rds")
+)
+readr::write_csv(
+  owid_snapshots,
+  here::here("data/processed/owid_excess_snapshots.csv")
+)
 
-owid_snapshots %>%
-  filter(location %in% c("Germany", "France", "Italy")) %>%
-  arrange(location, target_date) %>%
-  select(location, target_date, date, day_diff, excess_mortality_cumulative_per_million)
-
-# To enable a consistent cross-country comparison of cumulative excess mortality per million for the years 2020 to 2023, we defined 5 May as a fixed annual reference date. This date was chosen due to its symbolic significance in many countries as the period around which COVID-19 emergency measures were lifted or reevaluated, and it coincides with ISO Week 18, a recurring reporting point for many datasets.
-# Since not all countries report mortality data exactly on 5 May, and reporting frequency varies (weekly, biweekly, monthly), we applied a ±7-day window around each year's reference date.
-# For each country and year, the closest available non-missing value within this window was selected. This ensures temporal consistency while respecting national reporting lags.
-# The absolute difference in days between the selected date and the reference date (day_diff) was recorded to assess potential deviations in timing and reporting alignment. Most matches were within a range of ±2–3 days, typically falling on dates such as 30 April, 3 May, or 7 May, which aligns well with reporting conventions across the EUROCONTROL zone.
-
-## export
-write_csv(owid_snapshots,
-          here::here("data","processed","owid_excess_snapshots.csv"))
-write_rds(owid_snapshots,
-          here::here("data","processed","owid_excess_snapshots.rds"))
-message("✓ owid_excess_snapshots written: ",
-        nrow(owid_snapshots), " rows")
+message("✓ owid_excess_snapshots: ", nrow(owid_snapshots), " rows")
