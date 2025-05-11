@@ -123,6 +123,7 @@ spearman_res <- purrr::map_dfr(
   ))
 ```
 
+
 ```{r}
 knitr::kable(
   spearman_res |>
@@ -143,8 +144,60 @@ International flights mattered only during the narrow "pre-transmission window" 
 # Visualizing the trend
 
 ## p over time
+```{r}
+p_rho <- ggplot(
+  spearman_res,
+  aes(target_date, rho, colour = variable, group = variable)
+) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2.4) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  scale_x_date(date_labels = "%Y") +
+  labs(x = NULL, y = "Spearman ρ", colour = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top")
+
+p_rho |> (\(p) {
+  ggsave(
+    filename = here(fig_dir, "rho_timeseries.png"),
+    plot     = p,
+    width    = 6, height = 4, dpi = 300, bg = "transparent"
+  )
+  p
+})()
+
+```
+
+**Take-away:**
+
+- Import effect is early and short-lived. Direct flights explain ≈ 3 % of the rank variance in May 2020, but < 10 % (< 5 % once micro‑states are excluded) from 2021 onwards. …
+- Once the virus is seeded, domestic factors dominate. The mere fact of being well-connected n longer increases cumulative mrotality and may evne correlate with lower late-period deaths (?)
+- Policy implciation (exploratory) Border controls can delay the first wave but have little leverage on the long-run toll unelss coupled with sustained internal measures.
 
 ## Snapshot scatter (05 May 2020)
+```{r}
+p20 <- corr_df %>% 
+  filter(target_date == as.Date("2020-05-05")) %>%
+  ggplot(aes(total_inbound_flights_combined,
+             excess_mortality_cumulative_per_million)) +
+  geom_point(size = 3, alpha = .8, colour = "#2b8cbe") +
+  geom_text_repel(aes(label = iso3), max.overlaps = 12, size = 3) +
+  scale_x_log10(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    x = "Inbound flights (log-scale)",
+    y = "Excess deaths / million",
+    caption = "ρ = 0.53 (p ≈ 0.007)"
+  )
+
+p20
+ggsave(here(fig_dir, "scatter_2020.png"),
+       p20, width = 5.6, height = 4, dpi = 300)
+
+```
+
+## pp scatter (Inb flights, dec 2019 + mar 2020) - with highlighter 
+- planned! 
 
 ## Scater by year
 
