@@ -160,12 +160,11 @@ p_rho <- ggplot(
 p_rho |> (\(p) {
   ggsave(
     filename = here(fig_dir, "rho_timeseries.png"),
-    plot     = p,
-    width    = 6, height = 4, dpi = 300, bg = "transparent"
+    plot = p,
+    width = 6, height = 4, dpi = 300, bg = "transparent"
   )
   p
 })()
-
 ```
 
 **Take-away:**
@@ -176,10 +175,12 @@ p_rho |> (\(p) {
 
 ## Snapshot scatter (05 May 2020)
 ```{r}
-p20 <- corr_df %>% 
+p20 <- corr_df %>%
   filter(target_date == as.Date("2020-05-05")) %>%
-  ggplot(aes(total_inbound_flights_combined,
-             excess_mortality_cumulative_per_million)) +
+  ggplot(aes(
+    total_inbound_flights_combined,
+    excess_mortality_cumulative_per_million
+  )) +
   geom_point(size = 3, alpha = .8, colour = "#2b8cbe") +
   geom_text_repel(aes(label = iso3), max.overlaps = 12, size = 3) +
   scale_x_log10(labels = scales::comma) +
@@ -192,8 +193,9 @@ p20 <- corr_df %>%
 
 p20
 ggsave(here(fig_dir, "scatter_2020.png"),
-       p20, width = 5.6, height = 4, dpi = 300)
-
+  p20,
+  width = 5.6, height = 4, dpi = 300
+)
 ```
 
 ## pp scatter (Inb flights, dec 2019 + mar 2020) - with highlighter 

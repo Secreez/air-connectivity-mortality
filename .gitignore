@@ -15,7 +15,7 @@ docs/**/_freeze/
 # GitHub config (not required for analysis)
 .github/
 
-# Data 
+# Data
 # 1) Raw source files (large / licensed)
 data/raw/
 
@@ -24,3 +24,4 @@ data/processed/
 
 # 3) Legacy proposal data (archived, unused)
 archive/proposal/data/
+/.quarto/

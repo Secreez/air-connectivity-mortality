@@ -29,9 +29,10 @@ bachelor-thesis/
 ├─ notebooks/ # analysis notebooks & build scripts 
 │ ├─ 01_excess_snapshots.R 
 │ ├─ 02_flight_filter.R 
-│ ├─ 03_merge_exposure.R 
-│ ├─ 04_descriptive_plots.qmd 
-│ └─ 05_correlation.qmd 
+│ ├─ 03_merge_exposure.R
+│ ├─ 04_population_qc.qmd
+│ ├─ 05_descriptive_plots.qmd 
+│ └─ 06_correlation.qmd 
 ├─ R/ # QA scripts & functions
 ├─ thesis.qmd # main write-up (Quarto)
 ├─ thesis_ref.bib # references (BibTeX)

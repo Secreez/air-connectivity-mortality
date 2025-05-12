@@ -1,5 +1,3 @@
-
-
 ```{r}
 # 04_population_qc.R
 source(here::here("R/00_load_libs.R"))
