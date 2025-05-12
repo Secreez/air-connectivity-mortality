@@ -13,8 +13,9 @@ Rscript notebooks/02_flight_filter.R
 Rscript notebooks/03_merge_exposure.R
 
 echo "Step 3: Render analysis notebooks..."
-quarto render notebooks/04_descriptive_plots.qmd
-quarto render notebooks/05_correlation.qmd
+quarto render notebooks/04_population_qc.qmd
+quarto render notebooks/05_descriptive_plots.qmd
+quarto render notebooks/06_correlation.qmd
 
 echo "Step 4: Render full thesis..."
 quarto render thesis.qmd
