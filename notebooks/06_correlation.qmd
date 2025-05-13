@@ -56,7 +56,6 @@ boot_rho <- function(data, idx, xvar) {
 }
 
 spearman_by_year <- function(xvar, B = 5000) {
-
   corr_df %>%
     group_by(target_date) %>%
     group_modify(\(d, key) {
@@ -143,27 +142,7 @@ International flights mattered only during the narrow "pre-transmission window" 
 
 **Why bootstrap CIs?**
 
-We Report 95 % confidence limits for Spearman’s ρ from a **non‑parametric percentile
-bootstrap (B = 5 000 resamples)**.
-
-* **Minimum B.** Coverage‑error analyses show that at least 2 000
-replicates are needed in small‑sample settings (DiCiccio & Efron 1996).  
-* **Diminishing returns.** Empirical work on rank correlations finds that coverage
-error keeps falling but flattens out once *B* reaches ≈ 4 000–5 000
-(Tong et al. 2016; Mokhtar et al. 2023).  
-* **Monte‑Carlo noise.** With *B* = 5 000, the Monte‑Carlo
-s.e. of the 2.5 th quantile is  
-
-$$\sqrt{0.025\,(1-0.025)/B}\;=\;0.007,$$
-
-  well below the sampling variability of ρ for *n* ≈ 25.  
-* **Cost.** Five thousand resamples run in x s on a PC, so the
-extra precision is essentially free.
-* **Reproducibility.** We fix the random seed (`set.seed(42)`), making the
-intervals byte‑for‑byte reproducible.
-
-Hence 5 000 draws strike a pragmatic balance between statistical
-accuracy and computational effort.
+We drew 5 000 bootstrap resamples, following the ≥ 2 000‑replicates guidance for small‑$n$ studies (DiCiccio & Efron 1996). Empirical work shows that coverage error for correlation CIs stabilises by ≈ 4 000 resamples (Tong et al. 2016; Mokhtar 2023). Five thousand therefore offers stable tails at negligible computational cost. A fixed random seed (`set.seed(42)`) makes the intervals exactly reproducible.
 
 # Visualizing the trend
 
@@ -222,8 +201,67 @@ ggsave(here(fig_dir, "scatter_2020.png"),
 )
 ```
 
-## pp scatter (Inb flights, dec 2019 + mar 2020) - with highlighter 
-- planned! 
+## pp scatter (Inb flights, dec 2019 + mar 2020)
+
+```{r}
+snapshots <- corr_df |>
+  filter(target_date == as.Date("2020-05-05")) |>
+  select(
+    iso3, excess_mortality_cumulative_per_million,
+    flights_dec19 = total_inbound_flights_dec19,
+    flights_mar20 = total_inbound_flights_mar20
+  ) |>
+  pivot_longer(
+    starts_with("flights_"),
+    names_to = "month", values_to = "inbound_flights"
+  ) |>
+  mutate(
+    month = factor(
+      recode(month,
+        flights_dec19 = "Dec 2019",
+        flights_mar20 = "Mar 2020"
+      ),
+      levels = c("Dec 2019", "Mar 2020")
+    )
+  ) |>
+  filter(inbound_flights > 0) # drop zero‑flight countries
+
+gg_pp <- ggplot(
+  snapshots,
+  aes(inbound_flights, excess_mortality_cumulative_per_million)
+) +
+  geom_point(size = 3, alpha = .75, colour = "#2b8cbe") +
+  geom_text_repel(
+    data = \(d) d |> filter(iso3 %in% c("ESP", "ITA", "GBR", "DEU", "BEL", "FRA")), 
+    aes(label = iso3), family = "sans", size = 3
+  ) +
+  scale_x_log10(
+    breaks  = c(1, 3, 10, 30, 100, 300, 1000),
+    labels  = scales::comma,
+    expand  = expansion(mult = c(.05, .02)) # added bit of breathing room (because of log on x axis)
+  ) +
+  scale_y_continuous(
+    labels  = scales::comma,
+    expand  = expansion(mult = .03)
+  ) +
+  facet_wrap(~month, nrow = 1) +
+  labs(
+    x = "Inbound flights (log-scale)",
+    y = "Excess deaths / million (to 5 May 2020)",
+    caption = "Spearman ρ: Dec 2019 ≈ 0.50  Mar 2020 ≈ 0.57"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    panel.spacing = unit(1, "cm")
+  )
+
+gg_pp
+
+ggsave(here(fig_dir, "scatter_dec-mar.png"),
+  gg_pp,
+  width = 7.3, height = 3.8, dpi = 300, bg = "transparent")
+```
 
 ## Scater by year
 
