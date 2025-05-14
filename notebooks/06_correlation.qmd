@@ -263,7 +263,33 @@ ggsave(here(fig_dir, "scatter_dec-mar.png"),
   width = 7.3, height = 3.8, dpi = 300, bg = "transparent")
 ```
 
-## Scater by year
+
+## Caterpillar plot 
+
+```{r}
+gg_cater <- spearman_res |>
+  filter(variable %in% c("Dec 2019","Mar 2020","Combined")) |>
+  mutate(variable = factor(variable, c("Combined","Dec 2019","Mar 2020"))) |>
+  ggplot(aes(year, rho, colour = variable)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = .15, linewidth = .9, position = position_dodge(width = .4)) +
+  geom_point(size = 3, position = position_dodge(width = .4)) +
+  scale_colour_manual(values = c("Combined" = "#e76f51",
+                                 "Dec 2019" = "#2a9d8f",
+                                 "Mar 2020" = "#457b9d")) +
+  labs(x = NULL, y = "Spearman ρ (± 95 % CI)", colour = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top")
+
+gg_cater
+
+ggsave(here(fig_dir, "rho_caterpillar.png"),
+       gg_cater, width = 6, height = 4, dpi = 300, bg = "transparent")
+
+```
+All three exposure metrics are clearly positive in 2020.
+In 2021 their confidence intervals straddle zero, indicating the association has essentially disappeared. From 2022 onward the Combined and Flights‑per‑million measures become significantly negative (95 % CI entirely < 0), while the single‑month metrics hover just either side of zero. This confirms a genuine sign‑flip rather than sampling noise.
 
 # Robustness check
 
