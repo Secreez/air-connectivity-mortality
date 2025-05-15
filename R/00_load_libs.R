@@ -2,7 +2,7 @@ load_dependencies <- function() {
   cran_packages <- c(
     "styler", "rnaturalearth", "tidyverse", "lubridate", "sf", "viridis",
     "broom", "boot", "purrr", "ggrepel", "kableExtra", "scales", "stringr",
-    "here", "forcats", "countrycode"
+    "here", "forcats", "countrycode", "patchwork"
   )
 
   github_packages <- list(
