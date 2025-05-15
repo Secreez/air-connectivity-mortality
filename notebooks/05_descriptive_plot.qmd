@@ -42,42 +42,50 @@ knitr::kable(
 
 ## Inbound flight volumes (country level)
 ```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=6}
-top10 <- flights_country %>%
-  slice_max(total_inbound_flights_combined, n = 10) %>%
+top10 <- flights_country %>% 
+  slice_max(total_inbound_flights_combined, n = 10) %>% 
   pivot_longer(
     starts_with("total_"),
-    names_to = "window",
+    names_to  = "window",
     values_to = "flights"
-  ) %>%
-  mutate(window = recode(
-    window,
-    total_inbound_flights_dec19 = "Dec 2019",
-    total_inbound_flights_mar20 = "Mar 2020",
-    total_inbound_flights_combined = "Combined"
-  ))
+  ) %>% 
+  mutate(
+    window = recode(window,
+      total_inbound_flights_dec19    = "Dec 2019",
+      total_inbound_flights_mar20    = "Mar 2020",
+      total_inbound_flights_combined = "Combined"
+    ),
+    iso_country = fct_reorder(iso_country, flights, .fun = max)
+  )
 
-ggplot(top10, aes(
-  x = reorder(iso_country, flights),
-  y = flights,
-  fill = window
-)) +
-  geom_col(position = position_dodge(width = .8), width = .7) +
+pal <- c("Dec 2019" = "#E69F00",
+         "Mar 2020" = "#56B4E9",
+         "Combined" = "#009E73")
+
+p_top10 <- ggplot(top10,
+                  aes(iso_country, flights, fill = window)) +
+  geom_col(position = position_dodge(width = .75), width = .65) +
   coord_flip() +
-  scale_y_continuous(labels = scales::comma) +
-  scale_fill_manual(
-    name = "Time window",
-    values = c(
-      "Dec 2019" = "#4d4d4d",
-      "Mar 2020" = "#bababa",
-      "Combined" = "#d95f02"
-    )
-  ) +
-  labs(
-    title = "Top-10 EUROCONTROL destinations by direct flights",
-    x = NULL, y = "Number of direct flights"
-  ) +
-  theme_minimal(base_size = 11) +
-  theme(legend.position = "top")
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values = pal, name = NULL) +
+  labs(title    = "Top-10 Eurocontrol destinations",
+       subtitle = "Direct passenger flights from China / Hong Kong / Macao, Dec 2019 & Mar 2020",
+       x = NULL,
+       y = "Number of flights") +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position   = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    axis.text.y       = element_text(size = 9)
+  )
+
+p_top10
+
+ggsave(here(fig_dir, "bar_top10_destinations.png"),
+       plot   = p_top10,
+       width  = 5.8, height = 4.4, dpi = 300,
+       bg     = "transparent")
 ```
 
 ## Full 26 country list
@@ -132,11 +140,11 @@ ggplot(full_df, aes(
   theme(legend.position = "top")
 ```
 
-## HEAVILY IMPORTANT: Choropleth map of flight exposure
+## Choropleth map of flight exposure
 
 ... pending
 
-## HEAVILY IMPORTANT: Great-circle routes
+## Great-circle routes
 
 Needs a ton of work to get the routes to show up nicely ..
 - Cyprus missing (rnaturalearth problem)
@@ -144,59 +152,7 @@ Needs a ton of work to get the routes to show up nicely ..
 - Density of lines possible based on not just volume but also number of unique origins?
 - All Airports gonna get hard. probably make it mroe simplistic with only from China -> Countries, then line wise showcasing density -> count of flights into country.
 
-```{r}
-library(ggplot2)
-library(sf)
-library(rnaturalearth)
-library(dplyr)
-library(scales)
 
-routes_top <- routes_sf %>%
-  slice_max(n_flights, n = 30) %>% # top 30 airport pairs
-  mutate(origin_hub = factor(ADEP))
-
-# simple colour palette for big CN/HK hubs
-hub_cols <- c(
-  VHHH = "#7570b3", # Hong Kong
-  ZSPD = "#d95f02", # Shanghai Pudong
-  ZBAA = "#1b9e77", # Beijing Capital
-  ZGGG = "#e7298a", # Guangzhou Baiyun
-  ZUCK = "#66a61e", # Chongqing Jiangbei
-  ZUUU = "#e6ab02" # Chengdu Shuangliu
-)
-
-# basemap
-eu <- ne_countries(scale = 50, returnclass = "sf") |>
-  filter(continent == "Europe")
-
-ggplot() +
-  geom_sf(data = eu, fill = "grey92", colour = "white") +
-  geom_sf(
-    data = routes_top,
-    aes(
-      size = n_flights,
-      colour = origin_hub
-    ),
-    show.legend = "point",
-    alpha = .7
-  ) +
-  scale_size(
-    range = c(.4, 1.8),
-    breaks = c(10, 50, 100, 250),
-    name = "Direct flights\nDec 2019 + Mar 2020"
-  ) +
-  scale_colour_manual(values = hub_cols, name = "Origin hub") +
-  coord_sf(xlim = c(-15, 45), ylim = c(25, 65), expand = FALSE) +
-  labs(
-    title = "Main direct CN/HK → EUROCONTROL flows",
-    subtitle = "Top 30 airport-pairs; line width α total flights"
-  ) +
-  theme_void(base_size = 11) +
-  theme(
-    legend.position = "left",
-    plot.title.position = "plot"
-  )
-```
 
 
 ## Origin stacked barplot
