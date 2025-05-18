@@ -16,7 +16,6 @@ source(here::here("R", "00_load_libs.R"))
 fig_dir <- here::here("data", "figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
-# load processed inputs
 flights_country <- read_rds(here("data", "processed", "flights_country.rds"))
 flight_exposure <- read_rds(here("data", "processed", "flight_exposure_mapped.rds"))
 flows_pairwise <- read_rds(here("data", "processed", "flows_pairwise.rds"))
@@ -24,446 +23,328 @@ airports <- read_rds(here("data", "processed", "airports.rds"))
 flights_filtered <- read_rds(here("data", "processed", "flights_filtered.rds"))
 ```
 
-```{r}
-# look at the first few rows of each
-knitr::kable(
-  head(flights_country, 6),
-  caption = "`flights_country` (first 6 rows)"
-)
-knitr::kable(
-  head(flight_exposure, 6),
-  caption = "`flight_exposure_mapped` (first 6 rows)"
-)
-knitr::kable(
-  head(flows_pairwise, 6),
-  caption = "`flows_pairwise` (first 6 rows)"
-)
-```
+> Among continental Eurocontrol member states, is a higher volume of direct inbound flights from China/HongKong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
 
-## Inbound flight volumes (country level)
+Snapshots for 2021-2023 are analysed as robustness checks.
+
+### Objectives
+
+**1. Measure exposure:** Create a country-level index of inbound IFR flights (Dec 2019, Mar 2020, sum) from EUROCONTROL data.
+
+**2. Rank & correlate:** Compute Spearman ρ between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021-2023.
+
+**3. Appraise validity:** Discuss strengths and limits of flight counts as a proxy for epidemic seeding
+
+
+# Important for Storytelling
+
+## Top 10 Destination Bar
 ```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=6}
-top10 <- flights_country %>%
-  slice_max(total_inbound_flights_combined, n = 10) %>%
+top10 <- flights_country |>
+  slice_max(total_inbound_flights_combined, n = 10) |>
   pivot_longer(
     starts_with("total_"),
-    names_to = "window",
+    names_to  = "window",
     values_to = "flights"
-  ) %>%
-  mutate(window = recode(
-    window,
-    total_inbound_flights_dec19 = "Dec 2019",
-    total_inbound_flights_mar20 = "Mar 2020",
-    total_inbound_flights_combined = "Combined"
-  ))
-
-ggplot(top10, aes(
-  x = reorder(iso_country, flights),
-  y = flights,
-  fill = window
-)) +
-  geom_col(position = position_dodge(width = .8), width = .7) +
-  coord_flip() +
-  scale_y_continuous(labels = scales::comma) +
-  scale_fill_manual(
-    name = "Time window",
-    values = c(
-      "Dec 2019" = "#4d4d4d",
-      "Mar 2020" = "#bababa",
-      "Combined" = "#d95f02"
-    )
-  ) +
-  labs(
-    title = "Top-10 EUROCONTROL destinations by direct flights",
-    x = NULL, y = "Number of direct flights"
-  ) +
-  theme_minimal(base_size = 11) +
-  theme(legend.position = "top")
-```
-
-## Full 26 country list
-
-```{r bar_full, fig.cap="All 26 EUROCONTROL states: Dec 2019 vs Mar 2020", fig.height=6}
-dec_tot <- sum(flight_exposure$total_inbound_flights_dec19, na.rm = TRUE)
-mar_tot <- sum(flight_exposure$total_inbound_flights_mar20, na.rm = TRUE)
-
-full_df <- flight_exposure %>%
-  select(
-    country_name,
-    total_inbound_flights_combined,
-    total_inbound_flights_dec19,
-    total_inbound_flights_mar20
-  ) %>%
-  pivot_longer(
-    cols = c(total_inbound_flights_dec19, total_inbound_flights_mar20),
-    names_to = "window",
-    values_to = "flights"
-  ) %>%
+  ) |>
   mutate(
-    window = recode(
-      window,
-      total_inbound_flights_dec19 = "Dec 2019",
-      total_inbound_flights_mar20 = "Mar 2020"
-    )
+    window = recode(window,
+      total_inbound_flights_dec19    = "Dec 2019",
+      total_inbound_flights_mar20    = "Mar 2020",
+      total_inbound_flights_combined = "Combined"
+    ),
+    iso_country = fct_reorder(iso_country, flights, .fun = max)
   )
 
-ggplot(full_df, aes(
-  x = reorder(country_name, total_inbound_flights_combined),
-  y = flights,
-  fill = window
-)) +
-  geom_col(position = position_dodge(width = .8), width = .7) +
-  coord_flip() +
-  scale_y_continuous(labels = scales::comma) +
-  scale_fill_manual(
-    name = "Time window",
-    values = c("Dec 2019" = "#4d4d4d", "Mar 2020" = "#bababa")
-  ) +
-  labs(
-    title = "All 26 EUROCONTROL States: Dec 2019 vs Mar 2020",
-    subtitle = "Sorted by combined Dec+Mar exposures",
-    x = NULL,
-    y = "Number of direct flights",
-    caption = paste0(
-      "Total — Dec 2019: ", dec_tot,
-      " | Mar 2020: ", mar_tot
-    )
-  ) +
-  theme_minimal(base_size = 10) +
-  theme(legend.position = "top")
-```
-
-## HEAVILY IMPORTANT: Choropleth map of flight exposure
-
-... pending
-
-## HEAVILY IMPORTANT: Great-circle routes
-
-Needs a ton of work to get the routes to show up nicely ..
-- Cyprus missing (rnaturalearth problem)
-- which hubs? how do I even dissect them?
-- Density of lines possible based on not just volume but also number of unique origins?
-- All Airports gonna get hard. probably make it mroe simplistic with only from China -> Countries, then line wise showcasing density -> count of flights into country.
-
-```{r}
-library(ggplot2)
-library(sf)
-library(rnaturalearth)
-library(dplyr)
-library(scales)
-
-routes_top <- routes_sf %>%
-  slice_max(n_flights, n = 30) %>% # top 30 airport pairs
-  mutate(origin_hub = factor(ADEP))
-
-# simple colour palette for big CN/HK hubs
-hub_cols <- c(
-  VHHH = "#7570b3", # Hong Kong
-  ZSPD = "#d95f02", # Shanghai Pudong
-  ZBAA = "#1b9e77", # Beijing Capital
-  ZGGG = "#e7298a", # Guangzhou Baiyun
-  ZUCK = "#66a61e", # Chongqing Jiangbei
-  ZUUU = "#e6ab02" # Chengdu Shuangliu
+pal <- c(
+  "Dec 2019" = "#E69F00",
+  "Mar 2020" = "#56B4E9",
+  "Combined" = "#009E73"
 )
 
-# basemap
-eu <- ne_countries(scale = 50, returnclass = "sf") |>
-  filter(continent == "Europe")
-
-ggplot() +
-  geom_sf(data = eu, fill = "grey92", colour = "white") +
-  geom_sf(
-    data = routes_top,
-    aes(
-      size = n_flights,
-      colour = origin_hub
-    ),
-    show.legend = "point",
-    alpha = .7
-  ) +
-  scale_size(
-    range = c(.4, 1.8),
-    breaks = c(10, 50, 100, 250),
-    name = "Direct flights\nDec 2019 + Mar 2020"
-  ) +
-  scale_colour_manual(values = hub_cols, name = "Origin hub") +
-  coord_sf(xlim = c(-15, 45), ylim = c(25, 65), expand = FALSE) +
-  labs(
-    title = "Main direct CN/HK → EUROCONTROL flows",
-    subtitle = "Top 30 airport-pairs; line width α total flights"
-  ) +
-  theme_void(base_size = 11) +
-  theme(
-    legend.position = "left",
-    plot.title.position = "plot"
-  )
-```
-
-
-## Origin stacked barplot
-```{r origin_stack, fig.cap="Flight counts per CN/HK/MO origin"}
-origin_df <- flights_filtered %>%
-  count(month, ADEP, name = "flights") %>%
-  left_join(airports, by = c("ADEP" = "icao_code")) %>%
-  group_by(ADEP) %>%
-  mutate(total = sum(flights)) %>%
-  ungroup() %>%
-  arrange(desc(total)) %>%
-  slice_head(n = 25) %>%
-  mutate(
-    short_name = str_remove(name, " (International )?Airport$"),
-    month = recode(month,
-      dec19 = "Dec 2019",
-      mar20 = "Mar 2020"
-    )
-  )
-
-ggplot(
-  origin_df,
-  aes(
-    x = reorder(short_name, total),
-    y = flights,
-    fill = month
-  )
+p_top10 <- ggplot(
+  top10,
+  aes(iso_country, flights, fill = window)
 ) +
-  geom_col() +
+  geom_col(position = position_dodge(width = .75), width = .65) +
   coord_flip() +
   scale_y_continuous(labels = comma) +
-  scale_fill_manual(
-    name = "Time window",
-    values = c(
-      "Dec 2019" = "#4d4d4d",
-      "Mar 2020" = "#bababa"
-    )
-  ) +
+  scale_fill_manual(values = pal, name = NULL) +
   labs(
+    title = "Top-10 Eurocontrol destinations",
+    subtitle = "Direct passenger flights from China / Hong Kong / Macao, Dec 2019 & Mar 2020",
     x = NULL,
-    y = "Number of direct flights",
-    title = "CN/HK/MO → EUROCONTROL by Origin Airport",
-    subtitle = "Top 25 origin airports, Dec 2019 vs Mar 2020"
+    y = "Number of flights"
   ) +
   theme_minimal(base_size = 10) +
-  theme(legend.position = "top")
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    axis.text.y = element_text(size = 9)
+  )
+
+p_top10
+
+ggsave(here(fig_dir, "bar_top10_destinations.png"),
+  plot = p_top10,
+  width = 5.8, height = 4.4, dpi = 300,
+  bg = "transparent"
+)
 ```
 
-## Number of distinct CN/HK/MO origin airports per destination
+## Route diversity
+
+### Panel Plot: Distinct origins per destination (combined & monthly)
+
 ```{r}
-origins_combined <- flows_pairwise %>%
-  distinct(ADEP, ADES) %>%
-  count(ADES, name = "n_origins") %>%
-  left_join(airports, by = c("ADES" = "icao_code")) %>%
-  arrange(desc(n_origins)) %>%
-  slice_head(n = 20)
+top15 <- flows_pairwise |>
+  distinct(ADEP, ADES) |>
+  count(ADES, name = "n_origins") |>
+  slice_max(n_origins, n = 15) |>
+  pull(ADES)
 
-p1 <- ggplot(origins_combined, aes(
-  x = reorder(name, n_origins),
-  y = n_origins
-)) +
-  geom_col(fill = "#2b8cbe") +
-  coord_flip() +
-  labs(
-    title = "Distinct CN/HK/MO origin airports per destination",
-    subtitle = "Combined Dec 2019 + Mar 2020 (top 20)",
-    x = NULL, y = "Number of unique origins"
+combined_df <- flows_pairwise |>
+  filter(ADES %in% top15) |>
+  distinct(ADEP, ADES) |>
+  count(ADES, name = "n_origins") |>
+  left_join(airports, by = c(ADES = "icao_code")) |>
+  mutate(
+    panel = "Combined",
+    month = "Combined"
+  )
+
+monthly_df <- flights_filtered |>
+  filter(ADES %in% top15) |>
+  distinct(month, ADEP, ADES) |>
+  count(month, ADES, name = "n_origins") |>
+  left_join(airports, by = c(ADES = "icao_code")) |>
+  mutate(
+    month = recode(month, dec19 = "Dec 2019", mar20 = "Mar 2020"),
+    panel = "Monthly"
+  )
+
+plot_df <- bind_rows(combined_df, monthly_df) |>
+  mutate(
+    name  = fct_reorder(name, n_origins),
+    month = factor(month, levels = c("Combined", "Dec 2019", "Mar 2020")),
+    panel = factor(panel, levels = c("Combined", "Monthly"))
+  )
+
+pal_fill <- c(
+  "Combined" = "#009E73",
+  "Dec 2019" = "#E69F00",
+  "Mar 2020" = "#56B4E9"
+)
+
+panel_plot <- ggplot(plot_df, aes(n_origins, name, fill = month)) +
+  geom_col(width = .6, position = position_dodge(width = .6)) +
+  facet_grid(. ~ panel,
+    scales = "fixed",
+    space  = "free_x"
   ) +
-  theme_minimal(base_size = 11)
-
-origins_monthly <- flights_filtered %>%
-  distinct(month, ADEP, ADES) %>%
-  count(month, ADES, name = "n_origins") %>%
-  left_join(airports, by = c("ADES" = "icao_code")) %>%
-  mutate(month = recode(month,
-    dec19 = "Dec 2019",
-    mar20 = "Mar 2020"
-  ))
-
-p2 <- ggplot(
-  origins_monthly %>% slice_max(n_origins, n = 20),
-  aes(x = reorder(name, n_origins), y = n_origins, fill = month)
-) +
-  geom_col(position = position_dodge(.8), width = .7) +
-  coord_flip() +
-  scale_fill_manual(values = c("Dec 2019" = "#4d4d4d", "Mar 2020" = "#bababa")) +
+  scale_fill_manual(values = pal_fill, name = NULL) +
+  scale_x_continuous(expand = c(0, 0)) +
   labs(
-    title = "Distinct CN/HK/MO origin airports per destination",
-    subtitle = "Dec 2019 vs Mar 2020 (top 20)",
-    x = NULL, y = "Number of unique origins",
-    fill = NULL
+    title = "How many different CN/HK/MO airports feed each Eurocontrol destination?",
+    x = "Unique origin airports",
+    y = NULL
   ) +
-  theme_minimal(base_size = 11)
+  theme_minimal(base_size = 9) +
+  theme(
+    strip.text      = element_text(face = "bold"),
+    axis.text.y     = element_text(size = 7),
+    legend.position = "top",
+    panel.spacing.x = unit(1.1, "cm")
+  )
 
-print(p1)
-print(p2)
+panel_plot
+
+ggsave(here(fig_dir, "bar_origins_per_destination.png"),
+  panel_plot,
+  width = 6.3, height = 4.5, dpi = 300, bg = "transparent"
+)
 ```
 
-- Very interesting Trend .. should be investigated further with a Scatterplot for comparison of unique origins and absolute value of flights...
+### Scatterplot: log volume vs. origins
 
 ```{r scatter_volume_vs_origins, fig.cap="Total direct flights vs. distinct CN/HK/MO origin airports per destination", fig.height=5}
-dest_stats <- flows_pairwise %>%
-  group_by(ADES) %>%
+dest_stats <- flows_pairwise |>
+  group_by(ADES) |>
   summarise(
     total_flights = sum(n_flights),
     n_origins = n_distinct(ADEP),
     .groups = "drop"
-  ) %>%
-  # droped zeros so log scale won't blow up
-  filter(total_flights > 0) %>%
-  left_join(airports, by = c("ADES" = "icao_code")) %>%
-  mutate(
-    short_name = str_remove(name, " (International )?Airport$")
-  )
+  ) |>
+  filter(total_flights > 0) |>
+  left_join(airports, by = c("ADES" = "icao_code")) |>
+  mutate(short_name = str_remove(name, " (International )?Airport$"))
 
-ggplot(dest_stats, aes(x = total_flights, y = n_origins)) +
-  geom_point(color = "#2b8cbe", alpha = .7, size = 3) +
-  # only label the real standouts
+p_scatter <- ggplot(
+  dest_stats,
+  aes(x = total_flights, y = n_origins)
+) +
+  geom_point(size = 3, alpha = .75, colour = "#0072B2") +
   geom_text_repel(
-    data = dest_stats %>% filter(total_flights > 200 | n_origins > 8),
-    aes(label = short_name),
-    size = 3,
-    max.overlaps = 10
+    data = dest_stats |> filter(total_flights > 200 | n_origins > 8),
+    aes(label = short_name), size = 3, max.overlaps = 10
   ) +
-  scale_x_log10(labels = scales::comma) +
+  scale_x_log10(labels = comma, expand = c(0.02, 0)) +
   labs(
-    title = "Volume vs. Diversity of Direct CN/HK/MO Flights",
-    subtitle = "Each point is a EUROCONTROL destination airport\n(log-scale on total flights)",
-    x = "Total direct flights\n(Dec 2019 + Mar 2020)",
-    y = "Number of unique CN/HK/MO origin airports"
+    x = "Total direct flights  (Dec 2019 + Mar 2020, log-scale)",
+    y = "Unique CN/HK/MO origin airports",
+    title = "Volume vs Diversity of Direct Flights",
+    subtitle = "Each dot is a Eurocontrol destination airport"
   ) +
   theme_minimal(base_size = 11)
 
-ggsave(file.path(fig_dir, "scatter_volume_vs_origins.png"),
-  width = 7, height = 5, dpi = 300
+p_scatter
+
+ggsave(here(fig_dir, "scatter_volume_vs_origins.png"),
+  p_scatter,
+  width = 6, height = 4.5, dpi = 300, bg = "transparent"
 )
 ```
 
-# Pct change in flight exposure min 5 Dec flights
+## Collapse Bar: Percentage change (countries with ≥ 5 Dec flights)
 
-```{r pct_change_filtered, fig.cap="Pct change (filtered): Dec 2019→Mar 2020 (min 5 Dec flights)", fig.height=6}
-pct_df2 <- flight_exposure %>%
+```{r pct_change_filtered, fig.cap="Pct change (filtered): Dec 2019 → Mar 2020 (min 5 Dec flights)", fig.height=6}
+pct_df <- flight_exposure |>
   transmute(
-    country_name,
-    dec = total_inbound_flights_dec19,
-    mar = total_inbound_flights_mar20,
-    abs_change = mar - dec,
-    pct_change = 100 * abs_change / dec
-  ) %>%
-  filter(dec >= 5) %>%
-  arrange(pct_change) %>%
-  mutate(country_name = factor(country_name, levels = country_name))
+    country = country_name,
+    dec     = total_inbound_flights_dec19,
+    mar     = total_inbound_flights_mar20,
+    pct     = 100 * (mar - dec) / dec
+  ) |>
+  filter(dec >= 5) |>
+  arrange(pct) |>
+  mutate(country = fct_reorder(country, pct))
 
-ggplot(pct_df2, aes(
-  x = country_name,
-  y = pct_change,
-  fill = pct_change > 0
-)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(
-    aes(
-      label = paste0("Dec:", dec, " → Mar:", mar)
-    ),
-    hjust = ifelse(pct_df2$pct_change > 0, -0.05, 1.05),
-    size = 3,
-    color = "gray20"
+p_collapse <- ggplot(
+  pct_df,
+  aes(x = pct, y = country, fill = pct > 0)
+) +
+  geom_col(width = .72, show.legend = FALSE) +
+  scale_fill_manual(values = c(`TRUE` = "#56B4E9", `FALSE` = "#D55E00")) +
+  scale_x_continuous(
+    limits = c(-105, 5), breaks = seq(-100, 0, 25),
+    labels = \(x) paste0(x, "%")
   ) +
-  coord_flip(clip = "off") +
-  scale_y_continuous(
-    labels = percent_format(scale = 1),
-    expand = expansion(add = c(5, 10))
-  ) +
-  scale_fill_manual(values = c(`TRUE` = "#2b8cbe", `FALSE` = "#d95f02")) +
   labs(
-    x = NULL,
-    y = "% change",
-    title = "Pct Change in Direct CN/HK/MO → EUROCONTROL Flights",
-    subtitle = "Dec 2019 vs Mar 2020 (only countries with ≥5 Dec flights)"
+    title = "March collapse in direct CN-HK-MO → Eurocontrol flights",
+    subtitle = "Countries with ≥ 5 flights in Dec 2019",
+    x = "% change  (Mar 2020 vs Dec 2019)", y = NULL
   ) +
-  theme_minimal(base_size = 11) +
-  theme(plot.margin = margin(5, 40, 5, 5))
+  theme_minimal(base_size = 11)
 
-ggsave(file.path(fig_dir, "pct_change_filtered.png"),
-  width = 7, height = 6, dpi = 300
+p_collapse
+ggsave(here(fig_dir, "pct_change_filtered.png"),
+  p_collapse,
+  width = 6.3, height = 4.5, dpi = 300, bg = "transparent"
 )
 ```
-- At the beginning there was a interesting trend in the below countries.. then again. see table:
+
+
+## Full numeric table (all ≥  5-flight countries
 
 ```{r}
-targets <- c("SK", "IE", "LV", "LT", "BE")
+collapse_tbl <- pct_df |>
+  mutate(
+    `Dec 2019` = scales::comma(dec),
+    `Mar 2020` = scales::comma(mar),
+    `% change` = sprintf("%+.0f %%", pct),
+    `Δ flights` = scales::comma(mar - dec)
+  ) |>
+  select(Country = country, `Dec 2019`, `Mar 2020`, `% change`, `Δ flights`)
 
-read_rds(here("data", "processed", "flight_exposure_mapped.rds")) %>%
-  filter(iso_country %in% targets) %>%
-  select(
-    iso_country,
-    Country = country_name,
-    `Dec 2019` = total_inbound_flights_dec19,
-    `Mar 2020` = total_inbound_flights_mar20,
-    Combined = total_inbound_flights_combined
-  ) %>%
-  arrange(match(iso_country, targets)) %>%
-  select(-iso_country) %>%
-  kable()
+knitr::kable(
+  collapse_tbl,
+  caption = "Direct CN-HK-MO passenger flights: Dec 2019 vs Mar 2020 \
+(countries with ≥ 5 Dec flights)",
+  align = c("l", "r", "r", "r", "r")
+)
 ```
 
-## Create a percentage between March and December 
+## Top-10 drops and increases table
 
-A percentage‐change plot
-%Δ = ((Mar2020 − Dec2019) / Dec2019) × 100
-
-- Top 10 biggest drops and Top 10 increases side by side
-```{r pct_change_top10, fig.cap="Top 10 Biggest Drops & Increases in Direct Flights (Mar 2020 vs Dec 2019)", fig.height=6}
-# computed % change, dropping zero-base cases
-pct_df <- flight_exposure %>%
-  filter(total_inbound_flights_dec19 > 0) %>%
+```{r}
+top_tbl <- pct_df |>
   mutate(
-    pct_change = (total_inbound_flights_mar20 - total_inbound_flights_dec19) /
-      total_inbound_flights_dec19 * 100
+    direction = if_else(pct < 0, "Largest drop", "Largest increase"),
+    `Dec 2019` = dec,
+    `Mar 2020` = mar,
+    `% change` = sprintf("%+.0f %%", pct),
+    `Δ flights` = mar - dec
+  ) |>
+  arrange(direction, pct) |>
+  group_by(direction) |>
+  slice_head(n = 10) |>
+  mutate(Rank = row_number()) |>
+  ungroup() |>
+  select(direction, Rank,
+    Country = country,
+    `Dec 2019`, `Mar 2020`, `% change`, `Δ flights`
   )
-
-bottom10 <- pct_df %>%
-  slice_min(pct_change, n = 10) %>%
-  mutate(direction = "Largest drop")
-
-top10 <- pct_df %>%
-  slice_max(pct_change, n = 10) %>%
-  mutate(direction = "Largest increase")
-
-plot_df <- bind_rows(bottom10, top10) %>%
-  mutate(
-    country   = fct_reorder(country_name, pct_change),
-    direction = factor(direction, levels = c("Largest drop", "Largest increase"))
-  )
-
-p <- ggplot(plot_df, aes(pct_change, country, fill = direction)) +
-  geom_col(show.legend = TRUE) +
-  geom_text(
-    aes(
-      label = paste0(round(pct_change), "%"),
-      hjust = if_else(pct_change < 0, 1.05, -0.05) # push inside bar
-    ),
-    color = "white",
-    size = 3
-  ) +
-  scale_fill_manual(
-    values = c(
-      "Largest drop" = "#d95f02",
-      "Largest increase" = "#2b8cbe"
-    )
-  ) +
-  scale_x_continuous(labels = percent_format(scale = 1)) +
-  labs(
-    x = "% change (Mar 2020 vs Dec 2019)",
-    y = NULL,
-    fill = NULL
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    legend.position = "top",
-    panel.grid.major.y = element_blank()
-  )
-
-print(p)
-
-ggsave(
-  file.path(fig_dir, "pct_change_top10.png"),
-  plot = p,
-  width = 8, height = 6, dpi = 300
+knitr::kable(
+  top_tbl,
+  caption = "Largest proportional drops / increases in direct CN-HK-MO flights \
+(Mar 2020 vs Dec 2019, countries with ≥ 5 Dec flights)",
+  align = c("l", "r", "l", "r", "r", "r", "r"),
+  format.args = list(big.mark = ",")
 )
+```
+
+Percentage change alone masked important heterogeneity. Big hubs such as the UK, Germany and the Netherlands still operated hundreds of flights in March (-49 % to -66 %), whereas Italy and most medium-sized markets cut more than 90 % of their links, ending with single-digit connections. A few ‘increases’ (e.g. Latvia +400 %) reflect flights rising from one charter to five and are negligible in absolute terms. Overall, every Eurocontrol state but Belgium saw a collapse of at least two-thirds in direct CN/HK/MO traffic... 
+
+
+# Optional / Appendix
+
+## Origin-airport bar (top 25)
+
+```{r origin_stack, fig.cap="Flight counts per CN/HK/MO origin"}
+origin_df <- flights_filtered |>
+  count(month, ADEP, name = "flights") |>
+  left_join(airports, by = c("ADEP" = "icao_code")) |>
+  group_by(ADEP) |>
+  mutate(total = sum(flights)) |>
+  ungroup() |>
+  arrange(desc(total)) |>
+  slice_head(n = 25) |>
+  mutate(
+    short_name = str_remove(name, " (International )?Airport$"),
+    month      = recode(month, dec19 = "Dec 2019", mar20 = "Mar 2020"),
+    short_name = fct_reorder(short_name, total)
+  )
+
+pal_window <- c(
+  "Dec 2019" = "#E69F00",
+  "Mar 2020" = "#56B4E9"
+)
+
+p_orig <- ggplot(
+  origin_df,
+  aes(short_name, flights, fill = month)
+) +
+  geom_col(position = "stack", width = .75) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = pal_window, name = NULL) +
+  labs(
+    title = "Inbound flight counts by Chinese origin airport",
+    subtitle = "Top 25 origins  December 2019 (orange) vs March 2020 (blue)",
+    x = NULL, y = "Number of direct passenger flights"
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position      = "top",
+    legend.justification = "left",
+    axis.text.y          = element_text(size = 8)
+  )
+
+p_orig
+
+# ggsave(here(fig_dir, "bar_origins_top25.png"),
+#   p_orig,
+#   width = 6.3, height = 5.2, dpi = 300, bg = "transparent"
+# )
 ```
