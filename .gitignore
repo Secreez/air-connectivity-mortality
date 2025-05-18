@@ -6,22 +6,18 @@
 */.ipynb_checkpoints/
 trackchanges.sty
 /.luarc.json
-
 # Quarto build artefacts
 **/.quarto/
 _freeze/
 docs/**/_freeze/
-
 # GitHub config (not required for analysis)
 .github/
-
 # Data
 # 1) Raw source files (large / licensed)
 data/raw/
-
 # 2) Processed derivatives (can be rebuilt)
 data/processed/
-
 # 3) Legacy proposal data (archived, unused)
 archive/proposal/data/
 /.quarto/
+.vscode
