@@ -189,7 +189,7 @@ This chapter presents the results of the exploratory analysis investigating the 
 
 ## Early air-connectivity patterns
 
-> **Note on visual encoding:** To avoid unintended cultural or emotional interpretations, color palettes in maps and flow diagrams were deliberately selected to avoid connotations such as red = danger/blame. Additionally, all figures were designed to be accessible to readers with color vision deficiencies by using colorblind-safe palettes and clear labeling. These choices support neutral, inclusive, and responsible data visualization.
+> **Note on visual encoding:** All categorical colours follow the Okabe–Ito colour-universal palette (@okabe2002). The palette’s nine hues (hex `#009E73` green, `#E69F00` orange, `#56B4E9` blue, …) remain distinguishable for readers with the main forms of colour-vision deficiency. For continuous variables the viridis family is used. Axis titles, direct labels and dashed reference lines complement hue so that information is recoverable in greyscale printouts. No colours with strong cultural valence (e.g. “warning” red) are used in maps or flow diagrams in order to avoid unwanted emotional framing.
 
 [Notes for Figures]
 4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top-15 destinations.”

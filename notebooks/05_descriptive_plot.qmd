@@ -93,11 +93,17 @@ ggsave(here(fig_dir, "bar_top10_destinations.png"),
 )
 ```
 
+*In the Wording, China/Hong Kong/Macao (CN/HK/MO) refers to the three regions together. It should be noted, that no flights where recorded from Macao to Europe in the data set. The analysis is therefore based on flights from China and Hong Kong only.
+
+In December 2019 the direct China/HK/Macao traffic into Europe was highly concentrated: Germany (DE), the United Kingdom (GB) and the Netherlands (NL) alone handled > 60 % of all arrivals, followed by France and Belgium as secondary hubs. Every other Eurocontrol state receiver fewer than 300 flights that month. By March 2020 volumes collapsed everywhere (blue bars) yet the rnaking hardly changed: the same three hubs still dominated, each retaining 30-50 % of their December traffic, while Italy, Turkey and Finland - already mid-tier in December - fell below 250 flights. Combning both months (green bars) therefore produces an extremely right-skewed distribution: the top two countries (DE, GB) each saw > 900 direct flights, four times as many as rank #4. Intepretation: epidemic "import pressure" from direct flights was not evenly spread across Europe; instead, a small group of Western European gateways bore the brunt of exposure in both the seeding phase (Dec 2019) and the pre-lockdown (? should I call it that?) phase (Mar 2020).
+
+
+
 ## Route diversity
 
 ### Panel Plot: Distinct origins per destination (combined & monthly)
 
-```{r}
+```{r top_15_origins}
 top15 <- flows_pairwise |>
   distinct(ADEP, ADES) |>
   count(ADES, name = "n_origins") |>
@@ -166,6 +172,10 @@ ggsave(here(fig_dir, "bar_origins_per_destination.png"),
 )
 ```
 
+Direct links weere not ony concentrated by volume (see @bar_top10), but also by route diversity. In total, 15 Chinese/HK/Macao airports fed London-Heahtrow, 13 fed Paris-CDG and 12 fed Frankfurt between December 2019 and March 2020 (left panel, green bars). Every other Eurocontrol desitination received routes from ≤ 10 origins, and most from fewer than 6. The month-specific panel (right) reveals that this breadth of origins existed already in December (orange) and, despite the March collapse (blue), the major hubs still drew from 4-6 different airports while almost all secondary gateways fell to one or two. **Implication:** the first-wave seeding risk was amplified not just by sheer fligth counts but by the variety of source cities funnelling into the same Western European hubs, increasing the chance of multiple independent introductions.
+
+([Could be a good sentence for correlation after:] Because both exposure volume and diversity are right-skewed toward a handful of destinations, correlations with excess mortality might be driven by these outliers as much as by a monotone trend across all countries—an issue the next section explores with rank-based statistics and robustness checks.)
+
 ### Scatterplot: log volume vs. origins
 
 ```{r scatter_volume_vs_origins, fig.cap="Total direct flights vs. distinct CN/HK/MO origin airports per destination", fig.height=5}
@@ -184,7 +194,7 @@ p_scatter <- ggplot(
   dest_stats,
   aes(x = total_flights, y = n_origins)
 ) +
-  geom_point(size = 3, alpha = .75, colour = "#0072B2") +
+  geom_point(size = 3, alpha = .75, colour = "#56B4E9") +
   geom_text_repel(
     data = dest_stats |> filter(total_flights > 200 | n_origins > 8),
     aes(label = short_name), size = 3, max.overlaps = 10
@@ -198,13 +208,12 @@ p_scatter <- ggplot(
   ) +
   theme_minimal(base_size = 11)
 
-p_scatter
-
 ggsave(here(fig_dir, "scatter_volume_vs_origins.png"),
   p_scatter,
   width = 6, height = 4.5, dpi = 300, bg = "transparent"
 )
 ```
+[Hmm.. May need a bit more context. Add corr here already perhaps?]
 
 ## Collapse Bar: Percentage change (countries with ≥ 5 Dec flights)
 
