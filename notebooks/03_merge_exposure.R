@@ -17,18 +17,18 @@ euro_map <- read_csv(
 )
 
 # iso-2 → iso-3 mapping for flight exposure
-flight_exposure_mapped <- flights_country %>%
+flight_exposure_mapped <- flights_country |>
   left_join(euro_map, by = c(iso_country = "iso2"))
 
-unmapped <- flight_exposure_mapped %>% filter(is.na(iso3))
+unmapped <- flight_exposure_mapped |> filter(is.na(iso3))
 stopifnot(nrow(unmapped) == 0) # fail loud if any iso-2 not mapped
 
 # merge in OWID snapshots (four per country)
-analysis_df <- flight_exposure_mapped %>%
+analysis_df <- flight_exposure_mapped |>
   left_join(owid_snapshots, by = c(iso3 = "iso_code"))
 
-bad_year_cov <- analysis_df %>%
-  count(iso3) %>%
+bad_year_cov <- analysis_df |>
+  count(iso3) |>
   filter(n != 4)
 if (nrow(bad_year_cov) > 0) {
   warning(
