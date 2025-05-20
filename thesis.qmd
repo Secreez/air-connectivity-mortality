@@ -94,6 +94,9 @@ OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; ma
 
 ## Data & Methods {#methods}
 
+The EUROCONTROL schedule includes traffic from mainland China (CN), Hong Kong (HK) and Macao (MO).
+No Macao–Europe flights appear in December 2019 or March 2020, so subsequent figures refer effectively to CN + HK only. The acronym CN/HK/MO is retained for completeness the first time it is used; thereafter ‘CN/HK’ is shown on axes and captions.
+
 ### Study design
 
 Exploratory, cross-sectional correlation at the *country* level.
@@ -105,7 +108,7 @@ Exposure = direct CN/HK/MO → Eurocontrol flights in Dec 2019 and Mar 2020.
 ### Flight-exposure data
 
 *Source* Eurocontrol “Aviation Data Repository for Research” archive.  
-Filters ICAO types S/N; ADEP $∈$ {CN, HK, MO}; ADES $∈$ 26 continental member states.
+Filters ICAO types S/N; ADEP $∈$ {CN, HK}; ADES $∈$ 26 continental member states.
 Aggregation destination‐country counts →
 
 $$
