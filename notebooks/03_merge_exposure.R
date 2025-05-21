@@ -17,18 +17,18 @@ euro_map <- read_csv(
 )
 
 # iso-2 → iso-3 mapping for flight exposure
-flight_exposure_mapped <- flights_country %>%
+flight_exposure_mapped <- flights_country |>
   left_join(euro_map, by = c(iso_country = "iso2"))
 
-unmapped <- flight_exposure_mapped %>% filter(is.na(iso3))
+unmapped <- flight_exposure_mapped |> filter(is.na(iso3))
 stopifnot(nrow(unmapped) == 0) # fail loud if any iso-2 not mapped
 
 # merge in OWID snapshots (four per country)
-analysis_df <- flight_exposure_mapped %>%
+analysis_df <- flight_exposure_mapped |>
   left_join(owid_snapshots, by = c(iso3 = "iso_code"))
 
-bad_year_cov <- analysis_df %>%
-  count(iso3) %>%
+bad_year_cov <- analysis_df |>
+  count(iso3) |>
   filter(n != 4)
 if (nrow(bad_year_cov) > 0) {
   warning(
@@ -45,3 +45,9 @@ write_csv(flight_exposure_mapped, here("data", "processed", "flight_exposure_map
 
 message("✓ analysis_df: ", nrow(analysis_df), " rows")
 message("✓ flight_exposure_mapped: ", nrow(flight_exposure_mapped), " rows")
+
+# Rationale:
+# May 5 was chosen as the annual reference point for excess-mortality snapshots, as it marks
+# both the aftermath of the first major European COVID-19 wave (2020) and, notably, the official
+# WHO declaration of the end of the public health emergency on 5 May 2023.
+# This enables a four-year annual comparison, capturing the entire period of COVID-19 pandemic

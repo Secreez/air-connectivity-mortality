@@ -25,35 +25,40 @@ keep_cols <- c(
   "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME"
 )
 
-flights_dec19 <- flights_2019_12 %>%
-  select(all_of(keep_cols)) %>%
+# ICAO Flight Types "S" (Scheduled) and "N" (Non-scheduled commercial operation) are selected
+# as per EUROCONTROL metadata. This filters for commercial passenger flights, excluding
+# general aviation, military, and other non-commercial movements.
+# Source: EUROCONTROL Aviation Data Repository for Research – Metadata, FNI Doc25 Data Description v6 April 2025
+
+flights_dec19 <- flights_2019_12 |>
+  select(all_of(keep_cols)) |>
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
-flights_mar20 <- flights_2020_03 %>%
-  select(all_of(keep_cols)) %>%
+flights_mar20 <- flights_2020_03 |>
+  select(all_of(keep_cols)) |>
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
 # airport reference (OurAirports)
 airports_full <- read_csv(
   here("data", "raw", "OurAirports", "airports.csv"),
   show_col_types = FALSE
-) %>%
+) |>
   select(icao_code, iso_country, name,
     latitude_deg, longitude_deg,
     iata_code = any_of("iata_code")
   )
 
-china_hk_macao_airports <- airports_full %>%
-  filter(iso_country %in% c("CN", "HK", "MO")) %>%
+china_hk_macao_airports <- airports_full |>
+  filter(iso_country %in% c("CN", "HK", "MO")) |>
   pull(icao_code)
 
 eurocontrol_countries <- read_csv(
   here("data", "eurocontrol_iso_map.csv"),
   show_col_types = FALSE
-) %>% pull(iso2)
+) |> pull(iso2)
 
-eurocontrol_airports <- airports_full %>%
-  filter(iso_country %in% eurocontrol_countries) %>%
+eurocontrol_airports <- airports_full |>
+  filter(iso_country %in% eurocontrol_countries) |>
   pull(icao_code)
 
 # bind & filter to direct CN/HK/MO → EUROCONTROL
@@ -61,20 +66,20 @@ flights_filtered <- bind_rows(
   dec19 = flights_dec19,
   mar20 = flights_mar20,
   .id = "month"
-) %>%
+) |>
   filter(
     ADEP %in% china_hk_macao_airports,
     ADES %in% eurocontrol_airports
   )
 
 # country-level exposure table
-flights_country <- flights_filtered %>%
-  left_join(airports_full, by = c("ADES" = "icao_code")) %>%
-  count(month, iso_country, name = "n_flights") %>%
+flights_country <- flights_filtered |>
+  left_join(airports_full, by = c("ADES" = "icao_code")) |>
+  count(month, iso_country, name = "n_flights") |>
   pivot_wider(
     names_from = month, values_from = n_flights,
     names_prefix = "total_inbound_flights_", values_fill = 0
-  ) %>%
+  ) |>
   mutate(
     total_inbound_flights_combined =
       total_inbound_flights_dec19 + total_inbound_flights_mar20
@@ -83,8 +88,8 @@ flights_country <- flights_filtered %>%
 stopifnot(!any(is.na(flights_country$iso_country))) # sanity
 
 # airport-to-airport flow table
-flows_pairwise <- flights_filtered %>%
-  count(ADEP, ADES, name = "n_flights") %>%
+flows_pairwise <- flights_filtered |>
+  count(ADEP, ADES, name = "n_flights") |>
   arrange(desc(n_flights))
 
 # slim airport lookup (destinations + used origins)
@@ -93,7 +98,7 @@ needed_icaos <- union(
   unique(flights_filtered$ADES)
 )
 
-airports_slim <- airports_full %>%
+airports_slim <- airports_full |>
   filter(icao_code %in% needed_icaos)
 
 # export

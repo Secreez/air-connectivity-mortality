@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Picks the row closest to 5‑May (± 7 d) for 2020‑2023 from OWID
 # Compares OWID mid‑2020 population with UN‑WPP mid‑2020
-# Usage: Rscript notebooks/02_flight_filter.R
+# Usage: Rscript notebooks/01_excess_snapshots.R
 
 source(here::here("R", "00_load_libs.R"))
 
@@ -47,6 +47,7 @@ owid_snapshots <- covid_raw |>
 
 stopifnot(max(owid_snapshots$day_diff) <= 7)
 
+
 # save
 readr::write_rds(
   owid_snapshots,
@@ -58,3 +59,8 @@ readr::write_csv(
 )
 
 message("✓ owid_excess_snapshots: ", nrow(owid_snapshots), " rows")
+
+# Excess mortality snapshots from OWID (WMD + HMD–STMF)
+# Picks the closest available date within ±7 days around 5 May each year (2020-2023)
+# ±7-day window selected due to incomplete daily reporting by OWID across countries
+# Ukraine data after 2021 excluded due to war-related gaps

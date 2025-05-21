@@ -56,8 +56,8 @@ boot_rho <- function(data, idx, xvar) {
 }
 
 spearman_by_year <- function(xvar, B = 5000) {
-  corr_df %>%
-    group_by(target_date) %>%
+  corr_df |> 
+    group_by(target_date) |> 
     group_modify(\(d, key) {
       ok <- complete.cases(
         d[[xvar]],
@@ -97,8 +97,8 @@ spearman_by_year <- function(xvar, B = 5000) {
         p = pval,
         n = n
       )
-    }) %>%
-    ungroup() %>%
+    }) |> 
+    ungroup() |> 
     mutate(
       variable = xvar,
       year = lubridate::year(target_date)
@@ -178,8 +178,8 @@ p_rho |> (\(p) {
 
 ## Snapshot scatter (05 May 2020)
 ```{r}
-p20 <- corr_df %>%
-  filter(target_date == as.Date("2020-05-05")) %>%
+p20 <- corr_df |> 
+  filter(target_date == as.Date("2020-05-05")) |> 
   ggplot(aes(
     total_inbound_flights_combined,
     excess_mortality_cumulative_per_million
