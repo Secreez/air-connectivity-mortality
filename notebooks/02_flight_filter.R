@@ -25,6 +25,11 @@ keep_cols <- c(
   "ACTUAL OFF BLOCK TIME", "ACTUAL ARRIVAL TIME"
 )
 
+# ICAO Flight Types "S" (Scheduled) and "N" (Non-scheduled commercial operation) are selected
+# as per EUROCONTROL metadata. This filters for commercial passenger flights, excluding
+# general aviation, military, and other non-commercial movements.
+# Source: EUROCONTROL Aviation Data Repository for Research – Metadata, FNI Doc25 Data Description v6 April 2025
+
 flights_dec19 <- flights_2019_12 |>
   select(all_of(keep_cols)) |>
   filter(`ICAO Flight Type` %in% c("S", "N"))

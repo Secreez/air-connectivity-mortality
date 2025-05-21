@@ -37,7 +37,7 @@ Yet European countries later displayed wide gaps in excess mortality. Analysts h
 
 ### Research Question
 
-> Among continental Eurocontrol member states, is a higher volume of direct inbound flights from China/HongKong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
+> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/HongKong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
 
 Snapshots for 2021-2023 are analysed as robustness checks.
 
@@ -86,9 +86,9 @@ Recent syntheses (e.g. [@pizzato2024]) show wide cross-country gaps in European 
 - TODO: Outline the key studies that have used air-traffic data to study COVID-19 transmission dynamics. DONT OVERDO IT. Understanding and interpretation counts. Not mindlessly listing studies.
 - Ton of the next ### are more.. Methodological than literature review.]
 
-### Why Eurocontrol, not OpenSky
+### Why EUROCONTROL, not OpenSky
 
-OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). Eurocontrol, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (Eurocontrol), not scheduled seats or partial ADS-B traces. OpenSky appears only to illustrate its coverage bias.
+OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). EUROCONTROL, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (EUROCONTROL), not scheduled seats or partial ADS-B traces. OpenSky appears only to illustrate its coverage bias.
 
 [TODO: Create Opensky map again...]
 
@@ -97,17 +97,20 @@ OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; ma
 The EUROCONTROL schedule includes traffic from mainland China (CN), Hong Kong (HK) and Macao (MO).
 No Macao–Europe flights appear in December 2019 or March 2020, so subsequent figures refer effectively to CN + HK only. The acronym CN/HK/MO is retained for completeness the first time it is used; thereafter ‘CN/HK’ is shown on axes and captions.
 
+To ensure comparability, excess mortality was measured on or near 5 May of each year (2020–2023), using the closest available OWID data within ±7 days. The use of May is justified both by the timing of the initial European epidemic wave (Spring 2020) and by the World Health Organization's declaration on 5 May 2023 officially ending COVID-19 as a global public health emergency [@who2023end].
+This four-year series allows a consistent, annually repeated cross-sectional snapshot of excess mortality from the beginning through the official end of the pandemic.
+
 ### Study design
 
 Exploratory, cross-sectional correlation at the *country* level.
 
 Outcome = cumulative excess-deaths / million on 5 May of 2020-23.  
 
-Exposure = direct CN/HK/MO → Eurocontrol flights in Dec 2019 and Mar 2020.
+Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 
 ### Flight-exposure data
 
-*Source* Eurocontrol “Aviation Data Repository for Research” archive.  
+*Source* EUROCONTROL “Aviation Data Repository for Research” archive.  
 Filters ICAO types S/N; ADEP $∈$ {CN, HK}; ADES $∈$ 26 continental member states.
 Aggregation destination‐country counts →
 
@@ -118,7 +121,7 @@ F_{\text{MAR}} &=\; \text{Flights in Mar 2020}\\
 F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 \end{aligned}
 $$
-Geocoding OurAirports → ISO-2; Eurocontrol map → ISO-3.
+Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
 
 ### Excess mortality snapshots
@@ -126,6 +129,8 @@ Geocoding OurAirports → ISO-2; Eurocontrol map → ISO-3.
 *Source* OWID (WMD + HMD–STMF). 
 
 *Reference date* closest non-NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
+
+Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF data sources) does not consistently provide daily observations for all countries. To maintain consistency across EUROCONTROL member countries, a pragmatic ±7-day window around each 5 May reference date was chosen to select the closest available observation. Countries lacking observations within this window—particularly Ukraine after 2021—were excluded from the corresponding yearly correlation analyses.
 
 ### Analytical variables
 
@@ -290,7 +295,7 @@ This thesis deliberately applies an exploratory, correlation-based approach to i
 
 - **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric. 
 
-- **Eurocontrol data limitations:** The dataset also tracks ADEP and ADES that get communicated but not Shanghai -> Dubai -> Vienna. Which whould therefore count as Dubai -> Vienna. This could lead to undercounting of flights.
+- **EUROCONTROL data limitations:** The dataset also tracks ADEP and ADES that get communicated but not Shanghai -> Dubai -> Vienna. Which whould therefore count as Dubai -> Vienna. This could lead to undercounting of flights.
 
 > While airports like Dubai or Doha were important global transfer points in February, this thesis focuses on **direct seeding from China** and **intra-European flows**. Modeling later pandemic phases or full global mobility networks exceeds the practical scope of this project.
 

@@ -45,3 +45,9 @@ write_csv(flight_exposure_mapped, here("data", "processed", "flight_exposure_map
 
 message("✓ analysis_df: ", nrow(analysis_df), " rows")
 message("✓ flight_exposure_mapped: ", nrow(flight_exposure_mapped), " rows")
+
+# Rationale:
+# May 5 was chosen as the annual reference point for excess-mortality snapshots, as it marks
+# both the aftermath of the first major European COVID-19 wave (2020) and, notably, the official
+# WHO declaration of the end of the public health emergency on 5 May 2023.
+# This enables a four-year annual comparison, capturing the entire period of COVID-19 pandemic
