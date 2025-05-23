@@ -36,10 +36,10 @@ Snapshots for 2021-2023 are analysed as robustness checks.
 **3. Appraise validity:** Discuss strengths and limits of flight counts as a proxy for epidemic seeding
 
 
-# Important for Storytelling
+# Results: Flight Exposure Patterns
 
 ## Top 10 Destination Bar
-```{r bar_top10, fig.cap="Top-10 inbound destinations", fig.height=6}
+```{r bar_top10, fig.cap="Top 10 European destinations for direct scheduled passenger flights from China and Hong Kong in December 2019 and March 2020. Bars show the number of direct scheduled IFR passenger flights by month and in total (combined). Germany, the UK, and the Netherlands dominated the network, handling the majority of arrivals. Note: No Macao–Europe flights were recorded in the EUROCONTROL dataset.", fig.height=6}
 top10 <- flights_country |>
   slice_max(total_inbound_flights_combined, n = 10) |>
   pivot_longer(
@@ -74,7 +74,6 @@ p_top10 <- ggplot(
     title = "Top-10 EUROCONTROL destinations",
     subtitle = "Direct passenger flights from China & Hong Kong*  (Dec 2019 and Mar 2020)",
     x = NULL, y = "Number of flights",
-    caption = "*No Macao–Europe flights were recorded in the EUROCONTROL dataset."
   ) +
   theme_minimal(base_size = 10) +
   theme(
@@ -95,15 +94,14 @@ ggsave(here(fig_dir, "bar_top10_destinations.png"),
 
 * The acronym CN/HK is used for completeness, although the EUROCONTROL records contain zero Macao–Europe flights in the study windows; analyses therefore reflect traffic from mainland China and Hong Kong only.
 
-In December 2019 the direct CN/HK traffic into Europe was highly concentrated: Germany (DE), the United Kingdom (GB) and the Netherlands (NL) alone handled > 60 % of all arrivals, followed by France and Belgium as secondary hubs. Every other EUROCONTROL state receiver fewer than 300 flights that month. By March 2020 volumes collapsed everywhere (blue bars) yet the ranking hardly changed: the same three hubs still dominated, each retaining 30-50 % of their December traffic, while Italy, Turkey and Finland - already mid-tier in December - fell below 250 flights. Combining both months (green bars) therefore produces an extremely right-skewed distribution: the top two countries (DE, GB) each saw > 900 direct flights, four times as many as rank #4. Intepretation: epidemic "import pressure" from direct flights was not evenly spread across Europe; instead, a small group of Western European gateways bore the brunt of exposure in both the seeding phase (Dec 2019) and the "pre-lockdown" (? should I call it that?) phase (Mar 2020).
-
+In December 2019 the direct CN/HK traffic into Europe was highly concentrated: Germany (DE), the United Kingdom (GB) and the Netherlands (NL) alone handled > 60 % of all arrivals, followed by France and Belgium as secondary hubs. Every other EUROCONTROL state received fewer than 300 flights that month. By March 2020 volumes collapsed everywhere (blue bars) yet the ranking hardly changed: the same three hubs still dominated, each retaining 30-50 % of their December traffic, while Italy, Turkey and Finland - already mid-tier in December - fell below 250 flights. Combining both months (green bars) therefore produces an extremely right-skewed distribution: the top two countries (DE, GB) each saw > 900 direct flights, four times as many as rank #4. Interpretation: epidemic "import pressure" from direct flights was not evenly spread across Europe; instead, a small group of Western European gateways bore the brunt of exposure in both the initial seeding phase (December 2019) and the onset of pandemic restrictions (March 2020), when coordinated lockdowns and border closures rapidly reduced international flight volumes.
 
 
 ## Route diversity
 
 ### Panel Plot: Distinct origins per destination (combined & monthly)
 
-```{r top_15_origins}
+```{r top_15_origins, fig.cap = "Distinct CN/HK origin airports per EUROCONTROL destination: The left panel (‘Combined’) shows the total number of different Chinese and Hong Kong airports directly connected by direct scheduled passenger flights to each of the top 15 European destinations across both study months; the right panel breaks this down by December 2019 and March 2020. Major Western European hubs (London-Heathrow, Paris-CDG, Frankfurt) received flights from the widest range of origins, while most other destinations were linked to only a few. This highlights that early seeding risk was concentrated not just in flight volume but in route diversity."}
 top15 <- flows_pairwise |>
   distinct(ADEP, ADES) |>
   count(ADES, name = "n_origins") |>
@@ -172,13 +170,14 @@ ggsave(here(fig_dir, "bar_origins_per_destination.png"),
 )
 ```
 
-Direct links weere not ony concentrated by volume (see @bar_top10), but also by route diversity. In total, 15 CN/HK airports fed London-Heahtrow, 13 fed Paris-CDG and 12 fed Frankfurt between December 2019 and March 2020 (left panel, green bars). Every other EUROCONTROL destination received routes from ≤ 10 origins, and most from fewer than 6. The month-specific panel (right) reveals that this breadth of origins existed already in December (orange) and, despite the March collapse (blue), the major hubs still drew from 4-6 different airports while almost all secondary gateways fell to one or two. **Implication:** the first-wave seeding risk was amplified not just by sheer flight counts but by the variety of source cities funnelling into the same Western European hubs, increasing the chance of multiple independent introductions.
+Direct links were not only concentrated by volume (see @bar_top10), but also by route diversity. In total, 15 CN/HK airports fed London-Heathrow, 13 fed Paris-CDG and 12 fed Frankfurt between December 2019 and March 2020 (left panel, green bars). Every other EUROCONTROL destination received routes from ≤ 10 origins, and most from fewer than 6. The month-specific panel (right) reveals that this breadth of origins existed already in December (orange) and, despite the March collapse (blue), the major hubs still drew from 4-6 different airports while almost all secondary gateways fell to one or two. **Implication:** the first-wave seeding risk was amplified not just by sheer flight counts but by the variety of source cities funnelling into the same Western European hubs, increasing the chance of multiple independent introductions.
 
 ([Could be a good sentence for correlation after:] Because both exposure volume and diversity are right-skewed toward a handful of destinations, correlations with excess mortality might be driven by these outliers as much as by a monotone trend across all countries—an issue the next section explores with rank-based statistics and robustness checks.)
 
 ### Scatterplot: log volume vs. route diversity (airport level)
 
-```{r scatter_volume_vs_diversity, fig.height=5}
+```{r scatter_volume_vs_diversity, fig.height=5, fig.cap="Relationship between total direct scheduled passenger flight volume (log-scale) and route diversity for EUROCONTROL airports. Major Western European hubs combined high volume and high diversity, driving the positive association (Spearman ρ ≈ 0.86) seen here."}
+
 dest_stats <- flows_pairwise |>
   group_by(ADES) |>
   summarise(
@@ -215,11 +214,8 @@ p_scatter <- ggplot(
     title = "Volume vs Route Diversity",
     subtitle = "Each dot = one EUROCONTROL destination airport",
     x = "Total direct flights (Dec 2019 + Mar 2020, log-scale)",
-    y = "Distinct CN/HK/MO origin airports",
-    caption = glue::glue(
-      "Spearman ρ = {rho_air} (p {p_air}); 38 airports; ",
-      "ties handled via exact = FALSE"
-    )
+    y = "Distinct CN/HK origin airports",
+    caption = glue::glue("Spearman ρ = {rho_air} (p {p_air}); n = {nrow(dest_stats)} airports")
   ) +
   theme_minimal(base_size = 11)
 
@@ -240,7 +236,7 @@ ggsave(here(fig_dir, "scatter_volume_vs_origins.png"),
 
 ## Collapse Bar: Percentage change (countries with ≥ 5 Dec flights)
 
-```{r pct_change_filtered, fig.cap="March collapse in direct CN/HK → EUROCONTROL flights % change in scheduled flights, Mar 2020 vs. Dec 2019 countries - with ≥ 5 December flights", fig.height=6}
+```{r pct_change_filtered, fig.cap="Percentage change in direct scheduled passenger flights from China and Hong Kong to EUROCONTROL member states, comparing March 2020 to December 2019. Countries shown handled at least five inbound flights in December; most saw reductions exceeding 90% by March 2020 as international travel collapsed during the initial pandemic response", fig.height=6}
 pct_df <- flight_exposure |>
   transmute(
     country = country_name,
@@ -283,7 +279,7 @@ ggsave(here(fig_dir, "pct_change_filtered.png"),
 
 ## Full numeric table (all ≥  5-flight countries)
 
-```{r}
+```{r collapse_tbl}
 collapse_tbl <- pct_df |>
   mutate(
     `Dec 2019` = scales::comma(dec),
@@ -295,8 +291,7 @@ collapse_tbl <- pct_df |>
 
 knitr::kable(
   collapse_tbl,
-  caption = "Direct CN/HK passenger flights: Dec 2019 vs Mar 2020 \
-(countries with ≥ 5 Dec flights)",
+  caption = "Direct scheduled passenger flights from China and Hong Kong to EUROCONTROL countries by destination, Dec 2019 vs. Mar 2020, for states with at least five December flights. Table shows absolute and percentage changes; note that residual flight volumes varied widely despite near-universal contraction.",
   align = c("l", "r", "r", "r", "r")
 )
 ```
@@ -307,7 +302,7 @@ knitr::kable(
 
 ## Top-10 drops and increases table
 
-```{r}
+```{r top_tbl}
 top_tbl <- pct_df |>
   mutate(
     direction = if_else(pct < 0, "Largest drop", "Largest increase"),
@@ -327,8 +322,7 @@ top_tbl <- pct_df |>
   )
 knitr::kable(
   top_tbl,
-  caption = "Largest proportional drops / increases in direct CN/HK flights \
-(Mar 2020 vs Dec 2019, countries with ≥ 5 Dec flights)",
+  caption = "Largest proportional drops and increases in direct CN/HK → EUROCONTROL flights, Mar 2020 vs. Dec 2019, by country (≥ 5 Dec flights). Note: Some 'increases' are due to low baseline volumes.",
   align = c("l", "r", "l", "r", "r", "r", "r"),
   format.args = list(big.mark = ",")
 )
@@ -344,7 +338,7 @@ knitr::kable(
 
 ## Origin-airport bar (top 25)
 
-```{r origin_stack, fig.cap="Flight counts per CN/HK origin"}
+```{r origin_stack, fig.cap="Top 25 Chinese and Hong Kong airports ranked by the total number of direct scheduled passenger flights to EUROCONTROL countries. Bars show flights in December 2019 (orange) and March 2020 (blue). Major sources include Beijing, Shanghai, and Hong Kong, but many other cities contributed smaller volumes. The distribution highlights the diversity of origin airports supplying Europe prior to the pandemic collapse."}
 origin_df <- flights_filtered |>
   count(month, ADEP, name = "flights") |>
   left_join(airports, by = c("ADEP" = "icao_code")) |>
@@ -386,10 +380,10 @@ p_orig <- ggplot(
 
 p_orig
 
-# ggsave(here(fig_dir, "bar_origins_top25.png"),
-#   p_orig,
-#   width = 6.3, height = 5.2, dpi = 300, bg = "transparent"
-# )
+ggsave(here(fig_dir, "bar_origins_top25.png"),
+       p_orig,
+       width = 6.3, height = 5.2, dpi = 300, bg = "transparent"
+       )
 ```
 
 The next section quantifies how these residual volumes relate to first-wave excess mortality.
