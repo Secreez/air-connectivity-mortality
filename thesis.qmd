@@ -110,6 +110,8 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 
 ### Flight-exposure data
 
+Commercial passenger flights, defined here as direct flights with ICAO Flight Types S (scheduled) or N (non-scheduled commercial), excluding general aviation, military, and other non-commercial operations
+
 *Source* EUROCONTROL “Aviation Data Repository for Research” archive.  
 Filters ICAO types S/N; ADEP $∈$ {CN, HK}; ADES $∈$ 26 continental member states.
 Aggregation destination‐country counts →
@@ -149,9 +151,15 @@ Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF 
 
 Analyses were performed in **R 4.4**; the full script and data pipeline are available in `notebooks/`.
 
-**Population normalization:**
+### Population denominator: validation and choice
 
-Population denominators use the 2020 mid-year estimates from the UN World Population Prospects (WPP 2024 revision). This choice is justified because European populations change by less than ±1 % from year to year, making the 2020 estimate a robust and standard baseline for per-capita analyses. Using a fixed population denominator aligns with common practice in epidemiological studies of COVID-19 excess mortality (e.g., [@karlinsky2021; @kelly2021]), where mid-year population values serve as the most representative measure of the population at risk. A sensitivity check (Appendix X, Table X) shows that normalizing flights by later-year populations changes Spearman coefficients only in the third or fourth decimal place.
+Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). This fixed denominator approach is standard for COVID-19 excess-mortality studies [@karlinsky2021; @kelly2021], as European populations vary by less than ±1% year to year.
+
+To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (–31%), Ukraine (–11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.
+
+- **OWID source:** [OWID GitHub](https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv)
+- **UN WPP:** [PPgp/wpp2024](https://github.com/PPgp/wpp2024)
+
 
 ### Analysis workflow
 

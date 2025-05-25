@@ -63,12 +63,18 @@ if (nrow(big_gaps) == 0) {
 
 # Take away message
 
-OWID's 2022 population snapshot (UN WPP 2024 medium-variant, but restated to 31 Dec 2022) was compared with the official mid-2020 UN release (31 Dec 2019 in `wpp2024`). 
 
-* 37 of 41 Eurcontrol coutnries differ by < 5 % (median 2 %)
-* Larger gaps for Cyprus (‑31 %), Ukraine (‑11 %) and North Macedonia (+11 %) stem from boundary updates or new censuses incorporated by OWID.
+The OWID 2020 population snapshot (based on UN WPP 2024, but with minor restatements by OWID) was compared with the official UN WPP mid-2020 release (31 Dec 2019).
 
-Re-running all correlations with raw WPP figures shifts Spearman ρ by < 0.01, so the OWID populations were retained for consistency with the excess-mortality denominator.
+* For **38 of 41 EUROCONTROL countries**, the difference was **<5%** (median 2%).
+* **Larger differences** appeared for Cyprus (–31%), Ukraine (–11%), and North Macedonia (+11%), each due to boundary updates or recent census corrections in the OWID series.
+* All other differences were small (see table below), and even the largest had negligible effect on the main results.
 
-- Population denominator. OWID's population series is sourced from UN WPP: https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv
-- wpp2024 packages states: https://github.com/PPgp/wpp2024 
+**Sensitivity check:** Re-running all correlations with raw WPP denominators instead of OWID changed Spearman’s ρ by **less than 0.01** for every test. 
+
+**Decision:** The OWID populations were retained for full consistency with the OWID excess-mortality denominator used throughout the main analysis.
+
+* OWID population series source: [OWID GitHub](https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv)
+* wpp2024 package: [PPgp/wpp2024](https://github.com/PPgp/wpp2024)
+
+
