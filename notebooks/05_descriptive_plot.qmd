@@ -227,8 +227,6 @@ ggsave(here(fig_dir, "scatter_volume_vs_origins.png"),
   width = 6, height = 4.5, dpi = 300, bg = "transparent"
 )
 ```
-### Scatterplot: log volume vs. route diversity (airport level)
-
 * **Clear positive association.** Among the 47 EUROCONTROL airports that received at least one direct flight from China/Hong Kong in Dec 2019 or Mar 2020, both flight volume and route diversity increased together (Spearman ρ ≈ 0.86, p < 0.001). On average, every additional ~100 flights corresponded to **1–2 extra origin airports**.
 * **Right-skewed hierarchy.** Four major hubs—**London Heathrow** (748 flights, 15 origins), **Frankfurt** (638/12), **Amsterdam Schiphol** (577/9), **Paris-CDG** (469/13)—dominated, while all other airports handled <200 flights and ≤5 origins. This demonstrates that early "import pressure" from China was highly concentrated in a small number of Western European gateways.
 * **Cargo outlier – Liège (LGG).** **Liège** stands out with high route diversity (7 origins) for its moderate volume (205 flights), reflecting its status as a **dedicated cargo hub** (notably for UPS and DHL ([REF!])). As the underlying dataset treats cargo and passenger flights equally, this position may **overstate the true risk of passenger-borne seeding at cargo airports**-especially during the pandemic, when cargo volumes were resilient or even increased despite a collapse in passenger traffic [@fraport2021].
@@ -277,10 +275,14 @@ ggsave(here(fig_dir, "pct_change_filtered.png"),
 )
 ```
 
-* **Near-universal contraction.** By late March 2020 every EUROCONTROL member with ≥ 5 December flights had cut at least half of its direct links; **15 of 19 countries slashed > 90 %** (Fig. X).
-* **Policy timing.** The cliff-edge coincides with two coordinated border measures: (i) the EU/Schengen external-border stop of **17 March 2020** (@EU2020), and (ii) China’s **"Five-One" rule of 26 March 2020**, which limited each airline to one China-Europe passenger rotation per week (@CAAC2020).
-* **Hubs vs. medium markets.** Major transfer states—UK, Germany, Netherlands—still operated hundreds of flights after a 50-70 % cut, whereas medium markets such as Italy, Austria and the Nordics fell to single-digit (or zero) services.
-* **Interpretation.** Percentage change reflects the policy response; residual flight counts indicate where absolute seeding risk persisted. Subsequent mortality correlations therefore need to control for this highly concentrated residual volume.
+* **Near-universal contraction.** By late March 2020, every EUROCONTROL member with ≥ 5 direct CN/HK flights in December had cut at least half of them; **15 of 19 slashed > 90 %** (Figure @pct_change_filtered).
+* **Import shut-off confirmed externally.** Independent industry data show that by **December 2020 China–Europe long-haul capacity was ≈ 7 % of 2019, while China’s domestic network had already rebounded to ≈ 93 %** of pre-crisis levels [@warnocksmith2021, Fig 6-7]. This echoes the post-April collapse in our combined-flights exposure index and illustrates how effectively Europe was sealed off from fresh seeding risk.
+* **Policy timing.** The cliff-edge aligns with two synchronous border measures: (i) the EU/Schengen external-border stop of **17 March 2020** (@EU2020) and (ii) China’s **"Five-One" rule of 26 March 2020**, limiting each airline to one weekly CN–EU passenger rotation (@CAAC2020).
+* **Subsidies couldn’t break the wall.** Even Beijing’s cash incentive of **≈ US$ 0.003–0.008 per ASK** for international sectors failed to coax carriers back onto Europe routes [@warnocksmith2021]. Fiscal sweeteners are powerless when cross-border health rules and quarantine mandates crush demand.
+* **Hubs vs medium markets.** Major transfer states—UK, Germany, Netherlands—still operated a few hundred flights after a 50–70 % cut, whereas medium markets such as Italy, Austria and the Nordics dropped to single digits (or zero). Absolute residual volume, not percentage change, drives any continuing exposure.
+* **Interpretation.** Percentage change captures the policy shock; the *Δ flights* column shows where residual seeding potential persisted. Down-stream mortality correlations therefore need to weight absolute exposure—and discount cargo-heavy hubs—when assessing import pressure.
+
+Note: ASK means airlines were paid roughly three-quarters of a cent for every seat-kilometre they kept in the China-Europe market—regardless of whether those seats were filled.
 
 ## Full numeric table (all ≥  5-flight countries)
 

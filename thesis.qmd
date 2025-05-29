@@ -27,6 +27,18 @@ format:
     toc-depth: 3
 ---
 
+## TOC
+
+## Glossary
+| Acronym / symbol    | Meaning               | First appearance |
+|---------------------|-----------------------|------------------|
+| **ASK**             | Available‐Seat-Kilometre (supply metric) | ... |
+| **IFR**             | Instrument Flight Rules (EUROCONTROL flight plan) | ... |
+| **LCC**             | Low-Cost Carrier | ... |
+| **ρ**               | Spearman rank-correlation coefficient | ... |
+| **"Five–One" rule** | CAAC 26 Mar 2020: max 1 route / airline / week between China and any foreign country | ... |
+
+
 ## Introduction
 
 ### Context & motivation
