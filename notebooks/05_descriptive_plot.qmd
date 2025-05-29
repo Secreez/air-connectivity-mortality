@@ -177,7 +177,6 @@ Direct links were not only concentrated by volume (see @bar_top10), but also by 
 ### Scatterplot: log volume vs. route diversity (airport level)
 
 ```{r scatter_volume_vs_diversity, fig.height=5, fig.cap="Relationship between total direct scheduled passenger flight volume (log-scale) and route diversity for 47 EUROCONTROL airports receiving direct CN/HK flights (Dec 2019 + Mar 2020). Major passenger hubs combine high volume and high diversity; Liège stands out as a cargo hub with high diversity despite moderate volume [@fraport2021]."}
-
 dest_stats <- flows_pairwise |>
   group_by(ADES) |>
   summarise(
@@ -388,9 +387,9 @@ p_orig <- ggplot(
 p_orig
 
 ggsave(here(fig_dir, "bar_origins_top25.png"),
-       p_orig,
-       width = 6.3, height = 5.2, dpi = 300, bg = "transparent"
-       )
+  p_orig,
+  width = 6.3, height = 5.2, dpi = 300, bg = "transparent"
+)
 ```
 
 The next section quantifies how these residual volumes relate to first-wave excess mortality.

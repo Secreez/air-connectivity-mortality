@@ -57,8 +57,8 @@ boot_rho <- function(data, idx, xvar) {
 }
 
 spearman_by_year <- function(xvar, B = 5000) {
-  corr_df |> 
-    group_by(target_date) |> 
+  corr_df |>
+    group_by(target_date) |>
     group_modify(\(d, key) {
       ok <- complete.cases(
         d[[xvar]],
@@ -98,8 +98,8 @@ spearman_by_year <- function(xvar, B = 5000) {
         p = pval,
         n = n
       )
-    }) |> 
-    ungroup() |> 
+    }) |>
+    ungroup() |>
     mutate(
       variable = xvar,
       year = lubridate::year(target_date)
@@ -191,7 +191,6 @@ p_rho |> (\(p) {
   )
   p
 })()
-
 ```
 **Take-away**
 
@@ -205,8 +204,8 @@ p_rho |> (\(p) {
 
 ## Snapshot scatter (05 May 2020)
 ```{r scatter_2020, fig.cap="Relationship between cumulative direct scheduled passenger flights from China and Hong Kong to each European country (x-axis, log-scale) and excess mortality per million residents by 5 May 2020 (y-axis). Each point is a country (ISO3 code). A moderate positive correlation is observed (Spearman ρ = 0.53, p ≈ 0.007), indicating higher early air connectivity was associated with greater first-wave excess mortality."}
-p20 <- corr_df |> 
-  filter(target_date == as.Date("2020-05-05")) |> 
+p20 <- corr_df |>
+  filter(target_date == as.Date("2020-05-05")) |>
   ggplot(aes(
     total_inbound_flights_combined,
     excess_mortality_cumulative_per_million
@@ -234,7 +233,6 @@ Countries with the highest direct air connectivity to China and Hong Kong (such 
 ## pp scatter (Inb flights, dec 2019 + mar 2020)
 
 ```{r scatter_dec_mar, fig.cap = "Relationship between direct scheduled passenger flights from \ China and Hong Kong (log-scale, x-axis) and cumulative excess mortality per \ million residents measured on 5 May 2020 (y-axis). Panels separate the \ exposure metric for **December 2019** (left) and **March 2020** (right). A \ moderate positive association is visible in both months (Spearman ρ ≈ 0.50 \ and ρ ≈ 0.57). Country codes label (i) the three largest early-exposure hubs \ by flight count and (ii) countries in the top quintile of first-wave excess \ mortality, highlighting the states that drive the correlation." }
-
 snapshots <- corr_df |>
   filter(target_date == as.Date("2020-05-05")) |>
   select(
@@ -250,9 +248,11 @@ snapshots <- corr_df |>
   mutate(
     month = factor(
       recode(month,
-             flights_dec19 = "Dec 2019",
-             flights_mar20 = "Mar 2020"),
-      levels = c("Dec 2019", "Mar 2020"))
+        flights_dec19 = "Dec 2019",
+        flights_mar20 = "Mar 2020"
+      ),
+      levels = c("Dec 2019", "Mar 2020")
+    )
   ) |>
   filter(inbound_flights > 0) # drop zero-flight countries
 
@@ -260,12 +260,15 @@ stats_lbl <- snapshots |>
   group_by(month) |>
   summarise(
     rho = cor(inbound_flights,
-              excess_mortality_cumulative_per_million,
-              method = "spearman")
+      excess_mortality_cumulative_per_million,
+      method = "spearman"
+    )
   ) |>
-  mutate(label = sprintf("ρ ≈ %.2f", rho),
-         x = max(snapshots$inbound_flights)*0.9,
-         y = min(snapshots$excess_mortality_cumulative_per_million)*0.9)
+  mutate(
+    label = sprintf("ρ ≈ %.2f", rho),
+    x = max(snapshots$inbound_flights) * 0.9,
+    y = min(snapshots$excess_mortality_cumulative_per_million) * 0.9
+  )
 
 gg_pp <- ggplot(
   snapshots,
@@ -273,9 +276,9 @@ gg_pp <- ggplot(
 ) +
   geom_point(size = 3, alpha = 0.8, colour = "#009E73") +
   geom_text_repel(
-    data  = \(d) d |> filter(iso3 %in% c("ESP","ITA","GBR","DEU","BEL","FRA", "NLD")),
+    data = \(d) d |> filter(iso3 %in% c("ESP", "ITA", "GBR", "DEU", "BEL", "FRA", "NLD")),
     aes(label = iso3),
-    size  = 3
+    size = 3
   ) +
   geom_text(
     data = stats_lbl,
@@ -284,7 +287,7 @@ gg_pp <- ggplot(
     colour = "grey30"
   ) +
   scale_x_log10(
-    breaks = c(1,3,10,30,100,300,1000),
+    breaks = c(1, 3, 10, 30, 100, 300, 1000),
     labels = scales::comma,
     expand = expansion(mult = c(.05, .02))
   ) +
@@ -307,7 +310,8 @@ gg_pp
 
 ggsave(
   here(fig_dir, "scatter_dec_mar.png"),
-  gg_pp, width = 7.3, height = 3.8, dpi = 300, bg = "transparent"
+  gg_pp,
+  width = 7.3, height = 3.8, dpi = 300, bg = "transparent"
 )
 ```
 
@@ -326,7 +330,6 @@ ggsave(
 ## Caterpillar plot 
 
 ```{r caterpillar, fig.cap="Spearman ρ (±95% bootstrap CI) between early flight exposure and excess mortality, by reference year. The association is strongly positive in 2020, fades in 2021, and turns negative from 2022 onward."}
-
 pal <- c(
   "Dec 2019" = "#E69F00",
   "Mar 2020" = "#56B4E9",
@@ -336,7 +339,8 @@ pal <- c(
 gg_cater <- spearman_res |>
   filter(variable %in% c("Dec 2019", "Mar 2020", "Combined")) |>
   mutate(variable = factor(variable,
-                           levels = c("Combined", "Dec 2019", "Mar 2020"))) |>
+    levels = c("Combined", "Dec 2019", "Mar 2020")
+  )) |>
   ggplot(aes(year, rho, colour = variable)) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey30") +
   geom_errorbar(
@@ -353,8 +357,9 @@ gg_cater <- spearman_res |>
 gg_cater
 
 ggsave(here(fig_dir, "rho_caterpillar.png"),
-       gg_cater, width = 6, height = 4, dpi = 300, bg = "transparent")
-
+  gg_cater,
+  width = 6, height = 4, dpi = 300, bg = "transparent"
+)
 ```
 
 **Interpretation:**
@@ -434,14 +439,14 @@ boot_rho <- function(data, idx, xvar) {
   with(
     data[idx, ],
     cor(get(xvar),
-        excess_mortality_cumulative_per_million,
-        method = "spearman",
-        use   = "complete.obs")
+      excess_mortality_cumulative_per_million,
+      method = "spearman",
+      use = "complete.obs"
+    )
   )
 }
 
-# NEXT ! 
-
+# NEXT !
 ```
 
 ## Reverse causation
