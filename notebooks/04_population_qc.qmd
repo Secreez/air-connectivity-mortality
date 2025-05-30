@@ -1,64 +1,73 @@
 ```{r}
-# 04_population_qc.R
+# 04_population_qc.qmd
 source(here::here("R/00_load_libs.R"))
 
-euro_ISO3 <- readr::read_csv(here("data/eurocontrol_iso_map.csv"),
-  show_col_types = FALSE
-)$iso3
+# constants
+EURO_ISO   <- readr::read_csv(
+                here::here("data", "eurocontrol_iso_map.csv"),
+                show_col_types = FALSE
+              )$iso3
+POP_CUT    <- 2e6  # micro-state threshold used in 06_correlation
+DIFF_LIMIT <- 0.10  # 10 % OWID–WPP alarm line
+OUT_DIR    <- here::here("data", "processed")
+dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
-## UN WPP “mid‑2020" → 31 Dec 2019 in pop1dt
-data(pop1dt, package = "wpp2024") # values are in *thousands*
-
+# WPP 2020
+data(pop1dt, package = "wpp2024") # ‘000 persons’
 pop_wpp20 <- pop1dt |>
-  filter(year == 2019) |> # ← shift back by one year
+  filter(year == 2019) |> # mid-2020 = 31-Dec-2019
   mutate(
     iso3 = countrycode(
       name, "country.name", "iso3c",
-      custom_match = c(
-        "Czechia" = "CZE",
-        "Türkiye" = "TUR",
-        "United Kingdom" = "GBR"
-      )
-    )
-  ) |>
-  filter(iso3 %in% euro_ISO3) |>
-  transmute(iso3, pop_wpp = pop * 1e3) # to persons
+      custom_match = c("Czechia" = "CZE",
+                       "Türkiye" = "TUR",
+                       "United Kingdom" = "GBR"),
+      warn = FALSE)
+  ) |> 
+  filter(iso3 %in% EURO_ISO) |> 
+  transmute(iso3, pop_wpp = pop * 1e3)
 
-
-## OWID
-pop_owid20 <- readr::read_csv(
-  here("data/raw/owid/owid-covid-data.csv"),
+# OWID 2020
+pop_owid20 <- read_csv(
+  here::here("data", "raw", "owid", "owid-covid-data.csv"),
   show_col_types = FALSE,
-  col_select = c(iso_code, date, population)
+  col_select     = c(iso_code, date, population)
 ) |>
-  dplyr::filter(
-    lubridate::year(date) == 2020,
-    iso_code %in% euro_ISO3
-  ) |>
-  dplyr::group_by(iso3 = iso_code) |>
-  dplyr::slice_max(date, with_ties = FALSE) |>
-  dplyr::ungroup() |>
-  dplyr::transmute(iso3, pop_owid = population)
+  filter(year(date) == 2020,
+         iso_code %in% EURO_ISO) |> 
+  group_by(iso3 = iso_code) |> 
+  slice_max(date, with_ties = FALSE) |> 
+  ungroup() |> 
+  transmute(iso3, pop_owid = population)
 
-## join & compare
-pop_comp <- pop_wpp20 |>
-  dplyr::inner_join(pop_owid20, by = "iso3") |>
-  dplyr::mutate(rel_diff = (pop_owid - pop_wpp) / pop_wpp)
+# compare
+pop_comp <- inner_join(pop_wpp20, pop_owid20, by = "iso3") |> 
+  mutate(rel_diff = (pop_owid - pop_wpp) / pop_wpp)
+
+readr::write_csv(pop_comp,
+  here::here("data", "processed", "pop_comparison_2020.csv"))
+
+big_gaps <- pop_comp |> filter(abs(rel_diff) > DIFF_LIMIT)
+
+if (nrow(big_gaps) == 0) {
+  message("✔ OWID and WPP within ±10 % for all Eurocontrol states.")
+} else {
+  warning("! Gap >10 % for: ", paste(big_gaps$iso3, collapse = ", "))
+}
+
+# micro-states (2 million threshold ... for 06_correlation ~ sensitivity)
+small_in_baseline <- pop_comp |> 
+  filter(pop_owid < POP_CUT) |> 
+  arrange(pop_owid)
 
 readr::write_csv(
-  pop_comp,
-  here("data/processed/pop_comparison_2020.csv")
+  small_in_baseline,
+  here::here("data", "processed", "pop_below2M.csv")
 )
 
-big_gaps <- pop_comp |> dplyr::filter(abs(rel_diff) > 0.10)
-if (nrow(big_gaps) == 0) {
-  message("OWID and UN‑WPP within ±10 % for all Eurocontrol states.")
-} else {
-  warning(
-    "Gap >10 % for: ",
-    paste(big_gaps$iso3, collapse = ", ")
-  )
-}
+small_iso <- small_in_baseline$iso3
+
+
 ```
 
 # Take away message
