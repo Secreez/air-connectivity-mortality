@@ -37,7 +37,7 @@ pop_df <- read_csv(
 corr_df <- analysis_df |>
   semi_join(analysis_df |> count(iso3) |> filter(n == 4), by = "iso3") |> # Keep only countries with complete data (all 4 analysis dates)
   left_join(pop_df, by = "iso3") |>
-  mutate(flights_pm = total_inbound_flights_combined / (population / 1e6))
+  mutate(flights_pm = total_inbound_flights_combined / (population / 1e6)) 
 stopifnot(!anyNA(corr_df$flights_pm))
 ```
 
@@ -135,22 +135,23 @@ knitr::kable(
 
 **Key patterns:**
 
-* Early air connectivity explained a substantial share of cross-country variation in first-wave excess mortality (ρ ≈ 0.53, 95% CI \[0.18, 0.80], p < 0.01).
-* From 2021 onwards, the rank correlation essentially disappeared; by 2022–23 it became modestly negative (ρ ≈ –0.45, 95% CI \[–0.79, 0.00]).
-* This sign change exceeds the bootstrap confidence intervals, suggesting the shift is unlikely due to random sampling in a \~25-country dataset.
+* Early air connectivity explained a substantial share of cross-country variation in first-wave excess mortality (ρ ≈ 0.53, 95% CI [0.18, 0.80], p < 0.01).
+* From 2021 onwards, the rank correlation essentially disappeared; by 2022–23 it became modestly negative (ρ ≈ –0.45, 95% CI [–0.79, 0.00]).
+* This sign change exceeds the bootstrap confidence intervals, suggesting the shift is unlikely due to random sampling in a ~25-country dataset.
 * Notably, **“Flights per million population” was already significantly negative from 2021 onward**, indicating that higher per-capita connectivity was linked to *lower* late-pandemic mortality—a possible “resource advantage” effect in highly connected countries.
 
 **Interpretation:**
 
 * International flights played a major role only during the initial seeding phase—before widespread community transmission in Europe.
 * Once SARS-CoV-2 was established in most countries, *domestic factors*—population age, public health response, healthcare capacity, and vaccination coverage—became dominant in shaping excess mortality.
-* This pattern aligns with studies showing that the effect of border controls diminishes once local transmission is established (see e.g., Chinazzi et al. 2020, *Science*).
+* This pattern aligns with studies showing that the effect of border controls diminishes once local transmission is established (see @chinazzi2020).
 
 **Why bootstrap CIs?**
 
 * We computed 5,000 bootstrap resamples, following best practice for small-n correlation studies (DiCiccio & Efron 1996; Tong et al. 2016; Mokhtar 2023). This provides stable confidence intervals, and a fixed random seed (`set.seed(42)`) ensures full reproducibility.
 
 **Summary:**
+
 Early in the pandemic, countries most exposed to direct flights from China and Hong Kong suffered higher excess mortality. However, as the pandemic progressed, this association disappeared—and by 2022–2023, even reversed: high connectivity was linked to *lower* excess deaths, likely reflecting differences in domestic response, health system capacity, and perhaps a “rich country” advantage.
 These findings underscore the narrow window during which travel restrictions can affect epidemic outcomes, and the overwhelming importance of internal factors once local transmission is widespread.
 
@@ -192,13 +193,14 @@ p_rho |> (\(p) {
   p
 })()
 ```
+
 **Take-away**
 
-* **Early impact, short window.** Direct air connectivity is **strongly** associated with excess mortality during the first wave (ρ ≈ 0.55 in 2020), implying that early import pressure mattered.
+**Early impact, short window.** Direct air connectivity is **strongly** associated with excess mortality during the first wave (ρ ≈ 0.55 in 2020), implying that early import pressure mattered.
 
-* **Rapid attenuation.** The link collapses in 2021 and flips negative in 2022–23, once domestic factors—demography, public-health response, health-system capacity, and vaccination—dominate outcomes.
+**Rapid attenuation.** The link collapses in 2021 and flips negative in 2022–23, once domestic factors—demography, public-health response, health-system capacity, and vaccination—dominate outcomes.
 
-* **Policy implication.** Border closures can delay seeding but have little leverage once community transmission is established; long-run mortality depends on internal mitigation and resilience.
+**Policy implication.** Border closures can delay seeding but have little leverage once community transmission is established; long-run mortality depends on internal mitigation and resilience.
 
 > @warnocksmith2021 show that nimble Chinese LCCs—**especially Spring Airlines**—pivoted almost entirely to domestic, price-sensitive demand and recovered first. Such domestic-heavy networks generate **lots of flights but minimal cross-border exposure**, providing a behavioural mechanism for the **negative Spearman ρ after 2021** (Figure @rho_timeseries).
 
@@ -317,15 +319,15 @@ ggsave(
 
 **Interpretation**
 
-* **Consistent moderate association.** In both December 2019 and March 2020, countries with more direct scheduled flights from China/Hong Kong tended to record higher excess mortality by 5 May 2020 (Spearman ρ ≈ 0.50–0.57).
+**Consistent moderate association.** In both December 2019 and March 2020, countries with more direct scheduled flights from China/Hong Kong tended to record higher excess mortality by 5 May 2020 (Spearman ρ ≈ 0.50–0.57).
+  
+**Driven by a handful of hubs.** The positive tail is dominated by major Western-European gateways—Spain, Italy, the UK, Belgium, France and the Netherlands which were among the first and hardest-hit countries.
 
-* **Driven by a handful of hubs.** The positive tail is dominated by major Western-European gateways—Spain, Italy, the UK, Belgium, France and the Netherlands which were among the first and hardest-hit countries.
+**Why the right-skew?** Secondary China-Europe links such as **PEK–MUC** collapsed to ≈ 2 % of their 2017 revenue by March 2020, whereas the trunk **HKG–LHR** sector still moved ≈ 13 000 passengers in September 2020 [@warnocksmith2021]. This divergence creates the long horizontal tail in **Figure @scatter_dec_mar** (right panel), where just a few hubs sit far out on the x-axis and "pull" the correlation.
 
-* **Why the right-skew?** Secondary China-Europe links such as **PEK–MUC** collapsed to ≈ 2 % of their 2017 revenue by March 2020, whereas the trunk **HKG–LHR** sector still moved ≈ 13 000 passengers in September 2020 [@warnocksmith2021]. This divergence creates the long horizontal tail in **Figure @fig:scatter_dec_mar** (right panel), where just a few hubs sit far out on the x-axis and "pull" the correlation.
+**Limits of air-traffic seeding.** The pattern supports the hypothesis that early international connectivity helped seed Europe"s first wave. Yet not every highly connected country suffered high mortality, and conversely some hard-hit countries were not major hubs—pointing to domestic factors (age structure, public-health response, health-system capacity) that modulate outcomes.
 
-* **Limits of air-traffic seeding.** The pattern supports the hypothesis that early international connectivity helped seed Europe’s first wave. Yet not every highly connected country suffered high mortality, and conversely some hard-hit countries were not major hubs—pointing to domestic factors (age structure, public-health response, health-system capacity) that modulate outcomes.
-
-* **Time-bound effect.** After 2020 the association fades and even reverses, consistent with evidence that border controls matter mainly before widespread community transmission is established.
+**Time-bound effect.** After 2020 the association fades and even reverses, consistent with evidence that border controls matter mainly before widespread community transmission is established.
 
 ## Caterpillar plot 
 
@@ -363,7 +365,8 @@ ggsave(here(fig_dir, "rho_caterpillar.png"),
 ```
 
 **Interpretation:**
-* All three exposure metrics are clearly positive in 2020; in 2021 their CIs straddle zero, and from 2022 the combined metric is significantly negative, confirming a genuine sign-flip rather than sampling noise.
+
+All three exposure metrics are clearly positive in 2020; in 2021 their CIs straddle zero, and from 2022 the combined metric is significantly negative, confirming a genuine sign-flip rather than sampling noise.
 
 # Limitations {#limitations}
 
@@ -371,91 +374,63 @@ Can be used for Thesis.qmd
 
 ## Data limitations
 
-**Flight-exposure proxy (EUROCONTROL, IFR plans).**
-  Our exposure estimates count ICAO flight types S (scheduled) and N (non-scheduled commercial) as reported in EUROCONTROL's IFR data.
-  -  Actual passenger numbers per flight are unknown; all filed flights—including "ghost" (very low-occupancy) and cargo-only flights—are counted equally.
-  - Itineraries with connecting segments via third-country hubs (e.g., DXB, DOH) are not fully captured, so exposure is under-estimated for transfer states and may be over-estimated for major cargo airports such as Liège.
-  - In 2020, Liège Airport handled over 1.1 million metric tons of airfreight (ranking 6th in Europe), with cargo volumes rising 23.5% year-on-year despite the pandemic—contrasting with heavy declines in passenger traffic at most airports [@fraport2021]. This highlights the distinct behavior of cargo airports, where flight counts and exposure indices remained elevated due to surging demand for freight and widespread use of "preighter" operations (passenger planes repurposed for cargo).
-  - Only four "representative" months (Mar, Jun, Sep, Dec) are available per year from EUROCONTROL's data releases [@eurocontrolData2025], potentially missing key seeding windows (February 2020).
+**Flight-exposure proxy (EUROCONTROL, IFR plans).** Our exposure estimates count ICAO flight types S (scheduled) and N (non-scheduled commercial) as reported in EUROCONTROL's IFR data.
 
-This limitation is directly reflected in our results: for example, Belgium’s exposure index does not drop in line with other countries during the pandemic period (**see Figure @pct_change_filtered**), consistent with Liège’s unique role as a freight hub.
+- Actual passenger numbers per flight are unknown; all filed flights—including "ghost" (very low-occupancy) and cargo-only flights—are counted equally.
+- Itineraries with connecting segments via third-country hubs (e.g., DXB, DOH) are not fully captured, so exposure is under-estimated for transfer states and may be over-estimated for major cargo airports such as Liège.
+- In 2020, Liège Airport handled over 1.1 million metric tons of airfreight (ranking 6th in Europe), with cargo volumes rising 23.5% year-on-year despite the pandemic—contrasting with heavy declines in passenger traffic at most airports [@fraport2021]. This highlights the distinct behavior of cargo airports, where flight counts and exposure indices remained elevated due to surging demand for freight and widespread use of "preighter" operations (passenger planes repurposed for cargo).
+- Only four "representative" months (Mar, Jun, Sep, Dec) are available per year from EUROCONTROL's data releases [@eurocontrolData2025], potentially missing key seeding windows (February 2020).
 
-
-**Ghost/Abnormal flights (load-factor bias).**  
-The phenomenon of “ghost flights” — nearly empty aircraft operated mainly to preserve slots — is well documented in Europe [@sun2022_b].  @sun2022_b show that such flights peaked in March–April 2020, especially among low-cost carriers and on dense intra-European routes.
-
-* Our exposure metric cannot see passenger loads, so it counts ghost, cargo-only, and regularly filled flights equally; exposure is therefore overstated whenever ghost flights dominate a route.
-* @sun2022_b focus on intra-EU sectors, but similar slot-retention economics appeared on some **China–Europe trunk links**. For example, @warnocksmith2021 find that **on residual HKG–LHR services average Y-class fares jumped from ≈ US$ 772 (Feb 2020) to US$ 1 052 in March while loads collapsed** - a classic ghost-flight pattern.
-* Because cargo and ghost flights both keep IFR plans "alive," any flight-count proxy will exaggerate true person-to-person exposure on affected routes; this bias is most acute at slot-controlled hubs.
+This limitation is directly reflected in our results: for example, Belgium"s exposure index does not drop in line with other countries during the pandemic period (**see Figure @pct_change_filtered**), consistent with Liège"s unique role as a freight hub.
 
 
-* **Passenger vs. Cargo Dynamics: Exposure Index Bias at Cargo Hubs.**
-  A core limitation of our flight-exposure proxy is that it cannot distinguish between passenger, cargo, and “ghost” flights (near-empty for slot retention), especially at major hubs. While most European airports saw catastrophic declines in passenger traffic during 2020 (e.g., Frankfurt -74%, [@fraport2021]), cargo hubs like Liège (+23.5% cargo volume year-over-year (YoY)) or Frankfurt (-8.3% cargo) showed much greater resilience—partly due to a surge in dedicated freighters and “preighter” (cargo-only) flights. At Frankfurt, over 8,600 preighter flights accounted for 8% of annual cargo, and freighters made up 80% of cargo movements.
-  Consequently, flight counts and exposure indices may significantly overstate real human exposure at major cargo airports. This explains why indices for Belgium and Germany remained high despite catastrophic drops in passenger travel (see Figure @pct_change_filtered)—a pattern also seen at other major cargo hubs. Such discrepancies highlight the importance of careful interpretation when relying on flight-based proxies for pandemic exposure.
+**Ghost/Abnormal flights (load-factor bias).** The phenomenon of “ghost flights” — nearly empty aircraft operated mainly to preserve slots — is well documented in Europe [@sun2022_b]. @sun2022_b show that such flights peaked in March–April 2020, especially among low-cost carriers and on dense intra-European routes.
 
-* **Two-month window (Dec 2019 & Mar 2020).**  
-  EUROCONTROL’s public archive releases only four sample months per year; February—a critical seeding month—is missing [@eurocontrolData2025].
+- Our exposure metric cannot see passenger loads, so it counts ghost, cargo-only, and regularly filled flights equally; exposure is therefore overstated whenever ghost flights dominate a route.
+- @sun2022_b focus on intra-EU sectors, but similar slot-retention economics appeared on some **China–Europe trunk links**. For example, @warnocksmith2021 find that **on residual HKG–LHR services average Y-class fares jumped from ≈ US$ 772 (Feb 2020) to US$ 1 052 in March while loads collapsed** - a classic ghost-flight pattern.
+- Because cargo and ghost flights both keep IFR plans "alive," any flight-count proxy will exaggerate true person-to-person exposure on affected routes; this bias is most acute at slot-controlled hubs.
 
-* **Excess-mortality uncertainty.**  
-  Outcome data merge the World Mortality Dataset with HMD-STMF. National registration lags, baseline-fit choices, and wartime disruption (Ukraine ≥ 2022) widen credible intervals [@karlinsky2021; @msemburi2023]. Notably, @msemburi2023. caution that "basing rankings on point estimates will often be misleading" and discuss the "hazards of ranking countries' epidemic responses" given large data and model uncertainties.
-  – A ± 7-day tolerance around 5 May grabs the nearest non-NA value (day_diff ≤ 7); this reduces missingness but adds timing noise.
-  – Country ranks are more stable than absolute levels, yet still volatile for very small populations.
-  – As emphasized by @msemburi2023, "hazards of ranking countries’ epidemic responses based solely on excess-mortality estimates should be acknowledged."
+**Passenger vs. Cargo Dynamics: Exposure Index Bias at Cargo Hubs.** A core limitation of our flight-exposure proxy is that it cannot distinguish between passenger, cargo, and “ghost” flights (near-empty for slot retention), especially at major hubs. While most European airports saw catastrophic declines in passenger traffic during 2020 (e.g., Frankfurt -74%, [@fraport2021]), cargo hubs like Liège (+23.5% cargo volume year-over-year (YoY)) or Frankfurt (-8.3% cargo) showed much greater resilience—partly due to a surge in dedicated freighters and “preighter” (cargo-only) flights. At Frankfurt, over 8,600 preighter flights accounted for 8% of annual cargo, and freighters made up 80% of cargo movements.
 
-* **Population denominator.**  
-  OWID’s mid-2020 snapshot (UN WPP 2024–derived) differs from raw WPP by < 5 % in 38 / 41 countries; the largest gaps (Cyprus –31 %, Ukraine –11 %, North Macedonia +11 %) stem from boundary or census updates. Re-running all correlations with WPP figures shifts Spearman ρ by **< 0.01**, so OWID values were retained for consistency.
+Consequently, flight counts and exposure indices may significantly overstate real human exposure at major cargo airports. This explains why indices for Belgium and Germany remained high despite catastrophic drops in passenger travel (see Figure @pct_change_filtered)—a pattern also seen at other major cargo hubs. Such discrepancies highlight the importance of careful interpretation when relying on flight-based proxies for pandemic exposure.
+
+**Two-month window (Dec 2019 & Mar 2020).** EUROCONTROL's public archive releases only four sample months per year; February—a critical seeding month—is missing [@eurocontrolData2025].
+
+**Excess-mortality uncertainty.** Outcome data merge the World Mortality Dataset with HMD-STMF. National registration lags, baseline-fit choices, and wartime disruption (Ukraine ≥ 2022) widen credible intervals [@karlinsky2021; @msemburi2023]. Notably, @msemburi2023. caution that "basing rankings on point estimates will often be misleading" and discuss the "hazards of ranking countries' epidemic responses" given large data and model uncertainties.
+
+– A ± 7-day tolerance around 5 May grabs the nearest non-NA value (day_diff ≤ 7); this reduces missingness but adds timing noise.
+– Country ranks are more stable than absolute levels, yet still volatile for very small populations.
+– As emphasized by @msemburi2023, "hazards of ranking countries" epidemic responses based solely on excess-mortality estimates should be acknowledged."
+
+* **Population denominator.** OWID"s mid-2020 snapshot (UN WPP 2024–derived) differs from raw WPP by < 5 % in 38 / 41 countries; the largest gaps (Cyprus –31 %, Ukraine –11 %, North Macedonia +11 %) stem from boundary or census updates. Re-running all correlations with WPP figures shifts Spearman ρ by **< 0.01**, so OWID values were retained for consistency.
 
 ### Methodological  
 
-* **Ecological, country-level design.**  
-  Results are based on national aggregates, which mask substantial sub-national variation in both air-traffic exposure and health outcomes (e.g. Lombardy vs. Sicily in Italy).
-  – This approach risks the ecological fallacy: relationships observed at the country level may not hold at the city, regional, or individual level.
-  – Therefore, findings should not be interpreted as causal or representative for specific regions or population subgroups.
+* **Ecological, country-level design.** Results are based on national aggregates, which mask substantial sub-national variation in both air-traffic exposure and health outcomes (e.g. Lombardy vs. Sicily in Italy).
+
+– This approach risks the ecological fallacy: relationships observed at the country level may not hold at the city, regional, or individual level.
+– Therefore, findings should not be interpreted as causal or representative for specific regions or population subgroups.
 
 
-* **Small-N, rank-based correlation.**  
-  With ≈ 25 observations, Spearman ρ is sensitive to ties and outliers; one hub country can swing the estimate. We report 5 000-replicate bootstrap CIs, but sampling error remains large [@diciccio1996].
+**Small-N, rank-based correlation.** With ≈ 25 observations, Spearman ρ is sensitive to ties and outliers; one hub country can swing the estimate. We report 5 000-replicate bootstrap CIs, but sampling error remains large [@diciccio1996].
 
 
-* **Residual confounding.**  
-  Excess-mortality differences across countries are strongly shaped by vulnerability factors—GDP, poverty, and income inequality. We do **not** adjust for these, so findings may reflect socioeconomic risk more than direct effects of air connectivity [@ioannidis2023]. - Ward et al 2024 - msemburi et al 2023 ..
+**Residual confounding.** Excess-mortality differences across countries are strongly shaped by vulnerability factors—GDP, poverty, and income inequality. We do **not** adjust for these, so findings may reflect socioeconomic risk more than direct effects of air connectivity [@ioannidis2023, @msemburi2023].
   
 
 
 ### Causal interpretation  
 
-* **No causal identification.**  
-  December exposure precedes the European outbreak (minimising reverse causation), but March exposure is already influenced by border closures, so causality could run either way.
+**Temporal ordering helps but does not prove causality.** The **December-2019** exposure was measured months **before** COVID-19 deaths peaked in Europe, so reverse causation (high mortality → more flights) is implausible. By contrast, the **March-2020** metric is already affected by border closures, so its association may mix cause and effect.
 
-* **External validity.**  
-  Findings apply to continental EUROCONTROL members during the Wuhan/Alpha period. Extrapolation to later variants, island nations, or other regions should be cautious.
+**Residual confounding is unavoidable.** Country-level correlates—age structure, health-system capacity, NPIs, socio-economic status—remain uncontrolled and could drive part of the relationship.
 
-> **Bottom line:** The study is *hypothesis-generating*. Direct air connectivity plausibly seeded Europe’s first wave, but its statistical signal disappears once community transmission dominates. Data gaps, ecological design, and unmeasured confounders limit strong policy conclusions about long-run border-control effectiveness.
+**External validity is narrow.** Results pertain to continental EUROCONTROL members during the Wuhan/Alpha era. Islands, later variants, or regions with different mobility patterns may behave differently.
 
-# Robustness check
+> **Bottom line.** This is a *hypothesis-generating* study: early direct flights likely contributed to first-wave seeding, but their statistical signal vanishes once community transmission dominates. Data gaps, ecological design, and unmeasured confounders limit strong policy claims about long-run border-control effectiveness.
 
-```{r robustness_table}
-boot_rho <- function(data, idx, xvar) {
-  with(
-    data[idx, ],
-    cor(get(xvar),
-      excess_mortality_cumulative_per_million,
-      method = "spearman",
-      use = "complete.obs"
-    )
-  )
-}
-
-# NEXT !
-```
-
-## Reverse causation
-
-Early flight exposure is measured **before** first-wave mortality peaks; therefore, high deaths could not have caused higher December exposure. Correlation using **Dec-only** flights (ρ ≈ 0.50) shows the pattern predates policy cuts.
 
 ## Take-away  
 
 > **Early seeding signal, rapidly eclipsed.**  
 > Direct flights from China / Hong Kong explain roughly one-quarter of the *cross-country* spread in first-wave excess mortality (May 2020). That signal fades to zero in 2021 and reverses thereafter, once community transmission and domestic counter-measures dominate outcomes.
-
-
