@@ -27,6 +27,18 @@ format:
     toc-depth: 3
 ---
 
+## TOC
+
+## Glossary
+| Acronym / symbol    | Meaning               | First appearance |
+|---------------------|-----------------------|------------------|
+| **ASK**             | Available‐Seat-Kilometre (supply metric) | ... |
+| **IFR**             | Instrument Flight Rules (EUROCONTROL flight plan) | ... |
+| **LCC**             | Low-Cost Carrier | ... |
+| **ρ**               | Spearman rank-correlation coefficient | ... |
+| **"Five–One" rule** | CAAC 26 Mar 2020: max 1 route / airline / week between China and any foreign country | ... |
+
+
 ## Introduction
 
 ### Context & motivation
@@ -145,7 +157,6 @@ Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF 
 * Spearman $ρ$ between each flight metric and $E_t$.  
 * 5000-sample bootstrap CIs. (Need a why here)
 * Sensitivity checks:
-  1. exclude countries < 2 M pop;  
   2. use $FPM$;
   3. drop countries with any missing $E$ snapshot
 
@@ -178,7 +189,6 @@ To confirm that dataset differences do not bias results, OWID’s 2020 snapshot 
 
    | Label | Change | Purpose |
    |--------|--------|---------|
-   | POP-cut | drop < 2 M pop | small-country leverage |
    | FPM | flights per million pop | relative exposure |
    | COMPLETE | require full four-year ($E_t$) series | missing-data bias 
 
