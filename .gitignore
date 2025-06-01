@@ -2,6 +2,7 @@
 .Rproj.user/
 .Rhistory
 .RData
+.RDataTmp*
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 trackchanges.sty
