@@ -421,7 +421,7 @@ Consequently, flight counts and exposure indices may significantly overstate rea
 
 ### Causal interpretation  
 
-**Temporal ordering helps but does not prove causality.** The **December-2019** exposure was measured months **before** COVID-19 deaths peaked in Europe, so reverse causation (high mortality → more flights) is implausible. By contrast, the **March-2020** metric is already affected by border closures, so its association may mix cause and effect.
+**Temporal ordering helps but does not prove causality.** The **December-2019** exposure was measured months **before** COVID-19 deaths peaked in Europe, so reverse causation (high mortality → more flights) is implausible. By contrast, the **March-2020** metric is already affected by border closures, so its association may mix cause and effect. Because all exposure measures precede the 5 May mortality snapshot, reverse causation (i.e. deaths causing flight reductions) is implausible for December and mitigated—but not eliminated—for March.
 
 **Residual confounding is unavoidable.** Country-level correlates—age structure, health-system capacity, NPIs, socio-economic status—remain uncontrolled and could drive part of the relationship.
 
@@ -434,3 +434,43 @@ Consequently, flight counts and exposure indices may significantly overstate rea
 
 > **Early seeding signal, rapidly eclipsed.**  
 > Direct flights from China / Hong Kong explain roughly one-quarter of the *cross-country* spread in first-wave excess mortality (May 2020). That signal fades to zero in 2021 and reverses thereafter, once community transmission and domestic counter-measures dominate outcomes.
+
+# Appendix
+
+```{r restriction_table}
+# constant and helpers
+REF      <- as.Date("2020-05-05")
+boot_rho <- function(d, idx){
+  with(d[idx, ],
+       cor(total_inbound_flights_combined,
+           excess_mortality_cumulative_per_million,
+           method = "spearman"))
+}
+
+# countries with complete series
+FULL_SERIES <- corr_df |>
+  count(iso3) |>
+  filter(n == 4) |>
+  pull(iso3)
+
+# slice 2020 and compute
+snap_2020 <- corr_df |>
+  filter(target_date == REF,
+         iso3        %in% FULL_SERIES)
+
+set.seed(42)
+boot_out <- boot::boot(snap_2020, boot_rho, R = 5000)
+ci       <- quantile(boot_out$t, c(.025, .975), na.rm = TRUE)
+
+result_tbl <- tibble::tibble(
+  rho  = round(boot_out$t0, 3),
+  ci   = sprintf("[%.3f , %.3f]", ci[1], ci[2]),
+  n    = nrow(snap_2020)
+)
+
+knitr::kable(
+  result_tbl,
+  caption = "Spearman $\\rho$ for the 2020 snapshot **restricted to the 25 countries that have a complete four-year excess-mortality series**."
+)
+
+```

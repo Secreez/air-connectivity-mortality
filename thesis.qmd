@@ -110,6 +110,7 @@ The EUROCONTROL schedule includes traffic from mainland China (CN), Hong Kong (H
 No Macao–Europe flights appear in December 2019 or March 2020, so subsequent figures refer effectively to CN + HK only. The acronym CN/HK/MO is retained for completeness the first time it is used; thereafter ‘CN/HK’ is shown on axes and captions.
 
 To ensure comparability, excess mortality was measured on or near 5 May of each year (2020–2023), using the closest available OWID data within ±7 days. The use of May is justified both by the timing of the initial European epidemic wave (Spring 2020) and by the World Health Organization's declaration on 5 May 2023 officially ending COVID-19 as a global public health emergency [@who2023end].
+
 This four-year series allows a consistent, annually repeated cross-sectional snapshot of excess mortality from the beginning through the official end of the pandemic.
 
 ### Study design
@@ -122,11 +123,10 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 
 ### Flight-exposure data
 
-Commercial passenger flights, defined here as direct flights with ICAO Flight Types S (scheduled) or N (non-scheduled commercial), excluding general aviation, military, and other non-commercial operations
+Commercial passenger flights were extracted from EUROCONTROL's “Aviation Data Repository for Research”.  
+The public archive publishes **only four sample months per year (Mar; Jun; Sep; Dec)**, so **February 2020, the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
 
-*Source* EUROCONTROL “Aviation Data Repository for Research” archive.  
-Filters ICAO types S/N; ADEP $∈$ {CN, HK}; ADES $∈$ 26 continental member states.
-Aggregation destination‐country counts →
+Filters: ICAO flight types *S* / *N*; ADEP ∈ {CN, HK}; ADES ∈ 26 continental member states.  
 
 $$
 \begin{aligned}
@@ -145,6 +145,10 @@ Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 *Reference date* closest non-NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
 
 Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF data sources) does not consistently provide daily observations for all countries. To maintain consistency across EUROCONTROL member countries, a pragmatic ±7-day window around each 5 May reference date was chosen to select the closest available observation. Countries lacking observations within this window—particularly Ukraine after 2021—were excluded from the corresponding yearly correlation analyses.
+
+For every country and year we kept **only the OWID row whose date lay closest to 5 May (tolerance ± 7 days)**.  This pre-selection means that each country
+contributes exactly one observation per year, so no further timing‐shift robustness test is necessary.
+
 
 ### Analytical variables
 
@@ -242,9 +246,10 @@ Table 4.2 and optional heat-map fig. 4.3
 
 ### Main correlation results
 
-Presenting a single four-column table (Dec, Mar, Sum, Flights / M pop) with ρ, 95 % CI and p for each of the four years. (Table 4.3)
+Table @... shows that the baseline **ρ between "combined" Dec & Mar 2019/20 flights and excess mortality on 5 May 2020 is 0.53 (95 % CI 0.18 – 0.80; p < 0.01)**.  
+*Restricting the sample to the 25 countries that report a complete four-year excess-mortality series leaves the estimate virtually unchanged (ρ = 0.53, 95 % CI 0.18 – 0.77), confirming that missing-data exclusions do not drive the result.*
 
-Figure 4.4: line plot of ρ over 2020-2023 (one ribbon per exposure metric).
+Figure @... plots ρ for all exposure metrics over 2020-2023; the association fades in 2021 and turns negative thereafter.
 
 ### Snapshot scatter (May 2020)
 
