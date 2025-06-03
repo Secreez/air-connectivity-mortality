@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Maximilian Elixhauser">
-<meta name="dcterms.date" content="2025-03-27">
-<meta name="keywords" content="Mobility Modeling, Network Epidemiology, Spatiotemporal Spread, Excess Mortality, SIR Model">
+<meta name="dcterms.date" content="2025-06-01">
+<meta name="keywords" content="COVID-19, excess mortality, air connectivity, Spearman rank, Europe">
 
-<title>Proposal: Tracing COVID-19 Arrival in Europe: Air Travel Networks and Exploratory Insights into Excess Mortality</title>
+<title>Did early direct flights from China seed higher excess mortality in Europe? An exploratory correlation study</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -52,10 +52,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2ecb6af0b37e02a03a7e444e1ece7592.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
 <script async="" src="https://hypothes.is/embed.js"></script>
 <script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
@@ -63,16 +63,75 @@ div.csl-indent {
   });
 </script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta name="citation_title" content="Proposal: Tracing COVID-19 Arrival in Europe: Air Travel Networks and Exploratory Insights into Excess Mortality">
-<meta name="citation_keywords" content="Mobility Modeling,Network Epidemiology,Spatiotemporal Spread,Excess Mortality,SIR Model">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="citation_title" content="Did early direct flights from China seed higher excess mortality in Europe? An exploratory correlation study">
+<meta name="citation_abstract" content="*AFTER RESULTS!*
+">
+<meta name="citation_keywords" content="COVID-19,excess mortality,air connectivity,Spearman rank,Europe">
 <meta name="citation_author" content="Maximilian Elixhauser">
-<meta name="citation_publication_date" content="2025-03-27">
-<meta name="citation_cover_date" content="2025-03-27">
+<meta name="citation_publication_date" content="2025-06-01">
+<meta name="citation_cover_date" content="2025-06-01">
 <meta name="citation_year" content="2025">
-<meta name="citation_online_date" content="2025-03-27">
+<meta name="citation_online_date" content="2025-06-01">
 <meta name="citation_language" content="en">
-<meta name="citation_reference" content="citation_title=ATM datasets for r&amp;amp;amp;d;,citation_author=undefined Eurocontrol;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_publisher=https://www.eurocontrol.int;">
+<meta name="citation_reference" content="citation_title=Compartmental models of the COVID-19 pandemic for physicians and physician-scientists;,citation_author=Anas Abou-Ismail;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_issue=7;,citation_volume=2;,citation_journal_title=SN comprehensive clinical medicine;,citation_publisher=Springer;">
+<meta name="citation_reference" content="citation_title=The importance of the incubation time distribution in compartmental epidemiological models;,citation_author=Eric Alejandro Rozán;,citation_author=Marcelo Nestor Kuperman;,citation_author=Sebastian Bouzat;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_volume=650;,citation_journal_title=Physica A: Statistical Mechanics and its Applications;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=The WHO estimates of excess mortality associated with the COVID-19 pandemic;,citation_author=William Msemburi;,citation_author=Ariel Karlinsky;,citation_author=Victoria Knutson;,citation_author=Serge Aleshin-Guendel;,citation_author=Somnath Chatterji;,citation_author=Jon Wakefield;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_issue=7942;,citation_volume=613;,citation_journal_title=Nature;,citation_publisher=Nature Publishing Group UK London;">
+<meta name="citation_reference" content="citation_title=The effect of travel restrictions on the spread of the 2019 novel coronavirus (COVID-19) outbreak;,citation_author=Matteo Chinazzi;,citation_author=Jessica T Davis;,citation_author=Marco Ajelli;,citation_author=Corrado Gioannini;,citation_author=Maria Litvinova;,citation_author=Stefano Merler;,citation_author=Ana Pastore y Piontti;,citation_author=Kunpeng Mu;,citation_author=Luca Rossi;,citation_author=Kaiyuan Sun;,citation_author=others;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_issue=6489;,citation_volume=368;,citation_journal_title=Science;,citation_publisher=American Association for the Advancement of Science;">
+<meta name="citation_reference" content="citation_title=OurAirports dataset;,citation_author=OurAirports Contributors;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_fulltext_html_url=https://ourairports.com/data/;">
+<meta name="citation_reference" content="citation_title=ATM datasets for r&amp;amp;amp;d;,citation_author=undefined EUROCONTROL;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_publisher=https://www.eurocontrol.int;">
+<meta name="citation_reference" content="citation_title=Excess mortality during the coronavirus pandemic (COVID-19);,citation_author=Edouard Mathieu;,citation_author=Hannah Ritchie;,citation_author=Lucas Rodés-Guirao;,citation_author=Cameron Appel;,citation_author=Daniel Gavrilov;,citation_author=Charlie Giattino;,citation_author=Joe Hasell;,citation_author=Bobbie Macdonald;,citation_author=Saloni Dattani;,citation_author=Diana Beltekian;,citation_author=Esteban Ortiz-Ospina;,citation_author=Max Roser;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_journal_title=Our World in Data;">
+<meta name="citation_reference" content="citation_title=Tracking excess mortality across countries during the COVID-19 pandemic with the world mortality dataset;,citation_abstract=Comparing the impact of the COVID-19 pandemic between countries or across time is difficult because the reported numbers of cases and deaths can be strongly affected by testing capacity and reporting policy. Excess mortality, defined as the increase in all-cause mortality relative to the expected mortality, is widely considered as a more objective indicator of the COVID-19 death toll. However, there has been no global, frequently updated repository of the all-cause mortality data across countries. To fill this gap, we have collected weekly, monthly, or quarterly all-cause mortality data from 103 countries and territories, openly available as the regularly updated World Mortality Dataset. We used this dataset to compute the excess mortality in each country during the COVID-19 pandemic. We found that in several worst-affected countries (Peru, Ecuador, Bolivia, Mexico) the excess mortality was above 50% of the expected annual mortality (Peru, Ecuador, Bolivia, Mexico) or above 400 excess deaths per 100,000 population (Peru, Bulgaria, North Macedonia, Serbia). At the same time, in several other countries (e.g. Australia and New Zealand) mortality during the pandemic was below the usual level, presumably due to social distancing measures decreasing the non-COVID infectious mortality. Furthermore, we found that while many countries have been reporting the COVID-19 deaths very accurately, some countries have been substantially underreporting their COVID-19 deaths (e.g. Nicaragua, Russia, Uzbekistan), by up to two orders of magnitude (Tajikistan). Our results highlight the importance of open and rapid all-cause mortality reporting for pandemic monitoring.;,citation_author=Ariel Karlinsky;,citation_author=Dmitry Kobak;,citation_editor=Miles P Davenport;,citation_editor=Marc Lipsitch;,citation_editor=Marc Lipsitch;,citation_editor=Lone Simonsen;,citation_editor=Ayesha Mahmud;,citation_publication_date=2021-06;,citation_cover_date=2021-06;,citation_year=2021;,citation_fulltext_html_url=https://doi.org/10.7554/eLife.69336;,citation_doi=10.7554/eLife.69336;,citation_issn=2050-084X;,citation_volume=10;,citation_journal_title=eLife;,citation_publisher=eLife Sciences Publications, Ltd;">
+<meta name="citation_reference" content="citation_title=Covid-19, non-covid-19 and excess mortality rates not comparable across countries;,citation_author=Gabrielle Kelly;,citation_author=Stefano Petti;,citation_author=Norman Noah;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_volume=149;,citation_journal_title=Epidemiology &amp;amp;amp; Infection;,citation_publisher=Cambridge University Press;">
+<meta name="citation_reference" content="citation_title=Variability in excess deaths across countries with different vulnerability during 2020–2023;,citation_author=John PA Ioannidis;,citation_author=Francesco Zonta;,citation_author=Michael Levitt;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_issue=49;,citation_volume=120;,citation_journal_title=Proceedings of the National Academy of Sciences;,citation_publisher=National Academy of Sciences;">
+<meta name="citation_reference" content="citation_title=Impact of COVID-19 on total excess mortality and geographic disparities in europe, 2020–2023: A spatio-temporal analysis;,citation_author=Margherita Pizzato;,citation_author=Alberto Giovanni Gerli;,citation_author=Carlo La Vecchia;,citation_author=Gianfranco Alicandro;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_volume=44;,citation_journal_title=The Lancet Regional Health–Europe;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Estimating and projecting air passenger traffic during the COVID-19 coronavirus outbreak and its socio-economic impact;,citation_abstract=Due to the coronavirus global crisis, most countries have put in place restrictive measures in order to confine the pandemia and contain the number of casualties. Among the restrictive measures, air traffic suspension is certainly quite effective in reducing the mobility on the global scale in the short term but it also has high socio-economic impact on the long and short term. The main focus of this study is to collect and prepare data on air passengers traffic worldwide with the scope of analyze the impact of travel ban on the aviation sector. Based on historical data from January 2010 till October 2019, a forecasting model is implemented in order to set a reference baseline. Making use of airplane movements extracted from online flight tracking platforms and on-line booking systems, this study presents also a first assessment of recent changes in flight activity around the world as a result of the COVID-19 pandemic. To study the effects of air travel ban on aviation and in turn its socio-economic, several scenarios are constructed based on past pandemic crisis and the observed flight volumes. It turns out that, according to these hypothetical scenarios, in the first Quarter of 2020 the impact of aviation losses could have negatively reduced World GDP by 0.02;,citation_author=Stefano Maria Iacus;,citation_author=Fabrizio Natale;,citation_author=Carlos Santamaria;,citation_author=Spyridon Spyratos;,citation_author=Michele Vespe;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S0925753520301880;,citation_doi=https://doi.org/10.1016/j.ssci.2020.104791;,citation_issn=0925-7535;,citation_volume=129;,citation_journal_title=Safety Science;">
+<meta name="citation_reference" content="citation_title=The hidden geometry of complex, network-driven contagion phenomena;,citation_author=Dirk Brockmann;,citation_author=Dirk Helbing;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_issue=6164;,citation_volume=342;,citation_journal_title=science;,citation_publisher=American Association for the Advancement of Science;">
+<meta name="citation_reference" content="citation_title=Comparison of vaccination and booster rates and their impact on excess mortality during the COVID-19 pandemic in european countries;,citation_author=Olga Matveeva;,citation_author=Svetlana A Shabalina;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_volume=14;,citation_journal_title=Frontiers in Immunology;,citation_publisher=Frontiers Media SA;">
+<meta name="citation_reference" content="citation_title=Excess mortality and its determinants during the COVID-19 pandemic in 21 countries: An ecological study from the c-MOR project, 2020 and 2021;,citation_author=Mohammad Reza Rahmanian Haghighi;,citation_author=Chryso Th Pallari;,citation_author=Souzana Achilleos;,citation_author=Annalisa Quattrocchi;,citation_author=John Gabel;,citation_author=Andreas Artemiou;,citation_author=Maria Athanasiadou;,citation_author=Stefania Papatheodorou;,citation_author=Tianyu Liu;,citation_author=José Antonio Cernuda Martı́nez;,citation_author=others;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_journal_title=Journal of Epidemiology and Global Health;,citation_publisher=Springer;">
+<meta name="citation_reference" content="citation_title=Crowdsourced air traffic data from the OpenSky network 2019–2020;,citation_author=Martin Strohmeier;,citation_author=Xavier Olive;,citation_author=Jannis Lübbe;,citation_author=Matthias Schäfer;,citation_author=Vincent Lenders;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_issue=2;,citation_volume=13;,citation_journal_title=Earth System Science Data;,citation_publisher=Copernicus Publications Göttingen, Germany;">
+<meta name="citation_reference" content="citation_title=The impact of COVID-19 on flight networks;,citation_author=Toyotaro Suzumura;,citation_author=Hiroki Kanezashi;,citation_author=Mishal Dholakia;,citation_author=Euma Ishii;,citation_author=Sergio Alvarez Napagao;,citation_author=Raquel Pérez-Arnal;,citation_author=Dario Garcia-Gasulla;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_conference_title=2020 ieee international conference on big data (big data);,citation_conference=IEEE;">
+<meta name="citation_reference" content="citation_title=COVID-19 pandemic and air transportation: Summary of recent research, policy consideration and future research directions;,citation_author=Xiaoqian Sun;,citation_author=Sebastian Wandelt;,citation_author=Anming Zhang;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_volume=16;,citation_journal_title=Transportation research interdisciplinary perspectives;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Ghostbusters: Hunting abnormal flights in europe during COVID-19;,citation_abstract=The impact of the COVID-19 pandemic is unprecedented in airline history, with irregular flight bans, the inability for accurate demand estimation, several turns in the epidemiological evolution, and a wide range of downstream effects on all aviation stakeholders. While most airlines have increasingly entered a recovery stage, compared to the utmost disruption around April 2020, the airline business is far from back-to-normality. Throughout the past two years, recurrent statements have been made regarding the existence of so-called ghost flights, where airlines operate nearly empty aircraft on markets with insufficient demand, partially with the aim to avoid losing precious airport slots. This study investigates the extent of such abnormal market service during the COVID-19 pandemic through an explorative, data-driven analysis, based on actual load factor data of European airlines for the years 2017 to 2021. We break down the observed deviations by airlines, markets, and airports. We find that low-cost carriers are most-likely to have performed abnormal flights during the pandemic; and that abnormal flights have mostly occurred on frequently-served markets. In addition, we show that airline responses, in terms of departure and yield changes, are largely heterogeneous across the 24 airlines in this study. Our study is the first one to shed light on the important issue of load factor deviations, and we hope that our findings can contribute to a better understanding of the existence of abnormal flights during the pandemic, as well as deriving appropriate policies for dealing with the ubiquitous threat and impact of ghost flights in the future.;,citation_author=Xiaoqian Sun;,citation_author=Sebastian Wandelt;,citation_author=Anming Zhang;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S0967070X22002396;,citation_doi=https://doi.org/10.1016/j.tranpol.2022.08.020;,citation_issn=0967-070X;,citation_volume=127;,citation_journal_title=Transport Policy;">
+<meta name="citation_reference" content="citation_title=Statement on the fifteenth meeting of the IHR (2005) emergency committee on the COVID-19 pandemic;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_fulltext_html_url=https://www.who.int/news/item/05-05-2023-statement-on-the-fifteenth-meeting-of-the-international-health-regulations-(2005)-emergency-committee-regarding-the-coronavirus-disease-(covid-19)-pandemic;,citation_publisher=World Health Organization;">
+<meta name="citation_reference" content="citation_title=The role of high-speed rail and air travel in the spread of COVID-19 in china;,citation_abstract=Background Public transportation is a major facilitator of the spread of infectious diseases and has been a focus of policy interventions aiming to suppress the current COVID-19 epidemic. Methods We use a random-effects panel data model and a Difference-in-Differences in Reverse (DDR) model to examine how air and rail transport links with Wuhan as well as the suspension of these transport links influenced the development of the epidemic in China. Results We find high-speed rail (HSR) and air connectivity with Wuhan resulted in 25.4 Conclusions Our research provides important evidence for implementing transportation-related policies in controlling future infectious diseases.;,citation_author=Pengyu Zhu;,citation_author=Yuqing Guo;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S1477893921001381;,citation_doi=https://doi.org/10.1016/j.tmaid.2021.102097;,citation_issn=1477-8939;,citation_volume=42;,citation_journal_title=Travel Medicine and Infectious Disease;">
+<meta name="citation_reference" content="citation_title=Confidence intervals by bootstrapping approach: A significance review;,citation_author=Siti Mokhtar;,citation_author=Zahayu Yusof;,citation_author=Hasimah Sapiri;,citation_publication_date=2023-02;,citation_cover_date=2023-02;,citation_year=2023;,citation_doi=10.11113/mjfas.v19n1.2660;,citation_volume=19;,citation_journal_title=Malaysian Journal of Fundamental and Applied Sciences;">
+<meta name="citation_reference" content="citation_title=Bootstrap confidence intervals;,citation_author=Thomas J DiCiccio;,citation_author=Bradley Efron;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=3;,citation_volume=11;,citation_journal_title=Statistical science;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Uncertainty assessment of non-normal emission estimates using non-parametric bootstrap confidence intervals;,citation_author=Lee-Ing Tong;,citation_author=R Saminathan;,citation_author=CW Chang;,citation_author=others;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;,citation_issue=1;,citation_volume=28;,citation_journal_title=Journal of Environmental Informatics;,citation_publisher=International Society for Environmental Information Sciences;">
+<meta name="citation_reference" content="citation_title=Color universal design (CUD): How to make figures and presentations that are friendly to color‐blind people;,citation_author=Masataka Okabe;,citation_author=Kei Ito;,citation_publication_date=2002;,citation_cover_date=2002;,citation_year=2002;,citation_publisher=University of Tokyo;">
+<meta name="citation_reference" content="citation_title=COVID-19: Temporary restriction on non-essential travel to the EU;,citation_author=European Commission;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_publisher=https://commission.europa.eu/strategy-and-policy/coronavirus-response/travel-during-coronavirus-pandemic_en;">
+<meta name="citation_reference" content="citation_title=Notice on further reducing international passenger flights during the epidemic prevention and control period;,citation_author=Civil Aviation Administration China;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;">
+<meta name="citation_reference" content="citation_title=Air traffic statistics 2020;,citation_author=Fraport AG;,citation_publication_date=2021-05;,citation_cover_date=2021-05;,citation_year=2021;,citation_fulltext_html_url=https://www.fraport.com/content/dam/fraport-company/documents/investoren/eng/aviation-statistics/Air_Traffic_Statistics_2020.pdf;">
+<meta name="citation_reference" content="citation_title=Impact of COVID-19 on air transport passenger markets: Examining evidence from the chinese market;,citation_author=David Warnock-Smith;,citation_author=Anne Graham;,citation_author=John F. O’Connell;,citation_author=Marina Efthymiou;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S0969699721000685;,citation_doi=https://doi.org/10.1016/j.jairtraman.2021.102085;,citation_issn=0969-6997;,citation_volume=94;,citation_journal_title=Journal of Air Transport Management;">
 </head>
 
 <body>
@@ -80,7 +139,7 @@ div.csl-indent {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Proposal: Tracing COVID-19 Arrival in Europe: Air Travel Networks and Exploratory Insights into Excess Mortality</h1>
+      <h1 class="title">Did early direct flights from China seed higher excess mortality in Europe? An exploratory correlation study</h1>
           </div>
 
     
@@ -106,7 +165,7 @@ div.csl-indent {
                 <div>
             <div class="quarto-title-meta-heading">Published</div>
             <div class="quarto-title-meta-contents">
-              <p class="date">March 27, 2025</p>
+              <p class="date">June 1, 2025</p>
             </div>
           </div>
           
@@ -117,11 +176,17 @@ div.csl-indent {
       </div>
     </div>
 
+    <div>
+      <div class="abstract">
+        <div class="block-title">Abstract</div>
+        <p><em>AFTER RESULTS!</em></p>
+      </div>
+    </div>
 
     <div>
       <div class="keywords">
         <div class="block-title">Keywords</div>
-        <p>Mobility Modeling, Network Epidemiology, Spatiotemporal Spread, Excess Mortality, SIR Model</p>
+        <p>COVID-19, excess mortality, air connectivity, Spearman rank, Europe</p>
       </div>
     </div>
 
@@ -133,20 +198,67 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> 1. Introduction</a></li>
-  <li><a href="#literature-review" id="toc-literature-review" class="nav-link" data-scroll-target="#literature-review"><span class="header-section-number">2</span> 2. Literature Review</a></li>
-  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">3</span> 3. Methodology</a></li>
-  <li><a href="#results-analysis" id="toc-results-analysis" class="nav-link" data-scroll-target="#results-analysis"><span class="header-section-number">4</span> 4. Results &amp; Analysis</a></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">5</span> 5. Discussion</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> 6. Conclusion</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">7</span> 7. References</a></li>
-  <li><a href="#additional-notes" id="toc-additional-notes" class="nav-link" data-scroll-target="#additional-notes"><span class="header-section-number">8</span> Additional Notes</a>
+  <li><a href="#toc" id="toc-toc" class="nav-link active" data-scroll-target="#toc"><span class="header-section-number">0.1</span> TOC</a></li>
+  <li><a href="#glossary" id="toc-glossary" class="nav-link" data-scroll-target="#glossary"><span class="header-section-number">0.2</span> Glossary</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">0.3</span> Introduction</a>
   <ul class="collapse">
-  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments"><span class="header-section-number">8.1</span> Acknowledgments</a></li>
+  <li><a href="#context-motivation" id="toc-context-motivation" class="nav-link" data-scroll-target="#context-motivation"><span class="header-section-number">0.3.1</span> Context &amp; motivation</a></li>
+  <li><a href="#research-question" id="toc-research-question" class="nav-link" data-scroll-target="#research-question"><span class="header-section-number">0.3.2</span> Research Question</a></li>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives"><span class="header-section-number">0.3.3</span> Objectives</a></li>
+  <li><a href="#road-map" id="toc-road-map" class="nav-link" data-scroll-target="#road-map"><span class="header-section-number">0.3.4</span> Road-map</a></li>
   </ul></li>
-  <li><a href="#references-1" id="toc-references-1" class="nav-link" data-scroll-target="#references-1"><span class="header-section-number">9</span> References</a></li>
+  <li><a href="#litrev" id="toc-litrev" class="nav-link" data-scroll-target="#litrev"><span class="header-section-number">0.4</span> Literature Review</a>
+  <ul class="collapse">
+  <li><a href="#excess-mortality-as-benchmark" id="toc-excess-mortality-as-benchmark" class="nav-link" data-scroll-target="#excess-mortality-as-benchmark"><span class="header-section-number">0.4.1</span> Excess mortality as benchmark</a></li>
+  <li><a href="#mobility-driven-seeding" id="toc-mobility-driven-seeding" class="nav-link" data-scroll-target="#mobility-driven-seeding"><span class="header-section-number">0.4.2</span> Mobility-driven seeding</a></li>
+  <li><a href="#air-traffic-studies-during-covid-19" id="toc-air-traffic-studies-during-covid-19" class="nav-link" data-scroll-target="#air-traffic-studies-during-covid-19"><span class="header-section-number">0.4.3</span> Air-traffic studies during COVID-19</a></li>
+  <li><a href="#why-eurocontrol-not-opensky" id="toc-why-eurocontrol-not-opensky" class="nav-link" data-scroll-target="#why-eurocontrol-not-opensky"><span class="header-section-number">0.4.4</span> Why EUROCONTROL, not OpenSky</a></li>
+  </ul></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods"><span class="header-section-number">0.5</span> Data &amp; Methods</a>
+  <ul class="collapse">
+  <li><a href="#study-design" id="toc-study-design" class="nav-link" data-scroll-target="#study-design"><span class="header-section-number">0.5.1</span> Study design</a></li>
+  <li><a href="#flight-exposure-data" id="toc-flight-exposure-data" class="nav-link" data-scroll-target="#flight-exposure-data"><span class="header-section-number">0.5.2</span> Flight-exposure data</a></li>
+  <li><a href="#excess-mortality-snapshots" id="toc-excess-mortality-snapshots" class="nav-link" data-scroll-target="#excess-mortality-snapshots"><span class="header-section-number">0.5.3</span> Excess mortality snapshots</a></li>
+  <li><a href="#analytical-variables" id="toc-analytical-variables" class="nav-link" data-scroll-target="#analytical-variables"><span class="header-section-number">0.5.4</span> Analytical variables</a></li>
+  <li><a href="#statistical-approach" id="toc-statistical-approach" class="nav-link" data-scroll-target="#statistical-approach"><span class="header-section-number">0.5.5</span> Statistical approach</a></li>
+  <li><a href="#population-denominator-validation-and-choice" id="toc-population-denominator-validation-and-choice" class="nav-link" data-scroll-target="#population-denominator-validation-and-choice"><span class="header-section-number">0.5.6</span> Population denominator: validation and choice</a></li>
+  <li><a href="#analysis-workflow" id="toc-analysis-workflow" class="nav-link" data-scroll-target="#analysis-workflow"><span class="header-section-number">0.5.7</span> Analysis workflow</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">1</span> Results</a>
+  <ul class="collapse">
+  <li><a href="#data-coverages-descriptives" id="toc-data-coverages-descriptives" class="nav-link" data-scroll-target="#data-coverages-descriptives"><span class="header-section-number">1.1</span> Data coverages &amp; descriptives</a></li>
+  <li><a href="#early-air-connectivity-patterns" id="toc-early-air-connectivity-patterns" class="nav-link" data-scroll-target="#early-air-connectivity-patterns"><span class="header-section-number">1.2</span> Early air-connectivity patterns</a></li>
+  <li><a href="#country-exposure-rankings" id="toc-country-exposure-rankings" class="nav-link" data-scroll-target="#country-exposure-rankings"><span class="header-section-number">1.3</span> Country exposure rankings</a></li>
+  <li><a href="#association-with-excess-mortality" id="toc-association-with-excess-mortality" class="nav-link" data-scroll-target="#association-with-excess-mortality"><span class="header-section-number">1.4</span> Association with excess mortality</a>
+  <ul class="collapse">
+  <li><a href="#main-correlation-results" id="toc-main-correlation-results" class="nav-link" data-scroll-target="#main-correlation-results"><span class="header-section-number">1.4.1</span> Main correlation results</a></li>
+  <li><a href="#snapshot-scatter-may-2020" id="toc-snapshot-scatter-may-2020" class="nav-link" data-scroll-target="#snapshot-scatter-may-2020"><span class="header-section-number">1.4.2</span> Snapshot scatter (May 2020)</a></li>
+  </ul></li>
+  <li><a href="#robustness-check-sensitivity-analyses" id="toc-robustness-check-sensitivity-analyses" class="nav-link" data-scroll-target="#robustness-check-sensitivity-analyses"><span class="header-section-number">1.5</span> Robustness check &amp; sensitivity analyses</a>
+  <ul class="collapse">
+  <li><a href="#robustness-heck" id="toc-robustness-heck" class="nav-link" data-scroll-target="#robustness-heck"><span class="header-section-number">1.5.1</span> Robustness heck</a></li>
+  <li><a href="#sensitivity-analyses" id="toc-sensitivity-analyses" class="nav-link" data-scroll-target="#sensitivity-analyses"><span class="header-section-number">1.5.2</span> Sensitivity Analyses</a></li>
+  </ul></li>
+  <li><a href="#key-patterns-short-recap" id="toc-key-patterns-short-recap" class="nav-link" data-scroll-target="#key-patterns-short-recap"><span class="header-section-number">1.6</span> Key patterns &amp; short recap</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">1.7</span> Discussion</a>
+  <ul class="collapse">
+  <li><a href="#interpretation-of-findings" id="toc-interpretation-of-findings" class="nav-link" data-scroll-target="#interpretation-of-findings"><span class="header-section-number">1.7.1</span> Interpretation of Findings</a></li>
+  <li><a href="#relation-to-broader-structural-factors" id="toc-relation-to-broader-structural-factors" class="nav-link" data-scroll-target="#relation-to-broader-structural-factors"><span class="header-section-number">1.7.2</span> Relation to Broader Structural Factors</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">1.7.3</span> Limitations</a></li>
+  <li><a href="#methodological-reflections" id="toc-methodological-reflections" class="nav-link" data-scroll-target="#methodological-reflections"><span class="header-section-number">1.7.4</span> Methodological Reflections</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">1.8</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-findings" id="toc-key-findings" class="nav-link" data-scroll-target="#key-findings"><span class="header-section-number">1.8.1</span> Key Findings</a></li>
+  <li><a href="#implications-future-work" id="toc-implications-future-work" class="nav-link" data-scroll-target="#implications-future-work"><span class="header-section-number">1.8.2</span> Implications &amp; Future Work</a></li>
+  <li><a href="#why-exploratory-work-matters" id="toc-why-exploratory-work-matters" class="nav-link" data-scroll-target="#why-exploratory-work-matters"><span class="header-section-number">1.8.3</span> Why Exploratory Work Matters</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">1.9</span> References</a></li>
+  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments"><span class="header-section-number">1.10</span> Acknowledgments</a></li>
+  <li><a href="#appendix-code-etc." id="toc-appendix-code-etc." class="nav-link" data-scroll-target="#appendix-code-etc."><span class="header-section-number">1.11</span> Appendix (code, etc.)</a></li>
+  </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-notebooks"><h2>Notebooks</h2><ul><li><a href="notebooks\06_correlation-preview.html"><i class="bi bi-journal-code"></i>Correlation analysis</a></li><li><a href="notebooks\05_descriptive_plot-preview.html"><i class="bi bi-journal-code"></i>Descriptive plots</a></li><li><a href="notebooks\04_population_qc-preview.html"><i class="bi bi-journal-code"></i>Population QC</a></li></ul></div></nav>
 </div>
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
 </div>
@@ -157,149 +269,453 @@ div.csl-indent {
   
 
 
-<section id="introduction" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> 1. Introduction</h2>
+<section id="toc" class="level2" data-number="0.1">
+<h2 data-number="0.1" class="anchored" data-anchor-id="toc"><span class="header-section-number">0.1</span> TOC</h2>
+</section>
+<section id="glossary" class="level2" data-number="0.2">
+<h2 data-number="0.2" class="anchored" data-anchor-id="glossary"><span class="header-section-number">0.2</span> Glossary</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 37%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Acronym / symbol</th>
+<th>Meaning</th>
+<th>First appearance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ASK</strong></td>
+<td>Available‐Seat-Kilometre (supply metric)</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td><strong>IFR</strong></td>
+<td>Instrument Flight Rules (EUROCONTROL flight plan)</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td><strong>LCC</strong></td>
+<td>Low-Cost Carrier</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td><strong>ρ</strong></td>
+<td>Spearman rank-correlation coefficient</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td><strong>“Five–One” rule</strong></td>
+<td>CAAC 26 Mar 2020: max 1 route / airline / week between China and any foreign country</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="introduction" class="level2" data-number="0.3">
+<h2 data-number="0.3" class="anchored" data-anchor-id="introduction"><span class="header-section-number">0.3</span> Introduction</h2>
+<section id="context-motivation" class="level3" data-number="0.3.1">
+<h3 data-number="0.3.1" class="anchored" data-anchor-id="context-motivation"><span class="header-section-number">0.3.1</span> Context &amp; motivation</h3>
+<p>When SARS-CoV-2 emerged in late 2019, the global airline network compressed inter-city travel times to hours, not weeks. Modelling studies show that long-haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections <span class="citation" data-cites="chinazzi2020 sun2022_a">(<a href="#ref-chinazzi2020" role="doc-biblioref">Chinazzi et al. 2020</a>; <a href="#ref-sun2022_a" role="doc-biblioref">Sun, Wandelt, and Zhang 2022</a>)</span>.</p>
+<p>Yet European countries later displayed wide gaps in excess mortality. Analysts have linked those gaps to demography, health-system capacity, and policy timing <span class="citation" data-cites="rahmanian2024 matveeva2023">(<a href="#ref-rahmanian2024" role="doc-biblioref">Rahmanian Haghighi et al. 2024</a>; <a href="#ref-matveeva2023" role="doc-biblioref">Matveeva and Shabalina 2023</a>)</span>. How much of the early mortality spread can be traced to initial exposure via direct flights from China and its two SARs? The question remains largely descriptive—and unanswered.</p>
+</section>
+<section id="research-question" class="level3" data-number="0.3.2">
+<h3 data-number="0.3.2" class="anchored" data-anchor-id="research-question"><span class="header-section-number">0.3.2</span> Research Question</h3>
+<blockquote class="blockquote">
+<p>Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/HongKong/Macao (Dec 2019 &amp; Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?</p>
+</blockquote>
+<p>Snapshots for 2021-2023 are analysed as robustness checks.</p>
+</section>
+<section id="objectives" class="level3" data-number="0.3.3">
+<h3 data-number="0.3.3" class="anchored" data-anchor-id="objectives"><span class="header-section-number">0.3.3</span> Objectives</h3>
+<p><strong>1. Measure exposure:</strong> Create a country-level index of inbound IFR flights (Dec 2019, Mar 2020, sum) from EUROCONTROL data.</p>
+<p><strong>2. Rank &amp; correlate:</strong> Compute Spearman ρ between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021-2023.</p>
+<p><strong>3. Appraise validity:</strong> Discuss strengths and limits of flight counts as a proxy for epidemic seeding.</p>
+</section>
+<section id="road-map" class="level3" data-number="0.3.4">
+<h3 data-number="0.3.4" class="anchored" data-anchor-id="road-map"><span class="header-section-number">0.3.4</span> Road-map</h3>
 <ul>
-<li><strong>Context &amp; Motivation</strong>: What the problem is, why it matters.</li>
-<li><strong>Research Questions &amp; Objectives</strong>: State your RQs clearly; highlight objectives and scope.</li>
-<li><strong>Thesis Outline</strong>: Brief road map of chapters.</li>
+<li>Chapter 2 reviews work on mobility-driven seeding and excess-mortality metrics.</li>
+<li>Chapter 3 details data cleaning and the correlation method.</li>
+<li>Chapter 4 presents exposure rankings, maps, and ρ results.</li>
+<li>Chapter 5 interprets the patterns, weighs confounders, and tests sensitivity.</li>
+<li>Chapter 6 summarises key findings and outlines next-step research.</li>
+</ul>
+</section>
+</section>
+<section id="litrev" class="level2" data-number="0.4">
+<h2 data-number="0.4" class="anchored" data-anchor-id="litrev"><span class="header-section-number">0.4</span> Literature Review</h2>
+<p>Recent syntheses (e.g. <span class="citation" data-cites="pizzato2024">(<a href="#ref-pizzato2024" role="doc-biblioref">Pizzato et al. 2024</a>)</span>) show wide cross-country gaps in European excess-mortality and point to socio-economic gradients, health-system capacity and vaccination uptake as major drivers. This thesis adds an early-mobility angle that those studies treat only tangentially.</p>
+<section id="excess-mortality-as-benchmark" class="level3" data-number="0.4.1">
+<h3 data-number="0.4.1" class="anchored" data-anchor-id="excess-mortality-as-benchmark"><span class="header-section-number">0.4.1</span> Excess mortality as benchmark</h3>
+<p>[TODO: Brief paragraph: why excess deaths capture the full health burden better than case or COVID-death counts; citation to WMD, HMD-STMF.]</p>
+</section>
+<section id="mobility-driven-seeding" class="level3" data-number="0.4.2">
+<h3 data-number="0.4.2" class="anchored" data-anchor-id="mobility-driven-seeding"><span class="header-section-number">0.4.2</span> Mobility-driven seeding</h3>
+<p>[TODO: One paragraph: network epidemiology concept of “effective distance” [cite Brockmann &amp; Helbing 2013]; empirical links between flight volume and first-wave seeding (e.g. <span class="citation" data-cites="chinazzi2020">(<a href="#ref-chinazzi2020" role="doc-biblioref">Chinazzi et al. 2020</a>)</span> global; <span class="citation" data-cites="sun2022_a">(<a href="#ref-sun2022_a" role="doc-biblioref">Sun, Wandelt, and Zhang 2022</a>)</span> intra-EU).]</p>
+</section>
+<section id="air-traffic-studies-during-covid-19" class="level3" data-number="0.4.3">
+<h3 data-number="0.4.3" class="anchored" data-anchor-id="air-traffic-studies-during-covid-19"><span class="header-section-number">0.4.3</span> Air-traffic studies during COVID-19</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 17%">
+<col style="width: 7%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Study</th>
+<th>Data</th>
+<th>Scope</th>
+<th>Key insight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Chinazzi et al.&nbsp;2020</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>Sun et al.&nbsp;2022</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>Strohmeier et al.&nbsp;2021</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>[Comment: - TODO: Outline the key studies that have used air-traffic data to study COVID-19 transmission dynamics. DONT OVERDO IT. Understanding and interpretation counts. Not mindlessly listing studies. - Ton of the next ### are more.. Methodological than literature review.]</p>
+</section>
+<section id="why-eurocontrol-not-opensky" class="level3" data-number="0.4.4">
+<h3 data-number="0.4.4" class="anchored" data-anchor-id="why-eurocontrol-not-opensky"><span class="header-section-number">0.4.4</span> Why EUROCONTROL, not OpenSky</h3>
+<p>OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). EUROCONTROL, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (EUROCONTROL), not scheduled seats or partial ADS-B traces. OpenSky appears only to illustrate its coverage bias.</p>
+<p>[TODO: Create Opensky map again…]</p>
+</section>
+</section>
+<section id="methods" class="level2" data-number="0.5">
+<h2 data-number="0.5" class="anchored" data-anchor-id="methods"><span class="header-section-number">0.5</span> Data &amp; Methods</h2>
+<p>The EUROCONTROL schedule includes traffic from mainland China (CN), Hong Kong (HK) and Macao (MO). No Macao–Europe flights appear in December 2019 or March 2020, so subsequent figures refer effectively to CN + HK only. The acronym CN/HK/MO is retained for completeness the first time it is used; thereafter ‘CN/HK’ is shown on axes and captions.</p>
+<p>To ensure comparability, excess mortality was measured on or near 5 May of each year (2020–2023), using the closest available OWID data within ±7 days. The use of May is justified both by the timing of the initial European epidemic wave (Spring 2020) and by the World Health Organization’s declaration on 5 May 2023 officially ending COVID-19 as a global public health emergency <span class="citation" data-cites="who2023end">(<a href="#ref-who2023end" role="doc-biblioref"><span>“Statement on the Fifteenth Meeting of the IHR (2005) Emergency Committee on the COVID-19 Pandemic”</span> 2023</a>)</span>.</p>
+<p>This four-year series allows a consistent, annually repeated cross-sectional snapshot of excess mortality from the beginning through the official end of the pandemic.</p>
+<section id="study-design" class="level3" data-number="0.5.1">
+<h3 data-number="0.5.1" class="anchored" data-anchor-id="study-design"><span class="header-section-number">0.5.1</span> Study design</h3>
+<p>Exploratory, cross-sectional correlation at the <em>country</em> level.</p>
+<p>Outcome = cumulative excess-deaths / million on 5 May of 2020-23.</p>
+<p>Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.</p>
+</section>
+<section id="flight-exposure-data" class="level3" data-number="0.5.2">
+<h3 data-number="0.5.2" class="anchored" data-anchor-id="flight-exposure-data"><span class="header-section-number">0.5.2</span> Flight-exposure data</h3>
+<p>Commercial passenger flights were extracted from EUROCONTROL’s “Aviation Data Repository for Research”.<br>
+The public archive publishes <strong>only four sample months per year (Mar; Jun; Sep; Dec)</strong>, so <strong>February 2020, the crucial month between Wuhan lockdown and Europe’s first local clusters—is unfortunately absent</strong>.</p>
+<p>Filters: ICAO flight types <em>S</em> / <em>N</em>; ADEP ∈ {CN, HK}; ADES ∈ 26 continental member states.</p>
+<p><span class="math display">\[
+\begin{aligned}
+F_{\text{DEC}} &amp;=\; \text{Flights in Dec 2019}\\
+F_{\text{MAR}} &amp;=\; \text{Flights in Mar 2020}\\
+F_{\text{SUM}} &amp;=\; F_{\text{DEC}} + F_{\text{MAR}}
+\end{aligned}
+\]</span> Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.</p>
+</section>
+<section id="excess-mortality-snapshots" class="level3" data-number="0.5.3">
+<h3 data-number="0.5.3" class="anchored" data-anchor-id="excess-mortality-snapshots"><span class="header-section-number">0.5.3</span> Excess mortality snapshots</h3>
+<p><em>Source</em> OWID (WMD + HMD–STMF).</p>
+<p><em>Reference date</em> closest non-NA within <strong>± 7 days of 5 May</strong>; Ukraine excluded after 2021 (data break due to war).</p>
+<p>Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF data sources) does not consistently provide daily observations for all countries. To maintain consistency across EUROCONTROL member countries, a pragmatic ±7-day window around each 5 May reference date was chosen to select the closest available observation. Countries lacking observations within this window—particularly Ukraine after 2021—were excluded from the corresponding yearly correlation analyses.</p>
+<p>For every country and year we kept <strong>only the OWID row whose date lay closest to 5 May (tolerance ± 7 days)</strong>. This pre-selection means that each country contributes exactly one observation per year, so no further timing‐shift robustness test is necessary.</p>
+</section>
+<section id="analytical-variables" class="level3" data-number="0.5.4">
+<h3 data-number="0.5.4" class="anchored" data-anchor-id="analytical-variables"><span class="header-section-number">0.5.4</span> Analytical variables</h3>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Definition</th>
+<th>Transformation</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="statistical-approach" class="level3" data-number="0.5.5">
+<h3 data-number="0.5.5" class="anchored" data-anchor-id="statistical-approach"><span class="header-section-number">0.5.5</span> Statistical approach</h3>
+<ul>
+<li>Spearman <span class="math inline">\(ρ\)</span> between each flight metric and <span class="math inline">\(E_t\)</span>.<br>
+</li>
+<li>5000-sample bootstrap CIs. (Need a why here)</li>
+<li>Sensitivity checks:
+<ol start="2" type="1">
+<li>use <span class="math inline">\(FPM\)</span>;</li>
+<li>drop countries with any missing <span class="math inline">\(E\)</span> snapshot</li>
+</ol></li>
+</ul>
+<p>Analyses were performed in <strong>R 4.4</strong>; the full script and data pipeline are available in <code>notebooks/</code>.</p>
+</section>
+<section id="population-denominator-validation-and-choice" class="level3" data-number="0.5.6">
+<h3 data-number="0.5.6" class="anchored" data-anchor-id="population-denominator-validation-and-choice"><span class="header-section-number">0.5.6</span> Population denominator: validation and choice</h3>
+<p>Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). This fixed denominator approach is standard for COVID-19 excess-mortality studies <span class="citation" data-cites="karlinsky2021 kelly2021">(<a href="#ref-karlinsky2021" role="doc-biblioref">Karlinsky and Kobak 2021</a>; <a href="#ref-kelly2021" role="doc-biblioref">Kelly, Petti, and Noah 2021</a>)</span>, as European populations vary by less than ±1% year to year.</p>
+<p>To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (–31%), Ukraine (–11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.</p>
+<ul>
+<li><strong>OWID source:</strong> <a href="https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv">OWID GitHub</a></li>
+<li><strong>UN WPP:</strong> <a href="https://github.com/PPgp/wpp2024">PPgp/wpp2024</a></li>
+</ul>
+</section>
+<section id="analysis-workflow" class="level3" data-number="0.5.7">
+<h3 data-number="0.5.7" class="anchored" data-anchor-id="analysis-workflow"><span class="header-section-number">0.5.7</span> Analysis workflow</h3>
+<ol type="1">
+<li><p><strong>Exposure metrics</strong><br>
+<span class="math inline">\(F_{\text{DEC}};F_{\text{MAR}},\)</span> <span class="math inline">\(F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}\)</span></p></li>
+<li><p><strong>Outcome series</strong><br>
+<span class="math inline">\(E_t\)</span>– cumulative excess deaths / million on 5 May 2020–2023.</p></li>
+<li><p><strong>Main test</strong><br>
+Spearman <span class="math inline">\(ρ\)</span> (two-tailed) for every <span class="math inline">\(F \times E_t\)</span> pair;<br>
+5000-sample percentile bootstrap for 95 % CI (boot library)</p></li>
+<li><p><strong>Sensitivity panel</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Label</th>
+<th>Change</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FPM</td>
+<td>flights per million pop</td>
+<td>relative exposure</td>
+</tr>
+<tr class="even">
+<td>COMPLETE</td>
+<td>require full four-year (<span class="math inline">\(E_t\)</span>) series</td>
+<td>missing-data bias</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>Reproducibility</strong><br>
+R 4.4.0; libraries; scripts in <code>notebooks/</code> tracked via GitHub.</p></li>
+</ol>
+</section>
+</section>
+<section id="results" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Results</h1>
+<p>This chapter presents the results of the exploratory analysis investigating the association between early international flight exposure and cumulative excess mortality in European countries. It includes a descriptive overview of the flight data, early air connectivity patterns, country exposure rankings, and the results of the correlation analyses. Where relevant, additional sensitivity analyses are provided to assess the robustness of findings.</p>
+<section id="data-coverages-descriptives" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="data-coverages-descriptives"><span class="header-section-number">1.1</span> Data coverages &amp; descriptives</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Month</th>
+<th># flight (total)</th>
+<th>Median / country</th>
+<th>Min-Max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dec 2019</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><em>Table 4.1: Descriptive statistics of inbound flight data.</em></p>
+</section>
+<section id="early-air-connectivity-patterns" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="early-air-connectivity-patterns"><span class="header-section-number">1.2</span> Early air-connectivity patterns</h2>
+<blockquote class="blockquote">
+<p><strong>Note on visual encoding:</strong> All categorical colours follow the Okabe–Ito colour-universal palette (<span class="citation" data-cites="okabe2002">Okabe and Ito (<a href="#ref-okabe2002" role="doc-biblioref">2002</a>)</span>). The palette’s nine hues (hex <code>#009E73</code> green, <code>#E69F00</code> orange, <code>#56B4E9</code> blue, …) remain distinguishable for readers with the main forms of colour-vision deficiency. For continuous variables the viridis family is used. Axis titles, direct labels and dashed reference lines complement hue so that information is recoverable in greyscale printouts. No colours with strong cultural valence (e.g.&nbsp;“warning” red) are used in maps or flow diagrams in order to avoid unwanted emotional framing.</p>
+</blockquote>
+<p>[Notes for Figures] 4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top-15 destinations.” 4.2. Flow graphic – Shows who flew to whom; gives geographical intuition that a plain bar cannot. - If Sankyey, cleaner for volumes, but beware Variables. 4.3 Choropleth (per-country totals, same palette). 4.4. Daily flight profile within each sample month - Demonstrates intra-month variability (e.g.&nbsp;the steep drop after 15 Mar). - Two separate facets: “Dec 2019” and “Mar 2020” - Bar on thin line; y-axis = flights/day. - Insert grey panel: “No data Jan–Feb 2020” between facets</p>
+</section>
+<section id="country-exposure-rankings" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="country-exposure-rankings"><span class="header-section-number">1.3</span> Country exposure rankings</h2>
+<p>A ranking of European countries based on their total inbound flight exposure is presented.</p>
+<ul>
+<li>Separate ranking for <strong>December 2019</strong> and <strong>March 2020</strong></li>
+<li>Combined ranking aggregating total exposure (December + March)</li>
+</ul>
+<p><em>Table 4.2: Country exposure rankings.</em></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Rank</th>
+<th>ISO3</th>
+<th>Dec</th>
+<th>Mar</th>
+<th>Sum</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p>Table 4.2 and optional heat-map fig.&nbsp;4.3</p>
+</section>
+<section id="association-with-excess-mortality" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="association-with-excess-mortality"><span class="header-section-number">1.4</span> Association with excess mortality</h2>
+<section id="main-correlation-results" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="main-correlation-results"><span class="header-section-number">1.4.1</span> Main correlation results</h3>
+<p>Table @… shows that the baseline <strong>ρ between “combined” Dec &amp; Mar 2019/20 flights and excess mortality on 5 May 2020 is 0.53 (95 % CI 0.18 – 0.80; p &lt; 0.01)</strong>.<br>
+<em>Restricting the sample to the 25 countries that report a complete four-year excess-mortality series leaves the estimate virtually unchanged (ρ = 0.53, 95 % CI 0.18 – 0.77), confirming that missing-data exclusions do not drive the result.</em></p>
+<p>Figure @… plots ρ for all exposure metrics over 2020-2023; the association fades in 2021 and turns negative thereafter.</p>
+</section>
+<section id="snapshot-scatter-may-2020" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="snapshot-scatter-may-2020"><span class="header-section-number">1.4.2</span> Snapshot scatter (May 2020)</h3>
+</section>
+</section>
+<section id="robustness-check-sensitivity-analyses" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="robustness-check-sensitivity-analyses"><span class="header-section-number">1.5</span> Robustness check &amp; sensitivity analyses</h2>
+<section id="robustness-heck" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="robustness-heck"><span class="header-section-number">1.5.1</span> Robustness heck</h3>
+</section>
+<section id="sensitivity-analyses" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="sensitivity-analyses"><span class="header-section-number">1.5.2</span> Sensitivity Analyses</h3>
+<p>[TODO: evaluating the robustness of the observed correlation patterns, additional sensitivity analyses]</p>
+<ul>
+<li><p><strong>Exclusion of countries with incomplete mortality data:</strong><br>
+Countries lacking complete excess mortality records for all four reference timepoints removed.</p></li>
+<li><p><strong>Normalization by population size:</strong><br>
+Flight exposure indicators normalized by country population (in millions) to evaluate whether relative exposure, rather than absolute flight volume, influenced correlation outcomes.</p></li>
+<li><p><strong>Separate analysis by month:</strong><br>
+Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects. -&gt;</p></li>
+</ul>
+<p><em>Table 4.6: Sensitivity analysis results.</em></p>
+</section>
+</section>
+<section id="key-patterns-short-recap" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="key-patterns-short-recap"><span class="header-section-number">1.6</span> Key patterns &amp; short recap</h2>
+<p>[Transission to the next section]</p>
+<p>The following chapter discusses these findings in the broader context of structural factors and methodological considerations</p>
+</section>
+<section id="discussion" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="discussion"><span class="header-section-number">1.7</span> Discussion</h2>
+<section id="interpretation-of-findings" class="level3" data-number="1.7.1">
+<h3 data-number="1.7.1" class="anchored" data-anchor-id="interpretation-of-findings"><span class="header-section-number">1.7.1</span> Interpretation of Findings</h3>
+<p>[My discussion of the Spearman correlations, ranking, and visual insights.]</p>
+</section>
+<section id="relation-to-broader-structural-factors" class="level3" data-number="1.7.2">
+<h3 data-number="1.7.2" class="anchored" data-anchor-id="relation-to-broader-structural-factors"><span class="header-section-number">1.7.2</span> Relation to Broader Structural Factors</h3>
+<p>While factors such as GDP per capita, healthcare capacity, and vaccination coverage are widely considered to influence pandemic mortality [SOURCES!], these were not included as covariates in the correlation analysis to preserve interpretive clarity. This thesis focuses on early air connectivity as an exploratory lens, rather than constructing a multivariate explanatory model. Future work could meaningfully expand on this analysis by integrating these additional dimensions.</p>
+<p>[Now, how things like GDP, vaccination, age structure, or healthcare could interact.]</p>
+</section>
+<section id="limitations" class="level3" data-number="1.7.3">
+<h3 data-number="1.7.3" class="anchored" data-anchor-id="limitations"><span class="header-section-number">1.7.3</span> Limitations</h3>
+<p>[Likely needs more meat - might combine it with Methodological Reflections]</p>
+<p>This thesis deliberately applies an exploratory, correlation-based approach to investigate potential associations between early international air connectivity and excess mortality. The following key limitations must be acknowledged:</p>
+<ul>
+<li><p><strong>No causal inference:</strong> The observed correlations do not imply causation. Socioeconomic, demographic, and healthcare-related factors likely contributed substantially to mortality outcomes <span class="citation" data-cites="ioannidis2023 pizzato2024">(<a href="#ref-ioannidis2023" role="doc-biblioref">Ioannidis, Zonta, and Levitt 2023</a>; <a href="#ref-pizzato2024" role="doc-biblioref">Pizzato et al. 2024</a>)</span>.</p></li>
+<li><p><strong>Country-level aggregation:</strong> National-level analysis may obscure subnational differences in both exposure and vulnerability.</p></li>
+<li><p><strong>Flight data uncertainty:</strong> Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric.</p></li>
+<li><p><strong>EUROCONTROL data limitations:</strong> The dataset also tracks ADEP and ADES that get communicated but not Shanghai -&gt; Dubai -&gt; Vienna. Which whould therefore count as Dubai -&gt; Vienna. This could lead to undercounting of flights.</p></li>
 </ul>
 <blockquote class="blockquote">
-<p><em>Tip:</em> Keep this section <strong>concise</strong>. You can mention that more detailed reviews of certain concepts (e.g., network epidemiology, flight-based modeling) appear in <em>Section 2</em>.</p>
+<p>While airports like Dubai or Doha were important global transfer points in February, this thesis focuses on <strong>direct seeding from China</strong> and <strong>intra-European flows</strong>. Modeling later pandemic phases or full global mobility networks exceeds the practical scope of this project.</p>
 </blockquote>
-<hr>
-</section>
-<section id="literature-review" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="literature-review"><span class="header-section-number">2</span> 2. Literature Review</h2>
 <ul>
-<li><strong>Network Epidemiology &amp; SIR Models</strong>: Summarize the theoretical foundations (SIR, network contagion).</li>
-<li><strong>COVID-19 &amp; Global Mobility Networks (GMN)</strong>: Prior research on flight data + COVID-19 spread.</li>
-<li><strong>Data Challenges in Flight-Based Epidemiology</strong>: Sources, ADS-B constraints, coverage, etc.</li>
+<li><strong>Mortality data quality:</strong> Excess mortality estimates vary in completeness across countries due to differences in death registration systems. (https://www.nature.com/articles/s41586-022-05522-2)</li>
 </ul>
-<blockquote class="blockquote">
-<p><em>Tip:</em> If your review is extremely detailed, consider sub-subsections, but ensure you keep it <strong>logically ordered</strong>. You’ll be referencing this in your methodology to show how you overcame or adapted to known challenges.</p>
-</blockquote>
-<hr>
 </section>
-<section id="methodology" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="methodology"><span class="header-section-number">3</span> 3. Methodology</h2>
-<ul>
-<li><strong>Data Sources &amp; Feasibility</strong>:
-<ul>
-<li>Where data come from (OpenSky, Eurocontrol), how/why you chose them, data cleaning steps.</li>
-</ul></li>
-<li><strong>Model Implementation</strong>:
-<ul>
-<li>SIR model design, equations (if needed), assumptions.</li>
-</ul></li>
-<li><strong>Simulation Steps &amp; Parameter Choices</strong>:
-<ul>
-<li>Seeding rules, calibration decisions, load-factor sensitivities.</li>
-</ul></li>
-<li><strong>Statistical / Correlation Analysis</strong>:
-<ul>
-<li>How you plan to correlate arrival timings with excess mortality.</li>
-</ul></li>
-</ul>
-<blockquote class="blockquote">
-<p><em>Tip:</em> This section should be <strong>reproducible</strong>. Someone reading it should be able to grasp exactly how to replicate your pipeline.</p>
-</blockquote>
-<hr>
-</section>
-<section id="results-analysis" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="results-analysis"><span class="header-section-number">4</span> 4. Results &amp; Analysis</h2>
-<ul>
-<li><strong>Simulation Outcomes</strong>:
-<ul>
-<li>Main findings from your SIR model (e.g., arrival time estimates, R0, infection curves).</li>
-</ul></li>
-<li><strong>Comparison to Real Data</strong>:
-<ul>
-<li>Validation or partial validation with historical case timelines, partial flight volumes, etc.</li>
-</ul></li>
-<li><strong>Excess Mortality Correlation</strong>:
-<ul>
-<li>Results of Spearman’s rank (or other) correlation between arrival ranks and mortality.</li>
-</ul></li>
-</ul>
-<blockquote class="blockquote">
-<p><em>Tip:</em> Use <strong>clear figures</strong> (maps, Sankey diagrams, time-series plots) to illustrate your results.</p>
-</blockquote>
-<hr>
-</section>
-<section id="discussion" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="discussion"><span class="header-section-number">5</span> 5. Discussion</h2>
-<ul>
-<li><strong>Did Early Arrival Matter?</strong>
-<ul>
-<li>Interpret whether your results support or refute the hypothesis that earlier arrival correlates with higher mortality.<br>
-</li>
-</ul></li>
-<li><strong>Model Reliability &amp; Data Biases</strong>
-<ul>
-<li>Reflect on coverage issues, assumptions (e.g., seat-capacity multiplication).<br>
-</li>
-</ul></li>
-<li><strong>Limitations &amp; Future Work</strong>
-<ul>
-<li>Where the approach might fail or be extended. Potential expansions (agent-based models, additional socioeconomic variables).</li>
-</ul></li>
-</ul>
-<blockquote class="blockquote">
-<p><em>Tip:</em> Some theses merge “Discussion” and “Conclusion” into one chapter, but having them separate often gives a sharper wrap-up.</p>
-</blockquote>
-<hr>
-</section>
-<section id="conclusion" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">6</span> 6. Conclusion</h2>
-<ul>
-<li><strong>Major Takeaways</strong>:
-<ul>
-<li>Summarize the key findings in <strong>one or two paragraphs</strong>.<br>
-</li>
-</ul></li>
-<li><strong>Practical Implications</strong>:
-<ul>
-<li>Any direct recommendations for policymakers or future pandemic modeling?<br>
-</li>
-</ul></li>
-<li><strong>Final Thoughts</strong>:
-<ul>
-<li>Possibly mention global expansions or how your method might be adapted for future epidemic scenarios.</li>
-</ul></li>
-</ul>
-<hr>
-</section>
-<section id="references" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="references"><span class="header-section-number">7</span> 7. References</h2>
-<ul>
-<li>Follow a consistent reference style (e.g., APA, Harvard, IEEE, etc.).<br>
-</li>
-<li>Make sure each reference is <strong>cited in-text</strong>.</li>
-</ul>
-<hr>
-</section>
-<section id="additional-notes" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="additional-notes"><span class="header-section-number">8</span> Additional Notes</h2>
-<ul>
-<li><strong>Acknowledgments</strong>: Perfect to put at the beginning or end, whichever your department’s format prefers.</li>
-<li><strong>Appendices</strong>: If you have large tables, code, or raw data examples, place them in an appendix. That keeps the main text lean.</li>
-<li>For a <strong>Bachelor thesis</strong>, ensure your content is thorough but not labyrinthine. Clarity and coherence are paramount.</li>
-</ul>
-<section id="acknowledgments" class="level3" data-number="8.1">
-<h3 data-number="8.1" class="anchored" data-anchor-id="acknowledgments"><span class="header-section-number">8.1</span> Acknowledgments</h3>
-<p>Based on TOS:</p>
-<p>“This thesis includes results derived from the ATM Datasets made available by EUROCONTROL (©2025). EUROCONTROL does not necessarily endorse or support the conclusions drawn herein and shall not be liable for any direct or indirect damages arising out of or in connection with this work.”</p>
-<p>And for Figures for example: “Figure 1. Sankey diagram of daily passenger flows (April 2020) among selected European airports. Source: <span class="citation" data-cites="eurocontrolData2025">Eurocontrol (<a href="#ref-eurocontrolData2025" role="doc-biblioref">2025</a>)</span>.”</p>
+<section id="methodological-reflections" class="level3" data-number="1.7.4">
+<h3 data-number="1.7.4" class="anchored" data-anchor-id="methodological-reflections"><span class="header-section-number">1.7.4</span> Methodological Reflections</h3>
+<p>Early versions of this research design included dynamic modeling approaches such as a network-based SIR simulation <span class="citation" data-cites="brockmann2013">(<a href="#ref-brockmann2013" role="doc-biblioref">Brockmann and Helbing 2013</a>)</span> or SEIR extensions <span class="citation" data-cites="abou2020 rozan2024">(<a href="#ref-abou2020" role="doc-biblioref">Abou-Ismail 2020</a>; <a href="#ref-rozan2024" role="doc-biblioref">Rozán, Kuperman, and Bouzat 2024</a>)</span>. However, incomplete flight records for January–February 2020, combined with uneven global data coverage and the practical time constraints of a Bachelor’s thesis (~300 hours), rendered such approaches infeasible. A simplified, descriptive correlation analysis was chosen to maintain feasibility and transparency while stillallowing meaningful insights into early pandemic exposure patterns.</p>
 </section>
 </section>
-<section id="references-1" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="references-1"><span class="header-section-number">9</span> References</h2>
+<section id="conclusion" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">1.8</span> Conclusion</h2>
+<section id="key-findings" class="level3" data-number="1.8.1">
+<h3 data-number="1.8.1" class="anchored" data-anchor-id="key-findings"><span class="header-section-number">1.8.1</span> Key Findings</h3>
+</section>
+<section id="implications-future-work" class="level3" data-number="1.8.2">
+<h3 data-number="1.8.2" class="anchored" data-anchor-id="implications-future-work"><span class="header-section-number">1.8.2</span> Implications &amp; Future Work</h3>
+</section>
+<section id="why-exploratory-work-matters" class="level3" data-number="1.8.3">
+<h3 data-number="1.8.3" class="anchored" data-anchor-id="why-exploratory-work-matters"><span class="header-section-number">1.8.3</span> Why Exploratory Work Matters</h3>
+<p>Although this thesis does not make causal claims, its findings demonstrate the value of transparent, reproducible exploratory analysis. When approached with methodological humility and critical awareness, even basic statistical patterns—such as the timing and structure of early international flight exposure—can yield insights into complex public health events. In a field often pressured by urgent narratives or overstated certainty, exploratory studies like this play a role in grounding interpretation and informing future research directions.</p>
+</section>
+</section>
+<section id="references" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="references"><span class="header-section-number">1.9</span> References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-eurocontrolData2025" class="csl-entry" role="listitem">
-Eurocontrol. 2025. <span>“ATM Datasets for r&amp;d.”</span> <a href="https://www.eurocontrol.int" class="uri">https://www.eurocontrol.int</a>.
+<div id="ref-abou2020" class="csl-entry" role="listitem">
+Abou-Ismail, Anas. 2020. <span>“Compartmental Models of the COVID-19 Pandemic for Physicians and Physician-Scientists.”</span> <em>SN Comprehensive Clinical Medicine</em> 2 (7): 852–58.
+</div>
+<div id="ref-brockmann2013" class="csl-entry" role="listitem">
+Brockmann, Dirk, and Dirk Helbing. 2013. <span>“The Hidden Geometry of Complex, Network-Driven Contagion Phenomena.”</span> <em>Science</em> 342 (6164): 1337–42.
+</div>
+<div id="ref-chinazzi2020" class="csl-entry" role="listitem">
+Chinazzi, Matteo, Jessica T Davis, Marco Ajelli, Corrado Gioannini, Maria Litvinova, Stefano Merler, Ana Pastore y Piontti, et al. 2020. <span>“The Effect of Travel Restrictions on the Spread of the 2019 Novel Coronavirus (COVID-19) Outbreak.”</span> <em>Science</em> 368 (6489): 395–400.
+</div>
+<div id="ref-ioannidis2023" class="csl-entry" role="listitem">
+Ioannidis, John PA, Francesco Zonta, and Michael Levitt. 2023. <span>“Variability in Excess Deaths Across Countries with Different Vulnerability During 2020–2023.”</span> <em>Proceedings of the National Academy of Sciences</em> 120 (49): e2309557120.
+</div>
+<div id="ref-karlinsky2021" class="csl-entry" role="listitem">
+Karlinsky, Ariel, and Dmitry Kobak. 2021. <span>“Tracking Excess Mortality Across Countries During the COVID-19 Pandemic with the World Mortality Dataset.”</span> Edited by Miles P Davenport, Marc Lipsitch, Marc Lipsitch, Lone Simonsen, and Ayesha Mahmud. <em>eLife</em> 10 (June): e69336. <a href="https://doi.org/10.7554/eLife.69336">https://doi.org/10.7554/eLife.69336</a>.
+</div>
+<div id="ref-kelly2021" class="csl-entry" role="listitem">
+Kelly, Gabrielle, Stefano Petti, and Norman Noah. 2021. <span>“Covid-19, Non-Covid-19 and Excess Mortality Rates Not Comparable Across Countries.”</span> <em>Epidemiology &amp; Infection</em> 149: e176.
+</div>
+<div id="ref-matveeva2023" class="csl-entry" role="listitem">
+Matveeva, Olga, and Svetlana A Shabalina. 2023. <span>“Comparison of Vaccination and Booster Rates and Their Impact on Excess Mortality During the COVID-19 Pandemic in European Countries.”</span> <em>Frontiers in Immunology</em> 14: 1151311.
+</div>
+<div id="ref-okabe2002" class="csl-entry" role="listitem">
+Okabe, Masataka, and Kei Ito. 2002. <span>“Color Universal Design (CUD): How to Make Figures and Presentations That Are Friendly to Color‐blind People.”</span> University of Tokyo.
+</div>
+<div id="ref-pizzato2024" class="csl-entry" role="listitem">
+Pizzato, Margherita, Alberto Giovanni Gerli, Carlo La Vecchia, and Gianfranco Alicandro. 2024. <span>“Impact of COVID-19 on Total Excess Mortality and Geographic Disparities in Europe, 2020–2023: A Spatio-Temporal Analysis.”</span> <em>The Lancet Regional Health–Europe</em> 44.
+</div>
+<div id="ref-rahmanian2024" class="csl-entry" role="listitem">
+Rahmanian Haghighi, Mohammad Reza, Chryso Th Pallari, Souzana Achilleos, Annalisa Quattrocchi, John Gabel, Andreas Artemiou, Maria Athanasiadou, et al. 2024. <span>“Excess Mortality and Its Determinants During the COVID-19 Pandemic in 21 Countries: An Ecological Study from the c-MOR Project, 2020 and 2021.”</span> <em>Journal of Epidemiology and Global Health</em>, 1–12.
+</div>
+<div id="ref-rozan2024" class="csl-entry" role="listitem">
+Rozán, Eric Alejandro, Marcelo Nestor Kuperman, and Sebastian Bouzat. 2024. <span>“The Importance of the Incubation Time Distribution in Compartmental Epidemiological Models.”</span> <em>Physica A: Statistical Mechanics and Its Applications</em> 650: 129998.
+</div>
+<div id="ref-who2023end" class="csl-entry" role="listitem">
+<span>“Statement on the Fifteenth Meeting of the IHR (2005) Emergency Committee on the COVID-19 Pandemic.”</span> 2023. World Health Organization. <a href="https://www.who.int/news/item/05-05-2023-statement-on-the-fifteenth-meeting-of-the-international-health-regulations-(2005)-emergency-committee-regarding-the-coronavirus-disease-(covid-19)-pandemic">https://www.who.int/news/item/05-05-2023-statement-on-the-fifteenth-meeting-of-the-international-health-regulations-(2005)-emergency-committee-regarding-the-coronavirus-disease-(covid-19)-pandemic</a>.
+</div>
+<div id="ref-sun2022_a" class="csl-entry" role="listitem">
+Sun, Xiaoqian, Sebastian Wandelt, and Anming Zhang. 2022. <span>“COVID-19 Pandemic and Air Transportation: Summary of Recent Research, Policy Consideration and Future Research Directions.”</span> <em>Transportation Research Interdisciplinary Perspectives</em> 16: 100718.
 </div>
 </div>
+</section>
+<section id="acknowledgments" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="acknowledgments"><span class="header-section-number">1.10</span> Acknowledgments</h2>
+<p><em>This thesis includes results derived from the ATM Datasets made available by EUROCONTROL (©2025). EUROCONTROL does not necessarily endorse or support the conclusions drawn herein and shall not be liable for any direct or indirect damages arising out of or in connection with this work.</em></p>
+</section>
+<section id="appendix-code-etc." class="level2" data-number="1.11">
+<h2 data-number="1.11" class="anchored" data-anchor-id="appendix-code-etc."><span class="header-section-number">1.11</span> Appendix (code, etc.)</h2>
+<p><em>Additional data tables, methods, or extended results.</em></p>
+</section>
 </section>
 
 </main>
@@ -386,8 +802,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -498,7 +912,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

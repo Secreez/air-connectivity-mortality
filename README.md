@@ -2,7 +2,7 @@
 
 ### Exploratory correlation analysis for a Bachelor thesis (University of Salzburg)
 
-## Project idea
+## Project overview
 
 > **Research question**
 > *Did European countries that received more direct inbound flights from Mainland China, Hong Kong, and Macao in **Dec 2019 / Mar 2020** experience higher excess-mortality burdens during the first four pandemic years?*
@@ -37,7 +37,6 @@ bachelor-thesis/
 ├─ thesis.qmd # main write-up (Quarto)
 ├─ thesis_ref.bib # references (BibTeX)
 ├─ _quarto.yml # Quarto config
-├─ run_pipeline.sh # bash script to run the pipeline
 ├─ style_all.R # styler for all scripts
 └─ README.md
 ```
@@ -46,48 +45,30 @@ Scripts **01-03** build the data; notebooks **04-05** make the figures and corre
 
 ## Quick start
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "Step 0: Format all R code..."
-Rscript style_all.R
-
-echo "Step 1: Clean up old outputs"
-rm -rf data/processed/* data/figures/* notebooks/*_cache
-
-echo "Step 2: Run data preparation scripts..."
-Rscript notebooks/01_excess_snapshots.R
-Rscript notebooks/02_flight_filter.R
-Rscript notebooks/03_merge_exposure.R
-
-echo "Step 3: Render analysis notebooks..."
-quarto render notebooks/04_population_qc.qmd
-quarto render notebooks/05_descriptive_plots.qmd
-quarto render notebooks/06_correlation.qmd
-
-echo "Step 4: Render full thesis..."
-quarto render thesis.qmd
-
-echo "Done! All outputs are up-to-date."
+```
 
 ```
 
-> **Note:** EUROCONTROL flight CSVs (\~2 GB) are **not** tracked by Git.\
-> Place them under `data/raw/flight_data/YYYYMM/` as described in *02_flight_filter.R*.
+> **Note:** EUROCONTROL flight CSVs (\~2 GB) are **not** tracked by Git.
+> So, place them under `data/raw/flight_data/YYYYMM/` as described in *02_flight_filter.R*.
 
-## Main data sources
+## Data sources
 
-| dataset | license | link |
-|---------------------------|---------------------------|------------------|
-| EUROCONTROL ATM historical flights | © EUROCONTROL (research use) | <https://www.eurocontrol.int> |
-| Excess-mortality (HMD STMF + WMD via OWID) | CC-BY 4.0 | <https://ourworldindata.org/excess-mortality-covid> |
-| OurAirports reference | CC0 | <https://ourairports.com> |
-| Natural-Earth shapes | Public Domain | <https://www.naturalearthdata.com> |
+| Dataset                                                    | Licence        | Link                                                                                                                                         |
+| ---------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| EUROCONTROL ATM flight records (research release)          | © EUROCONTROL¹ | [https://www.eurocontrol.int](https://www.eurocontrol.int)                                                                                   |
+| Excess-mortality (HMD-STMF + WMD via OWID)                 | CC-BY-4.0      | [https://ourworldindata.org/excess-mortality-covid](https://ourworldindata.org/excess-mortality-covid)                                       |
+| **UN World Population Prospects 2024 (mid-2020 snapshot)** | CC-BY-3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) — R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024) |
+| OurAirports reference                                      | CC0            | [https://ourairports.com](https://ourairports.com)                                                                                           |
+| Natural-Earth vector shapes                                | Public Domain  | [https://www.naturalearthdata.com](https://www.naturalearthdata.com)                                                                         |
+
+¹ EUROCONTROL data are not redistributed here; if you have access for R&D, copy the csv.gz drops into data/raw/flight_data/201912/ and ../202003 before rendering.
 
 ## Re-use
 
-All code is released under the .. License Figures and processed CSVs inherit the licenses of their upstream data providers—please credit them when re-using.
+Code is MIT-licensed (see `LICENSE`).
+Figures and processed data inherit the licences of their upstream sources—
+please credit them when you reuse.
 
-*Last updated: 24 Apr 2025*
+*Last updated: 03 June 2025*
 *Maintainer: Maximilian Elixhauser – maximilian.elixhauser@stud.plus.ac.at*
