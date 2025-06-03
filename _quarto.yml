@@ -1,16 +1,37 @@
 project:
-  type: manuscript
+  type: manuscript  
+
+pre-render:
+  - Rscript notebooks/01_excess_snapshots.R
+  - Rscript notebooks/02_flight_filter.R
+  - Rscript notebooks/03_merge_exposure.R
+  - Rscript style_all.R   
+
+render:
+  - thesis.qmd
+  - notebooks/04_population_qc.qmd
+  - notebooks/05_descriptive_plot.qmd
+  - notebooks/06_correlation.qmd
 
 execute:
-  dir: .
-  freeze: auto
+  dir: "." 
+  freeze: auto   
 
 format:
   html:
     toc: true
+    toc-depth: 3
     theme: slate
     comments:
-      hypothesis: true
+      hypothesis: true      
 
 manuscript:
-  article: thesis.qmd
+  article: thesis.qmd   
+  notebooks:    
+    - notebook: notebooks/04_population_qc.qmd
+      title: Population QC
+    - notebook: notebooks/05_descriptive_plot.qmd
+      title: Descriptive plots
+    - notebook: notebooks/06_correlation.qmd
+      title: Correlation analysis
+

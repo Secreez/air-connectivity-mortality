@@ -238,7 +238,7 @@ ggsave(here(fig_dir, "scatter_volume_vs_origins.png"),
 
 ## Collapse Bar: Percentage change (countries with ≥ 5 Dec flights)
 
-```{r pct_change_filtered, fig.cap=fig.cap="Catastrophic pandemic-related collapse in direct scheduled passenger flights from China and Hong Kong to EUROCONTROL countries, March 2020 vs. December 2019. All countries with ≥5 December flights are shown. While nearly all countries saw reductions exceeding 75–90%, Belgium, the Netherlands, and Germany retained a much higher share of flights—reflecting their roles as major cargo and transfer hubs where flight activity persisted even as passenger movement evaporated. This anomaly highlights a key limitation of exposure metrics based on flight counts: for countries with large cargo airports, residual flight activity may dramatically overstate actual passenger-based seeding risk.", fig.height=6}
+```{r pct_change_filtered, fig.cap="Catastrophic pandemic-related collapse in direct scheduled passenger flights from China and Hong Kong to EUROCONTROL countries, March 2020 vs. December 2019. All countries with ≥5 December flights are shown. While nearly all countries saw reductions exceeding 75–90%, Belgium, the Netherlands, and Germany retained a much higher share of flights—reflecting their roles as major cargo and transfer hubs where flight activity persisted even as passenger movement evaporated. This anomaly highlights a key limitation of exposure metrics based on flight counts: for countries with large cargo airports, residual flight activity may dramatically overstate actual passenger-based seeding risk.", fig.height=6}
 pct_df <- flight_exposure |>
   transmute(
     country = country_name,

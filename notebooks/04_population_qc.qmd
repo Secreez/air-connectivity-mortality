@@ -8,7 +8,7 @@ EURO_ISO <- readr::read_csv(
 )$iso3
 
 DIFF_LIMIT <- 0.10 # alarm line
-OUT_DIR    <- here::here("data", "processed")
+OUT_DIR <- here::here("data", "processed")
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # UN WPP mid-2020
@@ -18,9 +18,11 @@ pop_wpp20 <- pop1dt |>
   mutate(
     iso3 = countrycode(
       name, "country.name", "iso3c",
-      custom_match = c("Czechia" = "CZE",
-                       "Türkiye" = "TUR",
-                       "United Kingdom" = "GBR"),
+      custom_match = c(
+        "Czechia" = "CZE",
+        "Türkiye" = "TUR",
+        "United Kingdom" = "GBR"
+      ),
       warn = FALSE
     )
   ) |>
@@ -33,8 +35,10 @@ pop_owid20 <- readr::read_csv(
   show_col_types = FALSE,
   col_select = c(iso_code, date, population)
 ) |>
-  filter(lubridate::year(date) == 2020,
-         iso_code %in% EURO_ISO) |>
+  filter(
+    lubridate::year(date) == 2020,
+    iso_code %in% EURO_ISO
+  ) |>
   group_by(iso3 = iso_code) |>
   slice_max(date, with_ties = FALSE) |>
   ungroup() |>
@@ -52,7 +56,6 @@ if (nrow(big_gaps) == 0) {
 } else {
   warning("! Gap >10 % for: ", paste(big_gaps$iso3, collapse = ", "))
 }
-
 ```
 
 # Take away message
