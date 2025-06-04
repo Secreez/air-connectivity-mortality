@@ -1,8 +1,6 @@
 load_dependencies <- function() {
   cran_packages <- c(
-    "styler", "rnaturalearth", "tidyverse", "lubridate", "sf", "viridis",
-    "broom", "boot", "purrr", "ggrepel", "kableExtra", "scales", "stringr",
-    "here", "forcats", "countrycode", "patchwork"
+    "styler", "tidyverse", "here", "countrycode", "ggrepel", "scales", "boot"
   )
 
   github_packages <- list(
