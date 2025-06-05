@@ -368,6 +368,16 @@ ggsave(here(fig_dir, "rho_caterpillar.png"),
 
 All three exposure metrics are clearly positive in 2020; in 2021 their CIs straddle zero, and from 2022 the combined metric is significantly negative, confirming a genuine sign-flip rather than sampling noise.
 
+
+
+## Confounder Test (Sanity Check)
+
+For Results > Sensitivity 
+- Partial Spearman or simple multiple rank regresion
+- using age 65+ share or GDP pc / Vacc (Think about it)
+- Just one sentence in the text like Adding median age lowers ...
+- Just to be safe against confounding
+
 # Limitations {#limitations}
 
 Can be used for Thesis.qmd
@@ -478,3 +488,4 @@ knitr::kable(
   caption = "Spearman $\\rho$ for the 2020 snapshot **restricted to the 25 countries that have a complete four-year excess-mortality series**."
 )
 ```
+
