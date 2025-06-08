@@ -1,74 +1,95 @@
-# Early Air Connectivity & Excess Mortality
+# Early Air Connectivity & Excess Mortality  
 
-### Exploratory correlation analysis for a Bachelor thesis (University of Salzburg)
+*Exploratory correlation study for a BSc thesis (University of Salzburg)*
 
-## Project overview
+## Research idea
 
-> **Research question**
-> *Did European countries that received more direct inbound flights from Mainland China, Hong Kong, and Macao in **Dec 2019 / Mar 2020** experience higher excess-mortality burdens during the first four pandemic years?*
+> **Question** Did European countries that received **more direct flights from  
+> Mainland China / Hong Kong in Dec 2019 & Mar 2020** suffer *higher* excess-
+> mortality during the first COVID-19 wave (May 2020)?
 
-We link EUROCONTROL flight records to Our World in Data’s excess-mortality series and produce:
+We join EUROCONTROL IFR data with OWID’s excess-mortality series and:
 
-- descriptive flight plots (barplot, choropleth, great-circle flow map)
-- Spearman rank correlations for four May snapshots (2020-2023)
-- robustness checks (flights / million, P-scores, small-state exclusion)
+* build country-level exposure metrics (Dec 19, Mar 20, Dec+Mar, flights / million);  
+* compute Spearman ρ for 2020 – 2023 snapshots;  
+* run quick robustness checks (population normalisation, full-series filter).
 
-Everything is reproducible and tested in **R 4.5.0** package stack see: `...`
+Everything is reproducible with **R ≥ 4.4** and **Quarto ≥ 1.6**.
 
-## Directory layout
 
-This repository is organized as follows:
+## Repository map
 
-```         
+```
 bachelor-thesis/
-├─ archive/ # old proposals & drafts
-├─ data/ 
-│ ├─ raw/ # untouched source files 
-│ ├─ processed/ # tidy outputs (CSV/RDS) 
-│ └─ figures/ # PNG/PDF figures used in the thesis 
-├─ notebooks/ # analysis notebooks & build scripts 
-│ ├─ 01_excess_snapshots.R 
-│ ├─ 02_flight_filter.R 
-│ ├─ 03_merge_exposure.R
-│ ├─ 04_population_qc.qmd
-│ ├─ 05_descriptive_plots.qmd 
-│ └─ 06_correlation.qmd 
-├─ R/ # QA scripts & functions
-├─ thesis.qmd # main write-up (Quarto)
-├─ thesis_ref.bib # references (BibTeX)
-├─ _quarto.yml # Quarto config
-├─ style_all.R # styler for all scripts
-└─ README.md
-```
-
-Scripts **01-03** build the data; notebooks **04-05** make the figures and correlation tables.
-
-## Quick start
+├─ data/
+│  ├─ raw/                      # original CSV (NOT in Git: \~2 GB EUROCONTROL flights)
+│  ├─ processed/                # tidy RDS/CSV created by the pipeline
+│  └─ figures/                  # PNGs for the manuscript
+├─ notebooks/                   # analysis notebooks + tiny R scripts
+│  ├─ 01\_excess\_snapshots.R
+│  ├─ 02\_flight\_filter.R
+│  ├─ 03\_merge\_exposure.R
+│  ├─ 04\_population\_qc.qmd
+│  ├─ 05\_descriptive\_plots.qmd
+│  └─ 06\_correlation.qmd
+├─ R/                           # helper functions & QA scripts
+├─ thesis.qmd                   # main manuscript (Quarto)
+├─ thesis\_ref.bib              # references
+├─ \_quarto.yml                 # project configuration (pre-render, render list, theme…)
+└─ README.md                    # you are here
 
 ```
 
+Scripts **01-03** create the analysis data; notebooks **04-06** generate all
+tables and plots; **thesis.qmd** pulls results into the write-up.
+
+## How to run
+
+### Prepare data files (required for build)
+
+Download/copy the following data to the correct locations in `data/raw/`:
+
+* **EUROCONTROL flights:** Place all `.csv.gz` files from Dec 2019 and Mar 2020 into `data/raw/flight_data/201912/` and `data/raw/flight_data/202003/`
+* **OurAirports:** Place `airports.csv` in `data/raw/OurAirports/`
+* **OWID:** Place `owid-covid-data.csv` in `data/raw/owid/`
+
+*(EUROCONTROL files are NOT public—see instructions above.)*
+
+### Build everything
+
+Open a terminal (preferably Git Bash), navigate to the project folder, and run:
+
+```bash
+./build.sh
 ```
 
-> **Note:** EUROCONTROL flight CSVs (\~2 GB) are **not** tracked by Git.
-> So, place them under `data/raw/flight_data/YYYYMM/` as described in *02_flight_filter.R*.
+The script will:
 
-## Data sources
+* Check that all data files are present
+* Install R package dependencies if needed
+* Run all preprocessing steps and build the manuscript plus supplementary notebooks
+
+### View results
+
+After successful completion, open `_manuscript/index.html` in your web browser to view the main manuscript.
+Supplementary HTML notebooks are also in `_manuscript/`.
+
+**Do NOT use RStudio’s “Render” button or `quarto render` directly; always run the provided build script to ensure reproducibility and data checks.**
 
 | Dataset                                                    | Licence        | Link                                                                                                                                         |
 | ---------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | EUROCONTROL ATM flight records (research release)          | © EUROCONTROL¹ | [https://www.eurocontrol.int](https://www.eurocontrol.int)                                                                                   |
 | Excess-mortality (HMD-STMF + WMD via OWID)                 | CC-BY-4.0      | [https://ourworldindata.org/excess-mortality-covid](https://ourworldindata.org/excess-mortality-covid)                                       |
-| **UN World Population Prospects 2024 (mid-2020 snapshot)** | CC-BY-3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) — R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024) |
+| UN World Population Prospects 2024 (mid-2020 snapshot)     | CC-BY-3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) — R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024) |
 | OurAirports reference                                      | CC0            | [https://ourairports.com](https://ourairports.com)                                                                                           |
-| Natural-Earth vector shapes                                | Public Domain  | [https://www.naturalearthdata.com](https://www.naturalearthdata.com)                                                                         |
 
-¹ EUROCONTROL data are not redistributed here; if you have access for R&D, copy the csv.gz drops into data/raw/flight_data/201912/ and ../202003 before rendering.
+¹EUROCONTROL data are not redistributed here; copy the CSV drops (“Research Repository”) into `data/raw/flight_data/YYYYMM/` before rendering. If you have access to [the R&D programme](https://www.eurocontrol.int/dashboard/aviation-data-research).
 
-## Re-use
+## Reuse
 
 Code is MIT-licensed (see `LICENSE`).
-Figures and processed data inherit the licences of their upstream sources—
+Figures and processed data inherit the licences of their upstream sources
 please credit them when you reuse.
 
-*Last updated: 03 June 2025*
-*Maintainer: Maximilian Elixhauser – maximilian.elixhauser@stud.plus.ac.at*
+*Last updated 2025-06-04*   —  Maintainer: Maximilian Elixhauser
+[maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)

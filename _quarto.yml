@@ -1,11 +1,5 @@
 project:
-  type: manuscript  
-
-pre-render:
-  - Rscript notebooks/01_excess_snapshots.R
-  - Rscript notebooks/02_flight_filter.R
-  - Rscript notebooks/03_merge_exposure.R
-  - Rscript style_all.R   
+  type: manuscript
 
 render:
   - thesis.qmd
@@ -34,4 +28,3 @@ manuscript:
       title: Descriptive plots
     - notebook: notebooks/06_correlation.qmd
       title: Correlation analysis
-
