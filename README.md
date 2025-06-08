@@ -45,26 +45,36 @@ tables and plots; **thesis.qmd** pulls results into the write-up.
 
 ## How to run
 
-All R packages are installed by `R/00_load_libs.R`.
-If you start from a fresh machine:
-(Careful, this will install all CRAN and GitHub dependencies, check the script!)
+### Prepare data files (required for build)
 
-```r
-source("R/00_load_libs.R") # downloads CRAN + GitHub deps, then library()
-```
+Download/copy the following data to the correct locations in `data/raw/`:
+
+* **EUROCONTROL flights:** Place all `.csv.gz` files from Dec 2019 and Mar 2020 into `data/raw/flight_data/201912/` and `data/raw/flight_data/202003/`
+* **OurAirports:** Place `airports.csv` in `data/raw/OurAirports/`
+* **OWID:** Place `owid-covid-data.csv` in `data/raw/owid/`
+
+*(EUROCONTROL files are NOT public—see instructions above.)*
+
+### Build everything
+
+Open a terminal (preferably Git Bash), navigate to the project folder, and run:
 
 ```bash
-# clone repo, put EUROCONTROL CSVs under data/raw/, then…
-quarto render
+./build.sh
 ```
 
-Quarto will:
+The script will:
 
-1. run the three *Rscript* pre-processing steps and the code styler (see `_quarto.yml: pre-render`);
-2. render the three notebooks to HTML (linked under **"Notebooks"**);
-3. knit **thesis.html**.
+* Check that all data files are present
+* Install R package dependencies if needed
+* Run all preprocessing steps and build the manuscript plus supplementary notebooks
 
-## Data sources
+### View results
+
+After successful completion, open `_manuscript/index.html` in your web browser to view the main manuscript.
+Supplementary HTML notebooks are also in `_manuscript/`.
+
+**Do NOT use RStudio’s “Render” button or `quarto render` directly; always run the provided build script to ensure reproducibility and data checks.**
 
 | Dataset                                                    | Licence        | Link                                                                                                                                         |
 | ---------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -73,8 +83,7 @@ Quarto will:
 | UN World Population Prospects 2024 (mid-2020 snapshot)     | CC-BY-3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) — R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024) |
 | OurAirports reference                                      | CC0            | [https://ourairports.com](https://ourairports.com)                                                                                           |
 
-¹EUROCONTROL data are not redistributed here; copy the CSV drops (“Research
-Repository”) into `data/raw/flight_data/YYYYMM/` before rendering. If you have access to [the R&D programme](https://www.eurocontrol.int/dashboard/aviation-data-research).
+¹EUROCONTROL data are not redistributed here; copy the CSV drops (“Research Repository”) into `data/raw/flight_data/YYYYMM/` before rendering. If you have access to [the R&D programme](https://www.eurocontrol.int/dashboard/aviation-data-research).
 
 ## Reuse
 
