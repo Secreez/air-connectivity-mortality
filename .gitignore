@@ -21,4 +21,5 @@ data/processed/
 # 3) Legacy proposal data (archived, unused)
 archive/proposal/data/
 /.quarto/
+/_manuscript/
 .vscode
