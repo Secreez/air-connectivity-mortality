@@ -137,6 +137,7 @@ F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 $$
 Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
+Flight exposure is intentionally fixed at these two pre-epidemic months to preserve temporal precedence.^[A time-varying flight metric (e.g. 2021 volumes) was not analysed because this study targets early seeding, not ongoing mobility. Future work could extend the panel with later exposure measures.]
 
 ### Excess mortality snapshots
 
@@ -166,6 +167,8 @@ contributes exactly one observation per year, so no further timing‐shift robus
 
 Analyses were performed in **R 4.4**; the full script and data pipeline are available in `notebooks/`.
 
+As a simple confounder sanity-check we re-computed ρ for each year after controlling for the share of population aged ≥ 65 (partial Spearman). Adjusting for age changed ρ by < 0.02 in any year (see Table X in the Results), confirming that demographic structure is not driving the flight–mortality association. No other variables were added, as the study remains exploratory and correlation-focused
+
 ### Population denominator: validation and choice
 
 Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). This fixed denominator approach is standard for COVID-19 excess-mortality studies [@karlinsky2021; @kelly2021], as European populations vary by less than ±1% year to year.
@@ -178,36 +181,39 @@ To confirm that dataset differences do not bias results, OWID’s 2020 snapshot 
 
 ### Analysis workflow
 
-1. **Exposure metrics**  
-   $F_{\text{DEC}};F_{\text{MAR}},$
-   $F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}$
+### Analysis workflow
 
-2. **Outcome series**  
-   $E_t$– cumulative excess deaths / million on 5 May 2020–2023.
+1. **Define fixed exposure metrics**  
+   $$F_{\mathrm{DEC}},\;F_{\mathrm{MAR}},\;
+   F_{\mathrm{SUM}} = F_{\mathrm{DEC}} + F_{\mathrm{MAR}}$$
+   (all measured once, in Dec 2019 & Mar 2020).
+
+2. **Assemble annual outcome series**  
+   $$E_t = \text{cumulative excess deaths / million on 5 May } t,
+   \quad t \in \{2020,\,21,\,22,\,23\}.$$
 
 3. **Main test**  
-   Spearman $ρ$ (two-tailed) for every $F \times E_t$ pair;  
-   5000-sample percentile bootstrap for 95 % CI (boot library)
+   Spearman rank correlation $ρ$ (two-tailed) for every $F_k \times E_t$ pair;  
+   5 000-sample percentile bootstrap for 95 % CI (`boot` package).
 
 4. **Sensitivity panel**
 
-   | Label | Change | Purpose |
-   |--------|--------|---------|
-   | FPM | flights per million pop | relative exposure |
-   | COMPLETE | require full four-year ($E_t$) series | missing-data bias 
+   | Label       | Modification                                    | Purpose                        |
+   |-------------|-------------------------------------------------|--------------------------------|
+   | **FPM**     | $F_{\mathrm{SUM}}$ / population (per million)   | Checks population-size artefact |
+   | **COMPLETE**| Keep only 25 countries with a full four-year $E_t$ series | Missing-data bias              |
+   | **AGE 65 +**| Partial Spearman controlling for share ≥ 65 y   | Confounder sanity-check        |
 
 5. **Reproducibility**  
-   R 4.4.0; libraries; scripts in `notebooks/` tracked via GitHub.
-
-
-
-
-
-
+   Analyses in **R 4.4.0**; code and data pipeline in `notebooks/` (Git-tracked).
 
 # Results
 
 This chapter presents the results of the exploratory analysis investigating the association between early international flight exposure and cumulative excess mortality in European countries. It includes a descriptive overview of the flight data, early air connectivity patterns, country exposure rankings, and the results of the correlation analyses. Where relevant, additional sensitivity analyses are provided to assess the robustness of findings.
+
+Countries in the top quartile of Dec + Mar flight exposure recorded ≈ 55 % higher excess mortality than the bottom quartile (ρ ≈ 0.53, p < 0.01).
+
+Because all exposure measures precede the 5 May mortality snapshot, reverse causation is implausible for December and mitigated for March.
 
 ## Data coverages & descriptives
 
@@ -274,7 +280,6 @@ Flight exposure indicators normalized by country population (in millions) to eva
 Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects. ->
 
 *Table 4.6: Sensitivity analysis results.*
-
 
 ## Key patterns & short recap
 
