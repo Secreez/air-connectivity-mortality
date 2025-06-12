@@ -41,6 +41,24 @@ corr_df <- analysis_df |>
 stopifnot(!anyNA(corr_df$flights_pm))
 ```
 
+```{r}
+# used for Confounder Tests
+age_df <- read_csv(
+  here("data/raw/owid/owid-covid-data.csv"),
+  col_select = c(iso_code, date, aged_65_older),
+  show_col_types = FALSE
+) |>
+  filter(lubridate::year(date) == 2020) |>
+  group_by(iso_code) |>
+  slice_max(date, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(iso3   = iso_code,
+            aged65 = aged_65_older)
+
+corr_df <- corr_df |> left_join(age_df, by = "iso3")
+stopifnot(!anyNA(corr_df$aged65))
+```
+
 ## Spearman's rank correlation (baseline)
 
 ```{r}
@@ -127,8 +145,8 @@ spearman_res <- purrr::map_dfr(
 ```{r spearmantable}
 knitr::kable(
   spearman_res |>
-    select(year, variable, rho, ci_lo, ci_hi, p, n) |>
-    mutate(across(where(is.numeric), \(x) round(x, 3))),
+    dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
+    dplyr::mutate(across(where(is.numeric), \(x) round(x, 3))),
   caption = "Table X Spearman ρ between early flight exposure and cumulative excess mortality."
 )
 ```
@@ -154,6 +172,27 @@ knitr::kable(
 
 Early in the pandemic, countries most exposed to direct flights from China and Hong Kong suffered higher excess mortality. However, as the pandemic progressed, this association disappeared—and by 2022–2023, even reversed: high connectivity was linked to *lower* excess deaths, likely reflecting differences in domestic response, health system capacity, and perhaps a “rich country” advantage.
 These findings underscore the narrow window during which travel restrictions can affect epidemic outcomes, and the overwhelming importance of internal factors once local transmission is widespread.
+
+```{r quartile_gap, echo = FALSE}
+snap20 <- corr_df %>%
+  filter(target_date == as.Date("2020-05-05")) %>%
+  arrange(total_inbound_flights_combined)
+
+q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
+
+low_med  <- median(snap20$excess_mortality_cumulative_per_million[
+                     snap20$total_inbound_flights_combined <= q[1] ])
+high_med <- median(snap20$excess_mortality_cumulative_per_million[
+                     snap20$total_inbound_flights_combined >= q[2] ])
+
+abs_gap  <- round(high_med - low_med)
+ratio    <- round(abs(high_med) / abs(low_med), 1)
+
+cat("Absolute gap top vs bottom quartile (2020):",
+    abs_gap, "deaths / million\n")
+cat("Magnitude ratio:", ratio, "×\n")
+```
+Countries in the **top quartile** of December + March flight exposure recorded **≈ 465 more excess deaths per million** than the bottom quartile in May 2020 (Spearman ρ = 0.526, 95 % CI 0.177 – 0.771, *p* = 0.007; Table @tbl-spearman).
 
 
 # Visualizing the trend
@@ -236,27 +275,28 @@ Countries with the highest direct air connectivity to China and Hong Kong (such 
 
 ```{r scatter_dec_mar, fig.cap = "Relationship between direct scheduled passenger flights from \ China and Hong Kong (log-scale, x-axis) and cumulative excess mortality per \ million residents measured on 5 May 2020 (y-axis). Panels separate the \ exposure metric for **December 2019** (left) and **March 2020** (right). A \ moderate positive association is visible in both months (Spearman ρ ≈ 0.50 \ and ρ ≈ 0.57). Country codes label (i) the three largest early-exposure hubs \ by flight count and (ii) countries in the top quintile of first-wave excess \ mortality, highlighting the states that drive the correlation." }
 snapshots <- corr_df |>
-  filter(target_date == as.Date("2020-05-05")) |>
-  select(
+  dplyr::filter(target_date == as.Date("2020-05-05")) |>
+  dplyr::select(
     iso3, excess_mortality_cumulative_per_million,
     flights_dec19 = total_inbound_flights_dec19,
     flights_mar20 = total_inbound_flights_mar20
   ) |>
-  pivot_longer(
+  tidyr::pivot_longer(
     starts_with("flights_"),
     names_to  = "month",
     values_to = "inbound_flights"
   ) |>
-  mutate(
+  dplyr::mutate(
     month = factor(
-      recode(month,
+      dplyr::recode(month,
         flights_dec19 = "Dec 2019",
         flights_mar20 = "Mar 2020"
       ),
       levels = c("Dec 2019", "Mar 2020")
     )
   ) |>
-  filter(inbound_flights > 0) # drop zero-flight countries
+  dplyr::filter(inbound_flights > 0)
+
 
 stats_lbl <- snapshots |>
   group_by(month) |>
@@ -377,6 +417,57 @@ For Results > Sensitivity
 - using age 65+ share or GDP pc / Vacc (Think about it)
 - Just one sentence in the text like Adding median age lowers ...
 - Just to be safe against confounding
+
+```{r confounder_test, echo = FALSE}
+partial_by_year <- corr_df |>
+  dplyr::group_by(target_date) |>
+  dplyr::group_modify(~{
+
+    dd <- dplyr::filter(
+      .x,
+      complete.cases(total_inbound_flights_combined,
+                     excess_mortality_cumulative_per_million,
+                     aged65)
+    )
+
+    n <- nrow(dd)
+    if (n < 3 || sd(dd$aged65) == 0) {
+      return(tibble())
+    }
+
+    p <- pcor.test(
+      dd$total_inbound_flights_combined,
+      dd$excess_mortality_cumulative_per_million,
+      dd$aged65,
+      method = "spearman"
+    )
+
+    tibble(
+      year = lubridate::year(.y$target_date),
+      rho_baseline = cor(dd$total_inbound_flights_combined,
+                         dd$excess_mortality_cumulative_per_million,
+                         method = "spearman"),
+      rho_adj_age  = p$estimate,
+      p_adj_age    = p$p.value
+    )
+  }) |>
+  dplyr::ungroup()
+
+knitr::kable(
+  partial_by_year |> dplyr::mutate(across(where(is.numeric), round, 3)),
+  caption = "Spearman ρ with and without adjustment for share ≥ 65, by year."
+)
+
+
+```
+
+Controlling for the share of population ≥ 65 alters Spearman ρ by < 0.02 in any year (Table X), confirming that age structure is not driving the observed pattern.
+
+...
+
+
+
+
 
 # Limitations {#limitations}
 
