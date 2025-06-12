@@ -217,7 +217,6 @@ This chapter first describes flight-data coverage and early air-connectivity pat
 
 Countries in the **top quartile** of December + March flight exposure recorded **≈ 465 more excess deaths per million** than the bottom quartile in May 2020 (Spearman ρ = 0.526, 95 % CI 0.177 – 0.771, *p* = 0.007; Table @tbl-spearman).
 
-
 Because all exposure measures precede the 5 May mortality snapshot, reverse causation is implausible for December and mitigated for March.
 
 ## Data coverages & descriptives
@@ -232,11 +231,7 @@ Because all exposure measures precede the 5 May mortality snapshot, reverse caus
 
 > **Note on visual encoding:** All categorical colours follow the Okabe–Ito colour-universal palette (@okabe2002). The palette’s nine hues (hex `#009E73` green, `#E69F00` orange, `#56B4E9` blue, …) remain distinguishable for readers with the main forms of colour-vision deficiency. For continuous variables the viridis family is used. Axis titles, direct labels and dashed reference lines complement hue so that information is recoverable in greyscale printouts. No colours with strong cultural valence (e.g. “warning” red) are used in maps or flow diagrams in order to avoid unwanted emotional framing.
 
-[Notes for Figures]
-4.1. Stack two coloured bars per country (legend “Dec / Mar”). Order by Dec count so the drop is obvious. - example: “Inbound CN/HK/MO → EU flights (IFR), top-15 destinations.”
-4.2. Flow graphic – Shows who flew to whom; gives geographical intuition that a plain bar cannot. - If Sankyey, cleaner for volumes, but beware Variables.
-4.3 Choropleth (per-country totals, same palette).
-4.4. Daily flight profile within each sample month - Demonstrates intra-month variability (e.g. the steep drop after 15 Mar). - Two separate facets: “Dec 2019” and “Mar 2020” - Bar on thin line; y-axis = flights/day. - Insert grey panel: “No data Jan–Feb 2020” between facets
+
 
 ## Country exposure rankings
 
@@ -282,7 +277,9 @@ Countries lacking complete excess mortality records for all four reference timep
 Flight exposure indicators normalized by country population (in millions) to evaluate whether relative exposure, rather than absolute flight volume, influenced correlation outcomes.
 
 - **Separate analysis by month:**  
-Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects. ->
+Correlation analyses repeated separately for December 2019 and March 2020 to explore potential timing effects.
+
+...
 
 *Table 4.6: Sensitivity analysis results.*
 
@@ -316,17 +313,22 @@ The signal then **collapsed**: ρ fell to –0.306 in 2021 (CI –0.622 – 0.11
 
 A one-shot confounder check (@confounder_test) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
 
+
+[Here the Timeline Plot!]
+
 ### Relation to Broader Structural Factors
 
 Several country-level attributes likely modulated the time-varying ρ pattern:
 
 * **Wealth and health-system capacity.** Cross-country studies show that higher GDP per capita and stronger hospital capacity were associated with *lower* late-pandemic mortality [@ioannidis2023]. Because the most flight-connected countries are also among the wealthiest, these advantages plausibly explain part of the negative ρ observed after 2021.
 
-* **Vaccination rollout.** OWID data show that by May 2022 most high-flight countries had fully vaccinated ≥ 70 % of their populations, several months ahead of the low-flight quartile (which was still below 60 %). Earlier and broader vaccine coverage would have suppressed late-wave deaths in the highly connected group, contributing to the sign-flip after 2021.
+* **Vaccination rollout.** OWID data show that by **5 May 2022** countries in the highest-exposure quartile had a median **≈ 78 %** of their populations fully vaccinated, compared with **≈ 62 %** in the lowest-exposure quartile—a **16-percentage-point lead** that likely suppressed late-wave mortality in the highly connected group and contributed to the sign-flip after 2021.
 
 * **Public-health response.** Stringency-timing work (e.g. [@rahmanian2024]) finds that early, coordinated NPIs shaved first-wave deaths. Several low-flight Nordic states locked down rapidly and later reopened cautiously, narrowing the mortality gap despite low exposure.
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
+
+
 
 
 

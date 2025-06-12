@@ -580,3 +580,25 @@ knitr::kable(
 )
 ```
 
+```{r}
+exposure_q <- corr_df %>%                              
+  filter(target_date == as.Date("2020-05-05")) %>%     
+  mutate(q = ntile(total_inbound_flights_combined, 4)) %>% 
+  dplyr::select(iso3, q)
+
+vacc22 <- read_csv(
+  here("data/raw/owid/owid-covid-data.csv"),
+  col_select = c(iso_code, date, people_fully_vaccinated_per_hundred),
+  show_col_types = FALSE
+) %>% 
+  filter(date == as.Date("2022-05-05")) %>% 
+  transmute(iso3 = iso_code,
+            vacc = people_fully_vaccinated_per_hundred)
+
+snap <- dplyr::left_join(exposure_q, vacc22, by = "iso3")
+
+snap %>% 
+  group_by(q) %>% 
+  summarise(median_vacc = median(vacc, na.rm = TRUE))
+
+```

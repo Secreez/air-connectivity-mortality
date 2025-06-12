@@ -31,11 +31,11 @@ keep_cols <- c(
 # Source: EUROCONTROL Aviation Data Repository for Research – Metadata, FNI Doc25 Data Description v6 April 2025
 
 flights_dec19 <- flights_2019_12 |>
-  select(all_of(keep_cols)) |>
+  dplyr::select(all_of(keep_cols)) |>
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
 flights_mar20 <- flights_2020_03 |>
-  select(all_of(keep_cols)) |>
+  dplyr::select(all_of(keep_cols)) |>
   filter(`ICAO Flight Type` %in% c("S", "N"))
 
 # airport reference (OurAirports)
@@ -43,7 +43,7 @@ airports_full <- read_csv(
   here("data", "raw", "OurAirports", "airports.csv"),
   show_col_types = FALSE
 ) |>
-  select(icao_code, iso_country, name,
+  dplyr::select(icao_code, iso_country, name,
     latitude_deg, longitude_deg,
     iata_code = any_of("iata_code")
   )
