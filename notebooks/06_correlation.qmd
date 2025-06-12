@@ -145,8 +145,8 @@ spearman_res <- purrr::map_dfr(
 ```{r spearmantable}
 knitr::kable(
   spearman_res |>
-    select(year, variable, rho, ci_lo, ci_hi, p, n) |>
-    mutate(across(where(is.numeric), \(x) round(x, 3))),
+    dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
+    dplyr::mutate(across(where(is.numeric), \(x) round(x, 3))),
   caption = "Table X Spearman ρ between early flight exposure and cumulative excess mortality."
 )
 ```
@@ -172,6 +172,27 @@ knitr::kable(
 
 Early in the pandemic, countries most exposed to direct flights from China and Hong Kong suffered higher excess mortality. However, as the pandemic progressed, this association disappeared—and by 2022–2023, even reversed: high connectivity was linked to *lower* excess deaths, likely reflecting differences in domestic response, health system capacity, and perhaps a “rich country” advantage.
 These findings underscore the narrow window during which travel restrictions can affect epidemic outcomes, and the overwhelming importance of internal factors once local transmission is widespread.
+
+```{r quartile_gap, echo = FALSE}
+snap20 <- corr_df %>%
+  filter(target_date == as.Date("2020-05-05")) %>%
+  arrange(total_inbound_flights_combined)
+
+q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
+
+low_med  <- median(snap20$excess_mortality_cumulative_per_million[
+                     snap20$total_inbound_flights_combined <= q[1] ])
+high_med <- median(snap20$excess_mortality_cumulative_per_million[
+                     snap20$total_inbound_flights_combined >= q[2] ])
+
+abs_gap  <- round(high_med - low_med)
+ratio    <- round(abs(high_med) / abs(low_med), 1)
+
+cat("Absolute gap top vs bottom quartile (2020):",
+    abs_gap, "deaths / million\n")
+cat("Magnitude ratio:", ratio, "×\n")
+```
+Countries in the **top quartile** of December + March flight exposure recorded **≈ 465 more excess deaths per million** than the bottom quartile in May 2020 (Spearman ρ = 0.526, 95 % CI 0.177 – 0.771, *p* = 0.007; Table @tbl-spearman).
 
 
 # Visualizing the trend

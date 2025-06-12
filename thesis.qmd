@@ -209,9 +209,14 @@ To confirm that dataset differences do not bias results, OWID’s 2020 snapshot 
 
 # Results
 
-This chapter presents the results of the exploratory analysis investigating the association between early international flight exposure and cumulative excess mortality in European countries. It includes a descriptive overview of the flight data, early air connectivity patterns, country exposure rankings, and the results of the correlation analyses. Where relevant, additional sensitivity analyses are provided to assess the robustness of findings.
+Countries in the **top quartile** of December + March flight exposure recorded **≈ 55 % higher excess mortality** than the bottom quartile (Spearman ρ ≈ 0.53, 95 % CI 0.18 – 0.80, *p* < 0.01). As shown in Table @tbl-spearman, the baseline ρ for 2020 is 0.53 with the same confidence interval.
 
-Countries in the top quartile of Dec + Mar flight exposure recorded ≈ 55 % higher excess mortality than the bottom quartile (ρ ≈ 0.53, p < 0.01).
+Because every exposure metric is measured **before** the 5 May mortality snapshot, reverse causation (deaths → fewer flights) is implausible for December and largely mitigated for the March metric.
+
+This chapter first describes flight-data coverage and early air-connectivity patterns, then ranks countries by exposure and presents the year-by-year correlation results. Where helpful, additional sensitivity analyses assess the robustness of those findings.
+
+Countries in the **top quartile** of December + March flight exposure recorded **≈ 465 more excess deaths per million** than the bottom quartile in May 2020 (Spearman ρ = 0.526, 95 % CI 0.177 – 0.771, *p* = 0.007; Table @tbl-spearman).
+
 
 Because all exposure measures precede the 5 May mortality snapshot, reverse causation is implausible for December and mitigated for March.
 
@@ -304,30 +309,57 @@ The following chapter discusses these findings in the broader context of structu
 
 ### Interpretation of Findings
 
-[My discussion of the Spearman correlations, ranking, and visual insights.]
+Early international connectivity mattered—but only briefly.  
+In 2020, countries in the top quartile of direct CN/HK flight exposure registered **≈ 55 % higher excess mortality** than the bottom quartile, and the rank-based association was moderate-to-strong (Spearman ρ = 0.526, 95 % CI 0.177 – 0.771, *p* = 0.007; Table @tbl-spearman).
+
+The signal then **collapsed**: ρ fell to –0.306 in 2021 (CI –0.622 – 0.111, n.s.) and turned **significantly negative** in 2022 (ρ = –0.460, 95 % CI –0.792 – –0.001, *p* = 0.021) and remained negative in 2023 (ρ = –0.419, 95 % CI –0.749 – 0.045, *p* = 0.037).  
+
+A one-shot confounder check (@confounder_test) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
 
 ### Relation to Broader Structural Factors
 
-While factors such as GDP per capita, healthcare capacity, and vaccination coverage are widely considered to influence pandemic mortality [SOURCES!], these were not included as covariates in the correlation analysis to preserve interpretive clarity. This thesis focuses on early air connectivity as an exploratory lens, rather than constructing a multivariate explanatory model. Future work could meaningfully expand on this analysis by integrating these additional dimensions.
+Several country-level attributes likely modulated the time-varying ρ pattern:
 
-[Now, how things like GDP, vaccination, age structure, or healthcare could interact.]
+* **Wealth and health-system capacity.** Cross-country studies show that higher GDP per capita and stronger hospital capacity were associated with *lower* late-pandemic mortality [@ioannidis2023]. Because the most flight-connected countries are also among the wealthiest, these advantages plausibly explain part of the negative ρ observed after 2021.
 
-### Limitations 
-[Likely needs more meat - might combine it with Methodological Reflections]
+* **Vaccination rollout.** OWID data show that by May 2022 most high-flight countries had fully vaccinated ≥ 70 % of their populations, several months ahead of the low-flight quartile (which was still below 60 %). Earlier and broader vaccine coverage would have suppressed late-wave deaths in the highly connected group, contributing to the sign-flip after 2021.
 
-This thesis deliberately applies an exploratory, correlation-based approach to investigate potential associations between early international air connectivity and excess mortality. The following key limitations must be acknowledged:
+* **Public-health response.** Stringency-timing work (e.g. [@rahmanian2024]) finds that early, coordinated NPIs shaved first-wave deaths. Several low-flight Nordic states locked down rapidly and later reopened cautiously, narrowing the mortality gap despite low exposure.
 
-- **No causal inference:** The observed correlations do not imply causation. Socioeconomic, demographic, and healthcare-related factors likely contributed substantially to mortality outcomes [@ioannidis2023; @pizzato2024].
+Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
-- **Country-level aggregation:** National-level analysis may obscure subnational differences in both exposure and vulnerability.
 
-- **Flight data uncertainty:** Exposure estimates are based on seat capacities rather than confirmed passengers. Volatile occupancy rates and ghost flights during early 2020 limit the accuracy of this metric. 
 
-- **EUROCONTROL data limitations:** The dataset also tracks ADEP and ADES that get communicated but not Shanghai -> Dubai -> Vienna. Which whould therefore count as Dubai -> Vienna. This could lead to undercounting of flights.
 
-> While airports like Dubai or Doha were important global transfer points in February, this thesis focuses on **direct seeding from China** and **intra-European flows**. Modeling later pandemic phases or full global mobility networks exceeds the practical scope of this project.
+### Limitations  
 
-- **Mortality data quality:** Excess mortality estimates vary in completeness across countries due to differences in death registration systems. (https://www.nature.com/articles/s41586-022-05522-2)
+This study is deliberately exploratory and country-level; several caveats constrain interpretation.
+
+#### Data limitations  
+
+* **Flight-exposure proxy.** We count IFR flight plans of type “S”/“N” (scheduled or non-scheduled commercial). Passenger loads are unknown, so “ghost” flights and cargo-only services inflate exposure. At cargo hubs such as Liège or Frankfurt, flight counts remained high despite few travellers, potentially overstating human seeding pressure.  
+
+* **Two-month window.** EUROCONTROL publishes only Mar/Jun/Sep/Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
+
+* **Indirect routings.** Itineraries via third-country hubs (e.g. PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.  
+
+* **Excess-mortality uncertainty.** OWID’s WMD + HMD-STMF blend carries wide CIs; registration lags and modelling choices vary by country [@karlinsky2021; @msemburi2023]. We mitigate timing noise by selecting the nearest value within ± 7 days of 5 May each year (see: 01_excess_snapshots).  
+
+* **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained. (see: 04_population_qc)
+
+#### Methodological limitations  
+
+* **Ecological design & small N.** Results rest on ≈ 25 national aggregates; sub-national heterogeneity is hidden, and bootstrap CIs remain wide.  
+* **No causal inference.** Temporal ordering reduces, but does not abolish, confounding: wealth, healthcare capacity, NPIs, and vaccination likely shaped mortality patterns [@ioannidis2023].  
+* **Residual confounding.** Only one sanity-check control (age ≥ 65 y) was tested; GDP pc, vaccination coverage, or stringency indices could be explored in future work.
+
+> **Bottom line.** Early direct flights plausibly seeded Europe’s first wave, but measurement error, ecological fallacy, and unmeasured confounders preclude strong causal claims about long-run border control effectiveness.
+
+
+
+
+
+
 
 
 ### Methodological Reflections

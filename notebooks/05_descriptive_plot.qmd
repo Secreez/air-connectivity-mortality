@@ -293,7 +293,7 @@ collapse_tbl <- pct_df |>
     `% change` = sprintf("%+.0f %%", pct),
     `Δ flights` = scales::comma(mar - dec)
   ) |>
-  select(Country = country, `Dec 2019`, `Mar 2020`, `% change`, `Δ flights`)
+  dplyr::select(Country = country, `Dec 2019`, `Mar 2020`, `% change`, `Δ flights`)
 
 knitr::kable(
   collapse_tbl,
@@ -322,7 +322,7 @@ top_tbl <- pct_df |>
   slice_head(n = 10) |>
   mutate(Rank = row_number()) |>
   ungroup() |>
-  select(direction, Rank,
+  dplyr::select(direction, Rank,
     Country = country,
     `Dec 2019`, `Mar 2020`, `% change`, `Δ flights`
   )
