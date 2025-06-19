@@ -45,7 +45,10 @@ format:
 
 When SARS-CoV-2 emerged in late 2019, the global airline network compressed inter-city travel times to hours, not weeks. Modelling studies show that long-haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections [@chinazzi2020; @sun2022_a].
 
-Yet European countries later displayed wide gaps in excess mortality. Analysts have linked those gaps to demography, health-system capacity, and policy timing [@rahmanian2024; @matveeva2023]. How much of the early mortality spread can be traced to initial exposure via direct flights from China and its two SARs? The question remains largely descriptive—and unanswered.
+Yet European countries later displayed wide gaps in excess mortality. 
+Multi-country panels link those gaps to demography, health-system capacity, and **the timing/strictness of early NPIs** [@rahmanian2024]. 
+
+
 
 ### Research Question
 
@@ -71,15 +74,20 @@ Snapshots for 2021-2023 are analysed as robustness checks.
 
 ## Literature Review {#litrev}
 
-Recent syntheses (e.g. [@pizzato2024]) show wide cross-country gaps in European excess-mortality and point to socio-economic gradients, health-system capacity and vaccination uptake as major drivers. This thesis adds an early-mobility angle that those studies treat only tangentially.
+Recent syntheses—most recently @pizzato2024 map the socio-economic and vaccination gradients in Europe’s excess mortality, but they give scant attention to **importation pathways**. This thesis adds that early-mobility lens.
 
 ### Excess mortality as benchmark
 
-[TODO: Brief paragraph: why excess deaths capture the full health burden better than case or COVID-death counts; citation to WMD, HMD-STMF.]
+Official Covid-19 death tallies are notoriously sensitive to testing capacity and certification rules.  
+Analyzing 35 countries, **@kelly2021** contrasted reported Covid-19 deaths with excess-death estimates built on a *fixed 2020 population denominator* and found that the **residual-mortality rate** (excess minus reported Covid deaths) ranged from ≈ –175 to +115 per 100 000. The authors conclude that “published Covid-19 death data are **not directly comparable** across countries,” reinforcing the use of excess mortality—scaled to a single mid-year population—as the more robust yard-stick.
 
 ### Mobility-driven seeding
 
-[TODO: One paragraph: network epidemiology concept of “effective distance” [cite Brockmann & Helbing 2013]; empirical links between flight volume and first-wave seeding (e.g. [@chinazzi2020] global; [@sun2022_a] intra-EU).]
+
+#### Role of long-haul aviation in January–February 2020 seeding
+
+Using a global metapopulation model seeded with IATA/OAG passenger flows, **@chinazzi2020** estimated that the Wuhan travel ban of **23 Jan 2020** delayed epidemic growth inside China by only **3–5 days**, yet cut *international* exportations by **≈ 78 %** up to mid-February. Counter-factuals showed that even a **90 %** drop in air traffic would merely postpone, not prevent, global spread unless local transmission were halved. After the Wuhan shutdown, export risk shifted to other hubs—most notably **Shanghai, Beijing, Shenzhen, Guangzhou and Kunming**—implying that Europe’s early exposure was driven by multiple Chinese airports, not Wuhan alone [@chinazzi2020].
+
 
 ### Air-traffic studies during COVID-19
 
@@ -97,6 +105,22 @@ Recent syntheses (e.g. [@pizzato2024]) show wide cross-country gaps in European 
 [Comment:
 - TODO: Outline the key studies that have used air-traffic data to study COVID-19 transmission dynamics. DONT OVERDO IT. Understanding and interpretation counts. Not mindlessly listing studies.
 - Ton of the next ### are more.. Methodological than literature review.]
+
+### Macro drivers of excess mortality {#macrodrivers}
+
+Large comparative studies converge on three protective clusters: socio-economic advantage, resilient health systems, and fast-acting public-health measures.
+
+**@pizzato2024** show that poverty and income inequality raise, while GDP-per-capita, health spending and vaccine coverage lower, age-standardised excess mortality in 29 European countries.  
+
+Using latent-class mixed models for 21 high-income nations, **@rahmanian2024** find that *government effectiveness*, *early stringent NPIs*, and *higher full-vaccination coverage* jointly explain membership in the low-mortality cluster during 2020-21.  
+
+**@matveeva2023** zoom in on the Delta era and confirm that late vaccine roll-out plus limited ICU capacity amplified deaths.  
+
+All three studies, however, start the causal clock **after the virus had already seeded**.  
+The present thesis steps one link earlier: did countries with heavier direct China/Hong Kong air traffic face a larger import shock that partly set these later trajectories?
+
+These syntheses stop at **how countries coped once SARS-CoV-2 was inside their borders**.  
+The present thesis pushes the causal chain one step back: *did differing levels of initial import pressure via direct China/Hong Kong flights help set those later trajectories?*
 
 ### Why EUROCONTROL, not OpenSky
 
@@ -124,9 +148,10 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 ### Flight-exposure data
 
 Commercial passenger flights were extracted from EUROCONTROL's “Aviation Data Repository for Research”.  
-The public archive publishes **only four sample months per year (Mar; Jun; Sep; Dec)**, so **February 2020, the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
+The public archive publishes **only four sample months per year (Mar | Jun | Sep | Dec)**, so **February 2020—the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
 
-Filters: ICAO flight types *S* / *N*; ADEP ∈ {CN, HK}; ADES ∈ 26 continental member states.  
+Filters: ICAO flight types *S* / *N*; **$ADEP ∈ {CN, HK}$ (all mainland-Chinese and Hong Kong airports); $ADES ∈$ the 26 continental member states.**  
+*We therefore count flights from **every** CN/HK origin, mirroring the hub-substitution effect documented by @chinazzi2020*
 
 $$
 \begin{aligned}
@@ -171,15 +196,14 @@ As a simple confounder sanity-check we re-computed ρ for each year after contro
 
 ### Population denominator: validation and choice
 
-Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). This fixed denominator approach is standard for COVID-19 excess-mortality studies [@karlinsky2021; @kelly2021], as European populations vary by less than ±1% year to year.
+Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). a fixed-denominator approach is standard in excess-mortality work [@karlinsky2021;
+@kelly2021], who both scale 2020 deaths by each country’s mid-2020 population.
 
 To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (–31%), Ukraine (–11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.
 
 - **OWID source:** [OWID GitHub](https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv)
 - **UN WPP:** [PPgp/wpp2024](https://github.com/PPgp/wpp2024)
 
-
-### Analysis workflow
 
 ### Analysis workflow
 
@@ -263,9 +287,6 @@ Figure @... plots ρ for all exposure metrics over 2020-2023; the association fa
 
 ## Robustness check & sensitivity analyses
 
-### Robustness heck
-
-
 ### Sensitivity Analyses
 
 [TODO: evaluating the robustness of the observed correlation patterns, additional sensitivity analyses]
@@ -324,7 +345,8 @@ Several country-level attributes likely modulated the time-varying ρ pattern:
 
 * **Vaccination rollout.** OWID data show that by **5 May 2022** countries in the highest-exposure quartile had a median **≈ 78 %** of their populations fully vaccinated, compared with **≈ 62 %** in the lowest-exposure quartile—a **16-percentage-point lead** that likely suppressed late-wave mortality in the highly connected group and contributed to the sign-flip after 2021.
 
-* **Public-health response.** Stringency-timing work (e.g. [@rahmanian2024]) finds that early, coordinated NPIs shaved first-wave deaths. Several low-flight Nordic states locked down rapidly and later reopened cautiously, narrowing the mortality gap despite low exposure.
+* **Policy timing & capacity.** @rahmanian2024. show that countries combining high government-effectiveness scores with early, stringent containment policies clustered in the lowest excess-mortality group during 2020-21. This exact pattern helps explain why low-exposure Nordic states curtailed deaths despite open economies, whereas some higher-exposure but lower-capacity peers fared worse.
+
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
@@ -345,7 +367,7 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 * **Indirect routings.** Itineraries via third-country hubs (e.g. PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.  
 
-* **Excess-mortality uncertainty.** OWID’s WMD + HMD-STMF blend carries wide CIs; registration lags and modelling choices vary by country [@karlinsky2021; @msemburi2023]. We mitigate timing noise by selecting the nearest value within ± 7 days of 5 May each year (see: 01_excess_snapshots).  
+* **Excess-mortality uncertainty.** OWID’s WMD + HMD-STMF blend carries wide CIs; registration lags and baseline-fit choices vary by country [@karlinsky2021; @msemburi2023]. We mitigate timing noise by taking the nearest value within ±7 days of 5 May each year (see *01_excess_snapshots*). Yet, even with a common mid-2020 denominator, cross-country mis-classification persists: **@kelly2021** show no socio-economic pattern in residual-mortality rates, underscoring how heterogeneous death-certification practices still cloud international comparisons.
 
 * **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained. (see: 04_population_qc)
 
