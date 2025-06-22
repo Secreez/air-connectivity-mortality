@@ -171,21 +171,15 @@ F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 \end{aligned}
 $$
 
-Geocoidng OurAirports → ISO-2; EUROCONTROL map → ISO-3.
+Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
 Flight exposure is intentionally fixed at these two pre-epidemic months to preserve temporal precedence.^[A time-varying flight metric (e.g. 2021 volumes) was not analysed because this study targets early seeding, not ongoing mobility. Future work could extend the panel with later exposure measures.]
 
-### Excess mortality snapshots
+### Excess-mortality snapshots {#excess-snaps}
 
-*Source* OWID (WMD + HMD–STMF). 
-
-*Reference date* closest non-NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
-
-Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF data sources) does not consistently provide daily observations for all countries. To maintain consistency across EUROCONTROL member countries, a pragmatic ±7-day window around each 5 May reference date was chosen to select the closest available observation. Countries lacking observations within this window—particularly Ukraine after 2021—were excluded from the corresponding yearly correlation analyses.
-
-For every country and year we kept **only the OWID row whose date lay closest to 5 May (tolerance ± 7 days)**.  This pre-selection means that each country
-contributes exactly one observation per year, so no further timing‐shift robustness test is necessary.
-
+* **Source.** **OWID**, which pipes the country-day series straight from the **World Mortality Dataset** (WMD) introduced by @karlinsky2021 and retains its published standard-error bands.
+* **Reference date.** For each year we take the observation **nearest to 5 May, within ± 7 days**; Ukraine is excluded after 2021 owing to war-related breaks.
+* **Why the ± 7-day rule?** WMD releases deaths in weekly blocks for ≈ 80 % of countries (fortnightly for most others). Following @karlinsky2021 guidance to respect that cadence, we select the closest block to 5 May—adding at most a ± ½-week timing blur, trivial alongside the WMD’s own **3 – 12 %** standard errors for high-income Europe.
 
 ### Analytical variables
 
@@ -380,8 +374,12 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 * **Two-month window.** EUROCONTROL publishes only Mar | Jun | Sep | Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
 
-* **Indirect routings.** Itineraries via third-country hubs (e.g., PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.  
-* **Excess-mortality uncertainty.** OWID’s WMD + HMD-STMF blend carries wide CIs; registration lags and baseline-fit choices vary by country [@karlinsky2021; @msemburi2023]. We mitigate timing noise by taking the nearest value within ± 7 days of 5 May each year (see *01_excess_snapshots*). Yet, even with a common mid-2020 denominator, cross-country mis-classification persists: Kelly et al. find no socio-economic signal in residual-mortality rates, underscoring how heterogeneous death-certification practices still cloud international comparisons [@kelly2021].
+* **Indirect routings.** Itineraries via third-country hubs (e.g., PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.
+
+* **Excess-mortality uncertainty.** WMD delivers deaths in weekly blocks (≈ 80 % of our sample) and fortnightly blocks for the rest. Choosing the observation nearest to 5 May within a ± 7-day window therefore adds at most a ± ½-week timing blur—trivial beside the WMD’s own 3 – 12 % standard errors for high-income Europe [@karlinsky2021]. Even so, registration lags, baseline-fit choices and death-certification rules still differ across countries, leaving some residual cross-country noise [@msemburi2023; @kelly2021].
+
+
+
 
 * **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained (see *04_population_qc*).
 
