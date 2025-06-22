@@ -45,7 +45,10 @@ format:
 
 When SARS-CoV-2 emerged in late 2019, the global airline network compressed inter-city travel times to hours, not weeks. Modelling studies show that long-haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections [@chinazzi2020; @sun2022_a].
 
-Yet European countries later displayed wide gaps in excess mortality. Analysts have linked those gaps to demography, health-system capacity, and policy timing [@rahmanian2024; @matveeva2023]. How much of the early mortality spread can be traced to initial exposure via direct flights from China and its two SARs? The question remains largely descriptive—and unanswered.
+Yet European countries later displayed wide gaps in excess mortality. 
+Multi-country panels link those gaps to demography, health-system capacity, and **the timing/strictness of early NPIs** [@rahmanian2024]. 
+
+
 
 ### Research Question
 
@@ -71,36 +74,65 @@ Snapshots for 2021-2023 are analysed as robustness checks.
 
 ## Literature Review {#litrev}
 
-Recent syntheses (e.g. [@pizzato2024]) show wide cross-country gaps in European excess-mortality and point to socio-economic gradients, health-system capacity and vaccination uptake as major drivers. This thesis adds an early-mobility angle that those studies treat only tangentially.
+Recent syntheses—most recently @pizzato2024 map the socio-economic and vaccination gradients in Europe’s excess mortality, but they give scant attention to **importation pathways**. This thesis adds that early-mobility lens.
 
 ### Excess mortality as benchmark
 
-[TODO: Brief paragraph: why excess deaths capture the full health burden better than case or COVID-death counts; citation to WMD, HMD-STMF.]
+Official Covid-19 death tallies are notoriously sensitive to testing capacity and certification rules.  
+Analyzing 35 countries, **@kelly2021** contrasted reported Covid-19 deaths with excess-death estimates built on a *fixed 2020 population denominator* and found that the **residual-mortality rate** (excess minus reported Covid deaths) ranged from ≈ –175 to +115 per 100 000. The authors conclude that “published Covid-19 death data are **not directly comparable** across countries,” reinforcing the use of excess mortality—scaled to a single mid-year population—as the more robust yard-stick.
 
 ### Mobility-driven seeding
 
-[TODO: One paragraph: network epidemiology concept of “effective distance” [cite Brockmann & Helbing 2013]; empirical links between flight volume and first-wave seeding (e.g. [@chinazzi2020] global; [@sun2022_a] intra-EU).]
+Modern hub-and-spoke aviation collapses geographical space into an **“effective distance”** that pathogens traverse far faster than in the pre-jet age.  Brockmann & Helbing’s network metric formalises this idea, while modelling work confirms its pandemic relevance:  
+* a global metapopulation simulation showed Wuhan’s January 2020 travel ban delayed, but did **not** prevent, intercontinental exportations [@chinazzi2020];  
+* a systematic review of ~200 COVID-aviation studies concludes that dense pre-2020 flight networks enabled **rapid intra-EU seeding** before capacity fell 60-75 % in March–April 2020 [@sun2022_a].
+
+This thesis picks up that thread by asking whether the **level** of direct China/Hong Kong traffic each country received just before the shutdown helped shape its first-wave death toll.
+
+
+#### Role of long-haul aviation in January–February 2020 seeding
+
+Using a global metapopulation model seeded with IATA/OAG passenger flows, **@chinazzi2020** estimated that the Wuhan travel ban of **23 Jan 2020** delayed epidemic growth inside China by only **3–5 days**, yet cut *international* exportations by **≈ 78 %** up to mid-February. Counter-factuals showed that even a **90 %** drop in air traffic would merely postpone, not prevent, global spread unless local transmission were halved. After the Wuhan shutdown, export risk shifted to other hubs—most notably **Shanghai, Beijing, Shenzhen, Guangzhou and Kunming**—implying that Europe’s early exposure was driven by multiple Chinese airports, not Wuhan alone [@chinazzi2020].
+
 
 ### Air-traffic studies during COVID-19
 
-| Study                     | Data            | Scope  | Key insight                             |
-| ------------------------- | --------------- | ------ | --------------------------------------- |
-| Chinazzi et al. 2020      | ...             | ...    | ...                                     |
-| Sun et al. 2022           | ...             | ...    | ...                                     |
-| Strohmeier et al. 2021    | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
+| Study                  | Data                                             | Scope                           | Key insight                                    |
+| ---------------------- | ------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
+| **Chinazzi 2020**      | IATA/OAG pax matrix + GLEaM metapopulation model | Global                          | Wuhan travel ban cut *international* export risk ≈ 78 % through mid-Feb; multiple mainland hubs mattered.  |
+| **Sun 2022a**          | Narrative review of ≈200 papers                  | Global/EU                       | Frames aviation as *effective-distance* driver; travel bans alone blunt without layered NPIs.            |
+| **Sun 2022b**          | Sabre load-factor panel 2017-21                  | 24 EU airlines                  | 30-50 % “ghost-flight” share in Mar–Apr 2020; slot-waiver slashed the phenomenon.                           |
+| **Strohmeier 2021**    | OpenSky ADS-B (\~46 % of 2019 flights)           | Global coverage audit           | Crowd-sourced ADS-B has deep Asia blanks ⇒ not fit for early-2020 China-EU work.                            |
+| **Warnock-Smith 2021** | OAG seats + Sabre MIDT revenue 2017-20           | China ↔ EU/Asia, China domestic | Domestic LCCs rebounded first; secondary China-EU links collapsed to < 2 % of 2017 revenue.                 |
 
+*Table 1. Landmark air-traffic studies that inform this thesis*
 
+Together, these studies establish that long-haul links seeded the virus early, while later traffic collapses and “ghost flights” distort raw flight counts—exactly the measurement caveat flagged in this thesis.
 
-[Comment:
-- TODO: Outline the key studies that have used air-traffic data to study COVID-19 transmission dynamics. DONT OVERDO IT. Understanding and interpretation counts. Not mindlessly listing studies.
-- Ton of the next ### are more.. Methodological than literature review.]
+### Macro drivers of excess mortality {#macrodrivers}
+
+Large comparative studies converge on three protective clusters: socio-economic advantage, resilient health systems, and fast-acting public-health measures.
+
+**@pizzato2024** show that poverty and income inequality raise, while GDP-per-capita, health spending and vaccine coverage lower, age-standardised excess mortality in 29 European countries.  
+
+Using latent-class mixed models for 21 high-income nations, **@rahmanian2024** find that *government effectiveness*, *early stringent NPIs*, and *higher full-vaccination coverage* jointly explain membership in the low-mortality cluster during 2020-21.  
+
+**@matveeva2023** zoom in on the Delta era and confirm that late vaccine roll-out plus limited ICU capacity amplified deaths.  
+
+All three studies, however, start the causal clock **after the virus had already seeded**.  
+The present thesis steps one link earlier: did countries with heavier direct China/Hong Kong air traffic face a larger import shock that partly set these later trajectories?
+
+These syntheses stop at **how countries coped once SARS-CoV-2 was inside their borders**.  
+The present thesis pushes the causal chain one step back: *did differing levels of initial import pressure via direct China/Hong Kong flights help set those later trajectories?*
 
 ### Why EUROCONTROL, not OpenSky
 
-OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). EUROCONTROL, by contrast, records every IFR movement that crosses its network boundary. For this project the exposure metric is therefore realised flights (EUROCONTROL), not scheduled seats or partial ADS-B traces. OpenSky appears only to illustrate its coverage bias.
+OpenSky’s crowd-sourced ADS-B receivers leave blind spots across East Asia; many CN → EU flights in Dec-19 are simply absent (Appendix Fig X). EUROCONTROL, by contrast, records every IFR movement that crosses its network boundary.
+
+> OpenSky’s patchy East-Asia reception also **violates the “complete-network” prerequisite for effective-distance analyses** highlighted by @sun2022_a.
+
+> To keep the exposure metric defensible for a "Brockmann-style" distance framework, we therefore rely on EUROCONTROL rather than OpenSky.
+
 
 [TODO: Create Opensky map again...]
 
@@ -124,9 +156,12 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 ### Flight-exposure data
 
 Commercial passenger flights were extracted from EUROCONTROL's “Aviation Data Repository for Research”.  
-The public archive publishes **only four sample months per year (Mar; Jun; Sep; Dec)**, so **February 2020, the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
+The public archive publishes **only four sample months per year (Mar | Jun | Sep | Dec)**, so **February 2020—the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
 
-Filters: ICAO flight types *S* / *N*; ADEP ∈ {CN, HK}; ADES ∈ 26 continental member states.  
+Filters: ICAO flight types *S* / *N*; **$ADEP ∈ {CN, HK}$ (all mainland-Chinese and Hong Kong airports); $ADES ∈$ the 26 continental member states.** *We therefore count flights from **every** CN/HK origin, mirroring the hub-substitution effect documented by @chinazzi2020*
+
+> **Load-factor caveat.**  During March–April 2020 as many as **30–50 %** of EU departures were near-empty *“ghost” flights* flown mainly to keep airport slots [@sun2022_b]. Because EUROCONTROL records the movement but not the cabin load, our $F_{\text{DEC}}$ and $F_{\text{MAR}}$ metrics count a 3 %-full ghost leg exactly the same as a sold-out A350—so exposure is overstated wherever slot-retention flights dominated.
+
 
 $$
 \begin{aligned}
@@ -135,21 +170,16 @@ F_{\text{MAR}} &=\; \text{Flights in Mar 2020}\\
 F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 \end{aligned}
 $$
+
 Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
 Flight exposure is intentionally fixed at these two pre-epidemic months to preserve temporal precedence.^[A time-varying flight metric (e.g. 2021 volumes) was not analysed because this study targets early seeding, not ongoing mobility. Future work could extend the panel with later exposure measures.]
 
-### Excess mortality snapshots
+### Excess-mortality snapshots {#excess-snaps}
 
-*Source* OWID (WMD + HMD–STMF). 
-
-*Reference date* closest non-NA within **± 7 days of 5 May**; Ukraine excluded after 2021 (data break due to war).
-
-Rationale: The OWID excess-mortality dataset (a combination of WMD and HMD-STMF data sources) does not consistently provide daily observations for all countries. To maintain consistency across EUROCONTROL member countries, a pragmatic ±7-day window around each 5 May reference date was chosen to select the closest available observation. Countries lacking observations within this window—particularly Ukraine after 2021—were excluded from the corresponding yearly correlation analyses.
-
-For every country and year we kept **only the OWID row whose date lay closest to 5 May (tolerance ± 7 days)**.  This pre-selection means that each country
-contributes exactly one observation per year, so no further timing‐shift robustness test is necessary.
-
+* **Source.** **OWID**, which pipes the country-day series straight from the **World Mortality Dataset** (WMD) introduced by @karlinsky2021 and retains its published standard-error bands.
+* **Reference date.** For each year we take the observation **nearest to 5 May, within ± 7 days**; Ukraine is excluded after 2021 owing to war-related breaks.
+* **Why the ± 7-day rule?** WMD releases deaths in weekly blocks for ≈ 80 % of countries (fortnightly for most others). Following @karlinsky2021 guidance to respect that cadence, we select the closest block to 5 May—adding at most a ± ½-week timing blur, trivial alongside the WMD’s own **3 – 12 %** standard errors for high-income Europe.
 
 ### Analytical variables
 
@@ -171,15 +201,14 @@ As a simple confounder sanity-check we re-computed ρ for each year after contro
 
 ### Population denominator: validation and choice
 
-Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). This fixed denominator approach is standard for COVID-19 excess-mortality studies [@karlinsky2021; @kelly2021], as European populations vary by less than ±1% year to year.
+Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). a fixed-denominator approach is standard in excess-mortality work [@karlinsky2021;
+@kelly2021], who both scale 2020 deaths by each country’s mid-2020 population.
 
 To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (–31%), Ukraine (–11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.
 
 - **OWID source:** [OWID GitHub](https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv)
 - **UN WPP:** [PPgp/wpp2024](https://github.com/PPgp/wpp2024)
 
-
-### Analysis workflow
 
 ### Analysis workflow
 
@@ -207,7 +236,7 @@ To confirm that dataset differences do not bias results, OWID’s 2020 snapshot 
 5. **Reproducibility**  
    Analyses in **R 4.4.0**; code and data pipeline in `notebooks/` (Git-tracked).
 
-# Results
+## Results
 
 Countries in the **top quartile** of December + March flight exposure recorded **≈ 55 % higher excess mortality** than the bottom quartile (Spearman ρ ≈ 0.53, 95 % CI 0.18 – 0.80, *p* < 0.01). As shown in Table @tbl-spearman, the baseline ρ for 2020 is 0.53 with the same confidence interval.
 
@@ -255,16 +284,20 @@ Table 4.2 and optional heat-map fig. 4.3
 Table @... shows that the baseline **ρ between "combined" Dec & Mar 2019/20 flights and excess mortality on 5 May 2020 is 0.53 (95 % CI 0.18 – 0.80; p < 0.01)**.  
 *Restricting the sample to the 25 countries that report a complete four-year excess-mortality series leaves the estimate virtually unchanged (ρ = 0.53, 95 % CI 0.18 – 0.77), confirming that missing-data exclusions do not drive the result.*
 
+Indeed, Industry data confirm the collapse of most secondary China–Europe links. Revenue on *PEK–MUC* fell to ≈ 2 % of its 2017 level by March 2020, whereas trunk sectors such as *HKG–LHR* still carried ~13 000 passengers six months later—albeit at Y-class fares 37 % higher than pre-crisis [@warnocksmith2021].
+
+
 Figure @... plots ρ for all exposure metrics over 2020-2023; the association fades in 2021 and turns negative thereafter.
 
 ### Snapshot scatter (May 2020)
 
 
+[TODO: Scater plot here!]
+
+
+Illustrates heavy right-tail: secondary links (e.g. PEK–MUC) vanished
 
 ## Robustness check & sensitivity analyses
-
-### Robustness heck
-
 
 ### Sensitivity Analyses
 
@@ -324,14 +357,10 @@ Several country-level attributes likely modulated the time-varying ρ pattern:
 
 * **Vaccination rollout.** OWID data show that by **5 May 2022** countries in the highest-exposure quartile had a median **≈ 78 %** of their populations fully vaccinated, compared with **≈ 62 %** in the lowest-exposure quartile—a **16-percentage-point lead** that likely suppressed late-wave mortality in the highly connected group and contributed to the sign-flip after 2021.
 
-* **Public-health response.** Stringency-timing work (e.g. [@rahmanian2024]) finds that early, coordinated NPIs shaved first-wave deaths. Several low-flight Nordic states locked down rapidly and later reopened cautiously, narrowing the mortality gap despite low exposure.
+* **Policy timing & capacity.** Countries that paired **high government effectiveness** with **early, stringent domestic NPIs** clustered in the lowest excess-mortality group during 2020-21 [@rahmanian2024].  Consistent with those findings, @sun2022_a show that stand-alone travel bans are blunt unless layered with vaccination and local measures and their Europe-focused load-factor study demonstrates that a timely slot-waiver quickly eliminated “ghost flights” [@sun2022_b].  Taken together with our results, these lines of evidence suggest that international flight exposure mattered only for the first wave; thereafter, domestic defences dominated.
+
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
-
-
-
-
-
 
 ### Limitations  
 
@@ -339,15 +368,20 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 #### Data limitations  
 
-* **Flight-exposure proxy.** We count IFR flight plans of type “S”/“N” (scheduled or non-scheduled commercial). Passenger loads are unknown, so “ghost” flights and cargo-only services inflate exposure. At cargo hubs such as Liège or Frankfurt, flight counts remained high despite few travellers, potentially overstating human seeding pressure.  
+* **Ghost / abnormal flights (load-factor bias).** “Slot-retention” flights peaked in Europe right after the first lockdown: Sun et al. detect **> 40 % low-load outliers** in April 2020 among major LCCs, clustered on dense Level-3 airport pairs such as AMS–BCN and ATH–MAD [@sun2022_b]. Because our exposure metric counts flight plans, not passengers, it over-weights these nearly empty sectors—and likewise any long-haul ghost service such as the high-fare, low-load **HKG–LHR** link documented by @warnocksmith2021.
 
-* **Two-month window.** EUROCONTROL publishes only Mar/Jun/Sep/Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
+* **Flight-exposure proxy.** We tally IFR plans of type “S”/“N” (scheduled or non-scheduled commercial). Passenger loads are unknown, so ghost flights and cargo-only services inflate exposure. At cargo hubs such as Liège or Frankfurt, flight counts remained high despite few travellers, potentially overstating human seeding pressure.
 
-* **Indirect routings.** Itineraries via third-country hubs (e.g. PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.  
+* **Two-month window.** EUROCONTROL publishes only Mar | Jun | Sep | Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
 
-* **Excess-mortality uncertainty.** OWID’s WMD + HMD-STMF blend carries wide CIs; registration lags and modelling choices vary by country [@karlinsky2021; @msemburi2023]. We mitigate timing noise by selecting the nearest value within ± 7 days of 5 May each year (see: 01_excess_snapshots).  
+* **Indirect routings.** Itineraries via third-country hubs (e.g., PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.
 
-* **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained. (see: 04_population_qc)
+* **Excess-mortality uncertainty.** WMD delivers deaths in weekly blocks (≈ 80 % of our sample) and fortnightly blocks for the rest. Choosing the observation nearest to 5 May within a ± 7-day window therefore adds at most a ± ½-week timing blur—trivial beside the WMD’s own 3 – 12 % standard errors for high-income Europe [@karlinsky2021]. Even so, registration lags, baseline-fit choices and death-certification rules still differ across countries, leaving some residual cross-country noise [@msemburi2023; @kelly2021].
+
+
+
+
+* **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained (see *04_population_qc*).
 
 #### Methodological limitations  
 
@@ -366,7 +400,17 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 ### Methodological Reflections
 
-Early versions of this research design included dynamic modeling approaches such as a network-based SIR simulation [@brockmann2013] or SEIR extensions [@abou2020; @rozan2024]. However, incomplete flight records for January–February 2020, combined with uneven global data coverage and the practical time constraints of a Bachelor's thesis (~300 hours), rendered such approaches infeasible. A simplified, descriptive correlation analysis was chosen to maintain feasibility and transparency while stillallowing meaningful insights into early pandemic exposure patterns.
+The earliest project sketch—floated by Neuwirth on the Z_GIS thesis blog in Nov 2024 [@neuwirth2024]—envisioned a global SIR network on “effective-distance” air routes [@brockmann2013]. A quick reality-check of open ADS-B coverage (see Appendix A) showed that February-2020 China-Europe traffic is too thin for such simulation, so the design pivoted to a descriptive, Europe-only correlation.
+
+I prototyped that approach, together with SEIR-style extensions summarised for clinicians by [@abou2020] (and, more recently, the multi-stage SEnIR work of [@rozan2024]). In practice, two constraints proved decisive:
+
+1. **Data gaps & granularity** – OpenSky ADS-B traces miss large parts of mainland-Chinese airspace in Jan–Feb 2020, and the publicly released EUROCONTROL archive offers only four snapshot months (Mar/Jun/Sep/Dec) each year—fine for a one-off exposure index, but too sparse for a day-by-day SIR/SEIR simulation.
+
+2. **Scope** – Calibrating a global SIR/SEIR within the 300-hour cap of a bachelor’s thesis was unrealistic.
+
+Accordingly, I pivoted to a lean, descriptive design: rank-correlating fixed pre-epidemic flight exposure with subsequent excess mortality. While less mechanistic, the approach is fully reproducible with public data and still illuminates the early-seeding question.
+
+
 
 ## Conclusion
 
@@ -388,4 +432,10 @@ Although this thesis does not make causal claims, its findings demonstrate the v
 
 ## Appendix (code, etc.)
 
-*Additional data tables, methods, or extended results.*
+### Appendix A -  Data-source triage and why a global SIR was dropped
+
+A.1 OpenSky coverage map + counts
+
+A.2 Cost table for FlightRadar24
+
+A.3 Rationale for Eurocontrol + OpenSky hybrid
