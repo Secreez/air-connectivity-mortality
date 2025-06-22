@@ -91,20 +91,19 @@ Using a global metapopulation model seeded with IATA/OAG passenger flows, **@chi
 
 ### Air-traffic studies during COVID-19
 
-| Study                     | Data            | Scope  | Key insight                             |
-| ------------------------- | --------------- | ------ | --------------------------------------- |
-| Chinazzi et al. 2020      | ...             | ...    | ...                                     |
-| Sun et al. 2022           | ...             | ...    | ...                                     |
-| Strohmeier et al. 2021    | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
-| ...                       | ...             | ...    | ...                                     |
+The most relevant empirical and review work on aviation during COVID-19 is summarised in Table 1
 
+| Study                  | Data                                             | Scope                           | Key insight                                    |
+| ---------------------- | ------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
+| **Chinazzi 2020**      | IATA/OAG pax matrix + GLEaM metapopulation model | Global                          | Wuhan travel ban cut *international* export risk ≈ 78 % through mid-Feb; multiple mainland hubs mattered.  |
+| **Sun 2022a**          | Narrative review of ≈200 papers                  | Global/EU                       | Frames aviation as *effective-distance* driver; travel bans alone blunt without layered NPIs.            |
+| **Sun 2022b**          | Sabre load-factor panel 2017-21                  | 24 EU airlines                  | 30-50 % “ghost-flight” share in Mar–Apr 2020; slot-waiver slashed the phenomenon.                           |
+| **Strohmeier 2021**    | OpenSky ADS-B (\~46 % of 2019 flights)           | Global coverage audit           | Crowd-sourced ADS-B has deep Asia blanks ⇒ not fit for early-2020 China-EU work.                            |
+| **Warnock-Smith 2021** | OAG seats + Sabre MIDT revenue 2017-20           | China ↔ EU/Asia, China domestic | Domestic LCCs rebounded first; secondary China-EU links collapsed to < 2 % of 2017 revenue.                 |
 
+*Table 1. Landmark air-traffic studies that inform this thesis*
 
-[Comment:
-- TODO: Outline the key studies that have used air-traffic data to study COVID-19 transmission dynamics. DONT OVERDO IT. Understanding and interpretation counts. Not mindlessly listing studies.
-- Ton of the next ### are more.. Methodological than literature review.]
+Together, these studies establish that long-haul links seeded the virus early, while later traffic collapses and “ghost flights” distort raw flight counts—exactly the measurement caveat flagged in this thesis.
 
 ### Macro drivers of excess mortality {#macrodrivers}
 
@@ -150,8 +149,10 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 Commercial passenger flights were extracted from EUROCONTROL's “Aviation Data Repository for Research”.  
 The public archive publishes **only four sample months per year (Mar | Jun | Sep | Dec)**, so **February 2020—the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
 
-Filters: ICAO flight types *S* / *N*; **$ADEP ∈ {CN, HK}$ (all mainland-Chinese and Hong Kong airports); $ADES ∈$ the 26 continental member states.**  
-*We therefore count flights from **every** CN/HK origin, mirroring the hub-substitution effect documented by @chinazzi2020*
+Filters: ICAO flight types *S* / *N*; **$ADEP ∈ {CN, HK}$ (all mainland-Chinese and Hong Kong airports); $ADES ∈$ the 26 continental member states.** *We therefore count flights from **every** CN/HK origin, mirroring the hub-substitution effect documented by @chinazzi2020*
+
+> **Load-factor caveat.**  During March–April 2020 as many as **30–50 %** of EU departures were near-empty *“ghost” flights* flown mainly to keep airport slots [@sun2022_b]. Because EUROCONTROL records the movement but not the cabin load, our $F_{\text{DEC}}$ and $F_{\text{MAR}}$ metrics count a 3 %-full ghost leg exactly the same as a sold-out A350—so exposure is overstated wherever slot-retention flights dominated.
+
 
 $$
 \begin{aligned}
@@ -160,7 +161,8 @@ F_{\text{MAR}} &=\; \text{Flights in Mar 2020}\\
 F_{\text{SUM}} &=\; F_{\text{DEC}} + F_{\text{MAR}}
 \end{aligned}
 $$
-Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
+
+Geocoidng OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
 Flight exposure is intentionally fixed at these two pre-epidemic months to preserve temporal precedence.^[A time-varying flight metric (e.g. 2021 volumes) was not analysed because this study targets early seeding, not ongoing mobility. Future work could extend the panel with later exposure measures.]
 
@@ -345,8 +347,7 @@ Several country-level attributes likely modulated the time-varying ρ pattern:
 
 * **Vaccination rollout.** OWID data show that by **5 May 2022** countries in the highest-exposure quartile had a median **≈ 78 %** of their populations fully vaccinated, compared with **≈ 62 %** in the lowest-exposure quartile—a **16-percentage-point lead** that likely suppressed late-wave mortality in the highly connected group and contributed to the sign-flip after 2021.
 
-* **Policy timing & capacity.** @rahmanian2024. show that countries combining high government-effectiveness scores with early, stringent containment policies clustered in the lowest excess-mortality group during 2020-21. This exact pattern helps explain why low-exposure Nordic states curtailed deaths despite open economies, whereas some higher-exposure but lower-capacity peers fared worse.
-
+* **Policy timing & capacity.** Countries that paired **high government effectiveness** with **early, stringent domestic NPIs** clustered in the lowest excess-mortality group during 2020-21 [@rahmanian2024]. Consistent with **@sun2022_a** finding that stand-alone travel bans are blunt unless layered with vaccination and local measures, **and with @sun2022_b empirical result that slot-waiver timing quickly eliminated ghost flights**, our own pattern shows flight exposure mattered  only for the first wave; thereafter domestic defences dominated.
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
@@ -361,7 +362,7 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 #### Data limitations  
 
-* **Flight-exposure proxy.** We count IFR flight plans of type “S”/“N” (scheduled or non-scheduled commercial). Passenger loads are unknown, so “ghost” flights and cargo-only services inflate exposure. At cargo hubs such as Liège or Frankfurt, flight counts remained high despite few travellers, potentially overstating human seeding pressure.  
+* **Ghost / abnormal flights (load-factor bias).**  “Slot-retention” flights peaked in Europe right after the first lockdown: Sun et al. detect **> 40 %  outliers** in April 2020 among major LCCs, clustered on dense Level-3 airport pairs such as AMS–BCN and ATH–MAD [@sun2022_b].  Because our exposure metric counts flight plans, not passengers, it over-weights these nearly empty sectors—and likewise any long-haul ghost service such as the high-fare, low-load **HKG–LHR** link documented by @warnocksmith2021.
 
 * **Two-month window.** EUROCONTROL publishes only Mar/Jun/Sep/Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
 
