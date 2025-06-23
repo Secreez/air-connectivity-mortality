@@ -155,12 +155,13 @@ Exposure = direct CN/HK/MO → EUROCONTROL flights in Dec 2019 and Mar 2020.
 
 ### Flight-exposure data
 
-Commercial passenger flights were extracted from EUROCONTROL's “Aviation Data Repository for Research”.  
-The public archive publishes **only four sample months per year (Mar | Jun | Sep | Dec)**, so **February 2020—the crucial month between Wuhan lockdown and Europe's first local clusters—is unfortunately absent**. 
+Commercial passenger flights were extracted from EUROCONTROL’s *Aviation Data Repository for Research* (ADRR) [@eurocontrol2025].
+The public ADRR dump publishes only four “snapshot” months per year (Mar | Jun | Sep | Dec), so the critical February-2020 seeding window is absent.
 
 Filters: ICAO flight types *S* / *N*; **$ADEP ∈ {CN, HK}$ (all mainland-Chinese and Hong Kong airports); $ADES ∈$ the 26 continental member states.** *We therefore count flights from **every** CN/HK origin, mirroring the hub-substitution effect documented by @chinazzi2020*
 
-> **Load-factor caveat.**  During March–April 2020 as many as **30–50 %** of EU departures were near-empty *“ghost” flights* flown mainly to keep airport slots [@sun2022_b]. Because EUROCONTROL records the movement but not the cabin load, our $F_{\text{DEC}}$ and $F_{\text{MAR}}$ metrics count a 3 %-full ghost leg exactly the same as a sold-out A350—so exposure is overstated wherever slot-retention flights dominated.
+> **Load-factor caveat.**  During March–April 2020 about **30–50 %** of EU departures were near-empty *“ghost” flights* flown mainly to keep airport slots [@sun2022_b].  
+EUROCONTROL records the movement but not the load, so our $F_{\text{DEC}}$ and $F_{\text{MAR}}$ metrics treat a 3 %-full ghost leg the same as a sold-out A350. For instance, at Frankfurt passenger throughput collapsed by **-73.4 %** (18.8 m pax) while cargo tonnage slipped only **-8.3 %**; freighters plus ≈ 8 600 “preighter” rotations performed **~81 %** of cargo movements [@fraport2021, pp. 11 & 17].
 
 
 $$
@@ -178,8 +179,11 @@ Flight exposure is intentionally fixed at these two pre-epidemic months to prese
 ### Excess-mortality snapshots {#excess-snaps}
 
 * **Source.** **OWID**, which pipes the country-day series straight from the **World Mortality Dataset** (WMD) introduced by @karlinsky2021 and retains its published standard-error bands.
+
 * **Reference date.** For each year we take the observation **nearest to 5 May, within ± 7 days**; Ukraine is excluded after 2021 owing to war-related breaks.
-* **Why the ± 7-day rule?** WMD releases deaths in weekly blocks for ≈ 80 % of countries (fortnightly for most others). Following @karlinsky2021 guidance to respect that cadence, we select the closest block to 5 May—adding at most a ± ½-week timing blur, trivial alongside the WMD’s own **3 – 12 %** standard errors for high-income Europe.
+
+* **Why the ± 7-day rule?** WMD reports deaths in weekly blocks for ≈ 80 % of countries (fortnightly for most others). Selecting the closest block to 5 May therefore adds at most a ± ½-week blur—trivial beside the **3–12 %** standard errors that @karlinsky2021 document for high-income Europe **and still smaller than the credible-interval width in the WHO model published by @msemburi2023** [@karlinsky2021; @msemburi2023].
+
 
 ### Analytical variables
 
@@ -370,16 +374,16 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 * **Ghost / abnormal flights (load-factor bias).** “Slot-retention” flights peaked in Europe right after the first lockdown: Sun et al. detect **> 40 % low-load outliers** in April 2020 among major LCCs, clustered on dense Level-3 airport pairs such as AMS–BCN and ATH–MAD [@sun2022_b]. Because our exposure metric counts flight plans, not passengers, it over-weights these nearly empty sectors—and likewise any long-haul ghost service such as the high-fare, low-load **HKG–LHR** link documented by @warnocksmith2021.
 
+* **Freight-heavy hubs accentuate the bias.** Frankfurt’s 2020 passenger throughput crashed to **18.8 m** (–73 %), yet cargo slipped only –8 %; conversely the pure-cargo hub Liège handled **1.11 Mt** of freight (**+23 % YoY**), ranking sixth in Europe [@fraport2021, p. 40]. Our flight counts therefore over-state human exposure wherever cargo or slot-retention flights dominate.
+
 * **Flight-exposure proxy.** We tally IFR plans of type “S”/“N” (scheduled or non-scheduled commercial). Passenger loads are unknown, so ghost flights and cargo-only services inflate exposure. At cargo hubs such as Liège or Frankfurt, flight counts remained high despite few travellers, potentially overstating human seeding pressure.
 
 * **Two-month window.** EUROCONTROL publishes only Mar | Jun | Sep | Dec snapshots; February 2020—the critical month between Wuhan lockdown and Europe’s first importations—is missing.  
 
 * **Indirect routings.** Itineraries via third-country hubs (e.g., PVG → DXB → VIE) are not captured, so exposure is under-estimated for transfer states and over-estimated for direct-flight hubs.
 
-* **Excess-mortality uncertainty.** WMD delivers deaths in weekly blocks (≈ 80 % of our sample) and fortnightly blocks for the rest. Choosing the observation nearest to 5 May within a ± 7-day window therefore adds at most a ± ½-week timing blur—trivial beside the WMD’s own 3 – 12 % standard errors for high-income Europe [@karlinsky2021]. Even so, registration lags, baseline-fit choices and death-certification rules still differ across countries, leaving some residual cross-country noise [@msemburi2023; @kelly2021].
-
-
-
+**Excess-mortality uncertainty.**  WMD provides weekly (≈ 80 % of our sample) or fortnightly blocks; our ± 7-day window adds at most a ± ½-week blur. @karlinsky2021 put the resulting sampling error at **3–12 %** for high-income Europe, while the WHO model published by @msemburi2023. shows even broader credible intervals and warns that *“basing rankings on point estimates will often be misleading”* (p. 134) [@karlinsky2021; @msemburi2023]. In addition, registration lags, baseline-fit choices and war-time disruption (e.g. Ukraine ≥ 2022) leave some residual cross-country
+noise [@kelly2021].
 
 * **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained (see *04_population_qc*).
 
@@ -387,7 +391,8 @@ This study is deliberately exploratory and country-level; several caveats constr
 
 * **Ecological design & small N.** Results rest on ≈ 25 national aggregates; sub-national heterogeneity is hidden, and bootstrap CIs remain wide.  
 * **No causal inference.** Temporal ordering reduces, but does not abolish, confounding: wealth, healthcare capacity, NPIs, and vaccination likely shaped mortality patterns [@ioannidis2023].  
-* **Residual confounding.** Only one sanity-check control (age ≥ 65 y) was tested; GDP pc, vaccination coverage, or stringency indices could be explored in future work.
+* **Residual confounding.**  Excess-mortality gaps track GDP, poverty and other structural factors that we do **not** control for [@ioannidis2023]. **Msemburi et al. underline this point, noting that **>50 %** of global excessdeaths occurred in *lower-middle-income economies* and cautioning that “basing rankings on point estimates will often be misleading”** [@msemburi2023, pp. 132 & 134].
+
 
 > **Bottom line.** Early direct flights plausibly seeded Europe’s first wave, but measurement error, ecological fallacy, and unmeasured confounders preclude strong causal claims about long-run border control effectiveness.
 
@@ -428,7 +433,7 @@ Although this thesis does not make causal claims, its findings demonstrate the v
 
 ## Acknowledgments
 
-*This thesis includes results derived from the ATM Datasets made available by EUROCONTROL (©2025). EUROCONTROL does not necessarily endorse or support the conclusions drawn herein and shall not be liable for any direct or indirect damages arising out of or in connection with this work.*
+*This thesis uses the Aviation Data Repository for Research (ADRR) made available by EUROCONTROL © 2025. EUROCONTROL does not necessarily endorse the conclusions and shall not be liable for any direct, indirect, incidental or consequential damages arising out of or in connection with this work.*
 
 ## Appendix (code, etc.)
 
