@@ -210,9 +210,11 @@ Population denominators use the 2020 mid-year estimates from Our World in Data (
 
 To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (–31%), Ukraine (–11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.
 
-- **OWID source:** [OWID GitHub](https://github.com/owid/covid-19-data/blob/master/scripts/input/un/population_latest.csv)
-- **UN WPP:** [PPgp/wpp2024](https://github.com/PPgp/wpp2024)
+Population denominators use the mid-2020 estimates curated by **Our World in Data** (OWID) [@owid_pop2024]. OWID re-publishes the UN *World Population Prospects 2024* (WPP 2024) in a tidy CSV but does not alter the underlying values.  
 
+As a robustness check, all correlations were re-run with the original UN series accessed through the **wpp2024** R package [@wpp2024_pkg].   Across the 41 EUROCONTROL countries the two sources differed by < 5 % for 38 of them (median 2 %); Spearman ρ shifted by < 0.01 in every case. The OWID snapshot was therefore kept for consistency with the excess-mortality rates.
+
+[see: 04_population_qc.qmd]
 
 ### Analysis workflow
 
@@ -239,6 +241,23 @@ To confirm that dataset differences do not bias results, OWID’s 2020 snapshot 
 
 5. **Reproducibility**  
    Analyses in **R 4.4.0**; code and data pipeline in `notebooks/` (Git-tracked).
+
+## Digital Methods & Reproducibility {#digmethods}
+
+Digital workflows, open science, and a critical look at data infrastructures are baked
+into this project in five concrete ways:
+
+- **Why sensors matter (2-line preface).** Crowd-sourced ADS-B feeds such as **OpenSky** are a powerful “digital telescope” on aviation—but they miss wide swathes of East Asia and carry no payload information. Regulator-grade **EUROCONTROL IFR plans** give full spatial coverage, yet still hide load factors. This trade-off frames the entire methods discussion that follows.
+
+2. **Single-command rebuild.** `build.sh` orchestrates the full pipeline—from raw CSVs to the final HTML via Quarto + R. No hidden steps; re-running the script recreates very figure and table.
+
+...
+
+
+[Something like that.. need to work on a little excerpt for: req Excerpt: ("- Themen bzw. grobe Themengebiete für die Bachelorarbeit werden idealerweise von Studierenden vorgeschlagen. Ggf. können bei Bedarf aber auch Themen durch die/den BetreuerIn ausgegeben werden.
+- Die Arbeit muss sich an der Kernthematik des DiG-Studiums orientieren, also im
+Großbereich Digitalisierung angesiedelt sein mit einer klaren Fokussierung auf digitale Technologien und Entwicklungen.
+- Inhaltlich ist wichtig, dass die Thesis die Entwicklungen und Ziele der Arbeit in den aktuellen Stand der Forschung und der Technik einordnet.)" - Bachelorarbeit 512.121]
 
 ## Results
 
@@ -357,12 +376,11 @@ A one-shot confounder check (@confounder_test) showed that controlling for the s
 
 Several country-level attributes likely modulated the time-varying ρ pattern:
 
-* **Wealth and health-system capacity.** Cross-country studies show that higher GDP per capita and stronger hospital capacity were associated with *lower* late-pandemic mortality [@ioannidis2023]. Because the most flight-connected countries are also among the wealthiest, these advantages plausibly explain part of the negative ρ observed after 2021.
-
+* **Wealth & vulnerability effects.**  In Ioannidis et al.’s 34-country panel the *percentage* excess-death burden (P-score) correlated **inversely** with GDP-per-capita (Spearman ρ ≈ –0.60) and **positively** with both the share of population in poverty and the Gini index of income inequality [@ioannidis2023].  Because the most flight-connected countries in our sample are also among the wealthiest, **this socioeconomic buffer plausibly helps explain why our flight–mortality correlation flips negative after 2021.**
+   
 * **Vaccination rollout.** OWID data show that by **5 May 2022** countries in the highest-exposure quartile had a median **≈ 78 %** of their populations fully vaccinated, compared with **≈ 62 %** in the lowest-exposure quartile—a **16-percentage-point lead** that likely suppressed late-wave mortality in the highly connected group and contributed to the sign-flip after 2021.
 
 * **Policy timing & capacity.** Countries that paired **high government effectiveness** with **early, stringent domestic NPIs** clustered in the lowest excess-mortality group during 2020-21 [@rahmanian2024].  Consistent with those findings, @sun2022_a show that stand-alone travel bans are blunt unless layered with vaccination and local measures and their Europe-focused load-factor study demonstrates that a timely slot-waiver quickly eliminated “ghost flights” [@sun2022_b].  Taken together with our results, these lines of evidence suggest that international flight exposure mattered only for the first wave; thereafter, domestic defences dominated.
-
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
@@ -390,9 +408,8 @@ noise [@kelly2021].
 #### Methodological limitations  
 
 * **Ecological design & small N.** Results rest on ≈ 25 national aggregates; sub-national heterogeneity is hidden, and bootstrap CIs remain wide.  
-* **No causal inference.** Temporal ordering reduces, but does not abolish, confounding: wealth, healthcare capacity, NPIs, and vaccination likely shaped mortality patterns [@ioannidis2023].  
-* **Residual confounding.**  Excess-mortality gaps track GDP, poverty and other structural factors that we do **not** control for [@ioannidis2023]. **Msemburi et al. underline this point, noting that **>50 %** of global excessdeaths occurred in *lower-middle-income economies* and cautioning that “basing rankings on point estimates will often be misleading”** [@msemburi2023, pp. 132 & 134].
-
+* **No causal ranking.**  Ioannidis et al. stress that “*country vulnerability dominated the cumulative impact*” and warn that **ranking national responses on raw excess-death point estimates is misleading**.  Accordingly, our study remains exploratory: confounding from wealth, NPIs, vaccination and health-system resources cannot be ruled out [@ioannidis2023].
+* **Residual confounding.**  Excess-mortality gaps closely track GDP and poverty—variables we do **not** adjust for—so part of our observed relationship may reflect socioeconomic risk rather than direct effects of early air connectivity [@ioannidis2023; @msemburi2023].
 
 > **Bottom line.** Early direct flights plausibly seeded Europe’s first wave, but measurement error, ecological fallacy, and unmeasured confounders preclude strong causal claims about long-run border control effectiveness.
 
