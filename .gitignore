@@ -18,6 +18,7 @@ docs/**/_freeze/
 data/raw/
 # 2) Processed derivatives (can be rebuilt)
 data/processed/
+data/derived/
 # 3) Legacy proposal data (archived, unused)
 archive/proposal/data/
 /.quarto/

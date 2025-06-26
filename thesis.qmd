@@ -27,8 +27,6 @@ format:
     toc-depth: 3
 ---
 
-## TOC
-
 ## Glossary
 | Acronym / symbol    | Meaning               | First appearance |
 |---------------------|-----------------------|------------------|
@@ -251,8 +249,13 @@ into this project in five concrete ways:
 
 2. **Single-command rebuild.** `build.sh` orchestrates the full pipeline—from raw CSVs to the final HTML via Quarto + R. No hidden steps; re-running the script recreates very figure and table.
 
-...
+3. **Frozen R environment.** The analysis will ship with a final **`renv.lock`**; reviewers reproduce the *exact* package set with `renv::restore()`. If the lockfile is absent, `R/00_load_libs.R` falls back to an on-the-fly bootstrap. [TODO! and planned]
 
+4. **Path-safe, self-checking code.** Every notebook calls `here::here()` for file paths, so the project works from any working directory.  During startup `build.sh` verifies for the large EUROCONTROL CSV drops before any R code runs.
+
+5. **Transparent, licence-respecting version control.** All code and Quarto sources live in a private Git repo (released under MIT after grading).  Licensed data stay *outside* Git; users must obtain them via EUROCONTROL’s R&D portal.
+
+*Appendix A expands the “sensor-bias audit,” contrasting OpenSky and EUROCONTROL in detail and illustrating how the design of digital data streams shapes research outcomes.
 
 [Something like that.. need to work on a little excerpt for: req Excerpt: ("- Themen bzw. grobe Themengebiete für die Bachelorarbeit werden idealerweise von Studierenden vorgeschlagen. Ggf. können bei Bedarf aber auch Themen durch die/den BetreuerIn ausgegeben werden.
 - Die Arbeit muss sich an der Kernthematik des DiG-Studiums orientieren, also im
