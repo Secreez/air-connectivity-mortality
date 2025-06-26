@@ -13,8 +13,14 @@ execute:
 
 ```{r setup, include=FALSE}
 source(here::here("R", "00_load_libs.R"))
+
+# Figures
 fig_dir <- here::here("data", "figures")
-dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Manuscript objects
+der_dir <- here::here("data", "derived")
+dir.create(der_dir, recursive = TRUE, showWarnings = FALSE)
 
 flights_country <- read_rds(here("data", "processed", "flights_country.rds"))
 flight_exposure <- read_rds(here("data", "processed", "flight_exposure_mapped.rds"))
@@ -300,6 +306,10 @@ knitr::kable(
   caption = "Direct scheduled passenger flights from China and Hong Kong to EUROCONTROL countries by destination, Dec 2019 vs. Mar 2020, for states with at least five December flights. Table shows absolute and percentage changes; note that residual flight volumes varied widely despite near-universal contraction.",
   align = c("l", "r", "r", "r", "r")
 )
+```
+
+```{r}
+saveRDS(collapse_tbl, here::here("data/derived/collapse_tbl.rds"))
 ```
 
 * **Every country contracted sharply.** All 19 EUROCONTROL states with ≥ 5 December flights cut inbound CN/HK service by ≥ 50 % by March 2020; 15 of them slashed **> 90 %**.

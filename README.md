@@ -24,6 +24,7 @@ bachelor-thesis/
 ├─ data/
 │  ├─ raw/                      # original CSV (NOT in Git: \~2 GB EUROCONTROL flights)
 │  ├─ processed/                # tidy RDS/CSV created by the pipeline
+│  ├─ derived/                  # final data for the manuscript
 │  └─ figures/                  # PNGs for the manuscript
 ├─ notebooks/                   # analysis notebooks + tiny R scripts
 │  ├─ 01\_excess\_snapshots.R

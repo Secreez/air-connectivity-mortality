@@ -142,7 +142,7 @@ spearman_res <- purrr::map_dfr(
 ```
 
 
-```{r spearmantable}
+```{r tbl-spearman}
 knitr::kable(
   spearman_res |>
     dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
@@ -475,14 +475,17 @@ Can be used for Thesis.qmd
 
 ## Data limitations
 
-**Flight-exposure proxy (EUROCONTROL, IFR plans).** Our exposure estimates count ICAO flight types S (scheduled) and N (non-scheduled commercial) as reported in EUROCONTROL's IFR data.
+**Flight-exposure proxy (EUROCONTROL, IFR plans).**  
+Our metrics count every filed ICAO type *S* / *N* plan equally.  They cannot
+distinguish well-loaded passenger legs from cargo-only or slot-retention
+“ghost” flights, which inflates **human** exposure at freight-oriented
+airports.
 
-- Actual passenger numbers per flight are unknown; all filed flights—including "ghost" (very low-occupancy) and cargo-only flights—are counted equally.
-- Itineraries with connecting segments via third-country hubs (e.g., DXB, DOH) are not fully captured, so exposure is under-estimated for transfer states and may be over-estimated for major cargo airports such as Liège.
-- In 2020, Liège Airport handled over 1.1 million metric tons of airfreight (ranking 6th in Europe), with cargo volumes rising 23.5% year-on-year despite the pandemic—contrasting with heavy declines in passenger traffic at most airports [@fraport2021]. This highlights the distinct behavior of cargo airports, where flight counts and exposure indices remained elevated due to surging demand for freight and widespread use of "preighter" operations (passenger planes repurposed for cargo).
-- Only four "representative" months (Mar, Jun, Sep, Dec) are available per year from EUROCONTROL's data releases [@eurocontrolData2025], potentially missing key seeding windows (February 2020).
+- At classic hubs passenger traffic collapsed in 2020 (Frankfurt **–73.4 %** pax, 18.8 m) while cargo slipped only **–8.3 %**, thanks to ≈ **8 600 “preighter” rotations**; pure freighters performed about **81 %** of all cargo movements.  
+- Liège, a dedicated cargo airport, **grew to 1.12 Mt (+24 %)** and ranked **#6** in Europe.  
+- Our flight counts therefore over-state person-to-person seeding pressure wherever cargo or ghost operations dominate [@fraport2021].
 
-This limitation is directly reflected in our results: for example, Belgium"s exposure index does not drop in line with other countries during the pandemic period (**see Figure @pct_change_filtered**), consistent with Liège"s unique role as a freight hub.
+A second, structural caveat is that EUROCONTROL releases only four “snapshot” months (Mar | Jun | Sep | Dec) per year; February 2020—the critical month between Wuhan’s lockdown and Europe’s first local clusters—is missing.
 
 
 **Ghost/Abnormal flights (load-factor bias).** The phenomenon of “ghost flights” — nearly empty aircraft operated mainly to preserve slots — is well documented in Europe [@sun2022_b]. @sun2022_b show that such flights peaked in March–April 2020, especially among low-cost carriers and on dense intra-European routes.
