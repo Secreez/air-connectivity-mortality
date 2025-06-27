@@ -27,6 +27,17 @@ format:
     toc-depth: 3
 ---
 
+```{r load_derived, include=FALSE}
+# needed
+collapse_tbl <- readRDS("data/derived/collapse_tbl.rds")
+top_tbl <- readRDS("data/derived/top_tbl.rds")
+spearman_res <- readRDS("data/derived/spearman_res.rds")
+
+# optional
+partial_by_year <- readRDS("data/derived/partial_by_year.rds")
+rho_restricted  <- readRDS("data/derived/rho_restricted_2020.rds")
+```
+
 ## Glossary
 | Acronym / symbol    | Meaning               | First appearance |
 |---------------------|-----------------------|------------------|
