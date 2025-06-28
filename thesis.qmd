@@ -39,25 +39,47 @@ rho_restricted  <- readRDS("data/derived/rho_restricted_2020.rds")
 ```
 
 ## Glossary
-| Acronym / symbol    | Meaning               | First appearance |
-|---------------------|-----------------------|------------------|
-| **ASK**             | Available‐Seat-Kilometre (supply metric) | ... |
-| **IFR**             | Instrument Flight Rules (EUROCONTROL flight plan) | ... |
-| **LCC**             | Low-Cost Carrier | ... |
-| **ρ**               | Spearman rank-correlation coefficient | ... |
-| **"Five–One" rule** | CAAC 26 Mar 2020: max 1 route / airline / week between China and any foreign country | ... |
+| Acronym / symbol       | Definition                                                                     |
+|------------------------|--------------------------------------------------------------------------------|
+| **ADEP / ADES**        | ICAO airport code for **A**ircraft **DEP**arture / **DES**tination             |
+| **ADRR**               | *Aviation Data Repository for Research* (EUROCONTROL snapshot files)           |
+| **ADS-B**              | *Automatic Dependent Surveillance–Broadcast* (crowd-sourced flight tracking)   |
+| **ASK**                | *Available-Seat-Kilometre* (air-capacity metric)                               |
+| **CAAC**               | Civil Aviation Administration of China                                         |
+| **CN/HK/MO**           | Mainland China, Hong Kong, Macao (study windows include no Macao flights)      |
+| **Effective distance** | Network metric that turns flight connections into a “distance” scale           |
+| **EUROCONTROL**        | European Organisation for the Safety of Air Navigation                         |
+| **FPM**                | Flights per million population (exposure normalised by country size)           |
+| **GLEaM**              | *Global Epidemic and Mobility* metapopulation model                            |
+| **IFR (flight)**       | *Instrument Flight Rules* filed flight plans tracked by EUROCONTROL            |
+| **IATA / ICAO**        | Airline (IATA) and airport/aircraft (ICAO) code standards                      |
+| **LCC**                | Low-Cost Carrier                                                               |
+| **NPI**                | Non-Pharmaceutical Intervention (lockdown, mask mandate, etc.)                 |
+| **OWID**               | *Our World in Data* open COVID and population dataset                          |
+| **P-score**            | Percent excess mortality = ($Excess / Expected − 1) × 100$                     |
+| **ρ (rho)**            | Spearman rank-correlation coefficient                                          |
+| **Slot waiver**        | EU March 2020 rule suspending “use-it-or-lose-it” airport-slot requirement     |
+| **WMD**                | *World Mortality Dataset* (source of excess-death figures)                     |
+| **WPP**                | UN *World Population Prospects* (population denominator)                       |
 
 
-## Introduction
 
-### Context & motivation
+# Introduction
 
-When SARS-CoV-2 emerged in late 2019, the global airline network compressed inter-city travel times to hours, not weeks. Modelling studies show that long-haul flights shorten the “effective distance” between outbreak foci and distant populations, speeding the first wave of infections [@chinazzi2020; @sun2022_a].
+## Context & motivation
 
-Yet European countries later displayed wide gaps in excess mortality. 
-Multi-country panels link those gaps to demography, health-system capacity, and **the timing/strictness of early NPIs** [@rahmanian2024]. 
+On **31 December 2019** the Wuhan Municipal Health Commission reported a cluster of “viral pneumonia of unknown aetiology”; WHO issued its first
+Disease-Outbreak News five days later [@who2022timeline].
 
+Europe detected its first laboratory-confirmed SARS-CoV-2 infections on 24 January 2020, when three travel-associated cases were reported in France [@spiteri2020]. By 21 February only 47 cases had been notified across nine European countries—most of them imported—but two incipient chains of local transmission were already recognised, one in Bavaria (Germany) and another in Haute-Savoie (France) [@spiteri2020]. Late that same evening Italy announced the region’s first COVID-19-related death and confirmed a rapidly growing cluster of autochthonous cases in Codogno and neighbouring towns in Lombardy [@ecdcitaly2020].
 
+The six-week hop from Wuhan to Northern Italy illustrates how long-haul aviation can relocate a pathogen within a single incubation cycle.
+A global metapopulation model by **@chinazzi2020** estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet still cut *international* exportations by roughly **78 %** through mid-February [@chinazzi2020].  A narrative review of ≈ 200 studies
+concludes that dense pre-2020 flight networks “shrank” Europe, enabling rapid cross-border seeding before March–April capacity collapses [@sun2022_a].
+
+Excess-mortality outcomes, however, diverged sharply thereafter. Latent-class analyses for high-income countries show that *domestic* factors—government effectiveness, early and stringent NPIs, vaccine roll-out and baseline life expectancy-best explain the longer-run gaps [@rahmanian2024].  
+
+What remains unknown is how much of the first-wave mortality spread can be attributed to a country’s direct-flight exposure to mainland China and its two Special Administrative Regions (Hong Kong and Macao) before lockdowns. This thesis addresses that descriptive gap.
 
 ### Research Question
 
