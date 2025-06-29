@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+shopt -s failglob
 
 RAW=data/raw
 FLIGHTS="$RAW/flight_data"

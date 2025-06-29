@@ -344,6 +344,11 @@ knitr::kable(
 )
 ```
 
+
+```{r save-top, echo=FALSE}
+saveRDS(top_tbl, here::here("data/derived/top_tbl.rds"))
+```
+
 * **Largest drops**: Hub–and-spoke carriers in Italy, Türkiye, Finland and Denmark virtually shut direct CN/HK traffic (–86 % to –96 %).
 * **Largest "increases"** are statistical artefacts. Latvia (+400 %) and Lithuania (+200 %) rose from *one* charter to 4–5 rotations—epidemiologically negligible.
 * **Hubs absorb the floor effect.** The UK, Germany and the Netherlands appear under "increases" because they still ran hundreds of flights; their percentage fall was "only" –50 % to –66 %, but the absolute cut was 180 – 450 flights.

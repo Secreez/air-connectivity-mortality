@@ -151,6 +151,12 @@ knitr::kable(
 )
 ```
 
+```{r save-spearman_res, echo=FALSE}
+# Spearman-Ergebnistabelle sichern
+saveRDS(spearman_res,
+        here::here("data/derived/spearman_res.rds"))
+```
+
 **Key patterns:**
 
 * Early air connectivity explained a substantial share of cross-country variation in first-wave excess mortality (ρ ≈ 0.53, 95% CI [0.18, 0.80], p < 0.01).
@@ -461,6 +467,11 @@ knitr::kable(
 
 ```
 
+```{r save-partial_by_year, echo=FALSE}
+saveRDS(partial_by_year,
+        here::here("data/derived/partial_by_year.rds"))
+```
+
 Controlling for the share of population ≥ 65 alters Spearman ρ by < 0.02 in any year (Table X), confirming that age structure is not driving the observed pattern.
 
 ...
@@ -604,4 +615,9 @@ snap %>%
   group_by(q) %>% 
   summarise(median_vacc = median(vacc, na.rm = TRUE))
 
+```
+
+```{r save-result_tbl, echo=FALSE}
+saveRDS(result_tbl,
+        here::here("data/derived/rho_restricted_2020.rds"))
 ```
