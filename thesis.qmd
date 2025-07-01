@@ -61,7 +61,7 @@ rho_restricted  <- readRDS("data/derived/rho_restricted_2020.rds")
 | **Slot waiver**        | EU March 2020 rule suspending “use-it-or-lose-it” airport-slot requirement                                                     |
 | **WMD**                | *World Mortality Dataset* (source of excess-death figures)                                                                     |
 | **WPP**                | UN *World Population Prospects* (population denominator)                                                                       |
-
+| **n.s.**               | Not significant                                                                              |
 
 
 # Introduction
@@ -151,12 +151,25 @@ The present thesis pushes the causal chain one step back: *did differing levels 
 ## Data-source considerations: EUROCONTROL vs. OpenSky
 
 [TODO HERE !! 30.06! - CREATE PLOT FOR APPENDIX! AND EXPAND!]
+[!! Compare March together and February for Opensky only to showcase that even Opensky data couldn't have saved the gap.]
 
-Crowd-sourced ADS-B datasets like OpenSky suffer from significant blind spots across East Asia, leaving crucial gaps in early-2020 flights between mainland China or Hong Kong and Europe [@strohmeier2021; @iacus2020]. Initial data exploration revealed that OpenSky captured X direct China–Europe flights in February 2020—a substantial undercount relative to expected volumes, confirming severe coverage limitations.
+Crowd-sourced ADS-B datasets like OpenSky suffer from significant blind spots across East Asia, leaving crucial gaps in early-2020 flights between mainland China or Hong Kong and Europe [@strohmeier2021; @iacus2020]. Initial data exploration revealed that OpenSky captured X China–Europe flights in February 2020 (data shown in Table/Plot X). However, our study relies on EUROCONTROL ADRR, which only provides full IFR flight records for December 2019 and March 2020. As a result, no direct comparison is possible for February.
 
 In contrast, EUROCONTROL’s Aviation Data Repository for Research (ADRR) compiles comprehensive records from flight plans and radar tracking of all IFR flights crossing European airspace boundaries. While EUROCONTROL provides snapshots for only four months per year (including December 2019 and March 2020), these snapshots include all commercial IFR flights, significantly improving reliability and coverage compared to OpenSky.
 
 Given these considerations—and to ensure a robust, defensible measure of direct flight exposure—this thesis relies exclusively on EUROCONTROL data, supplemented by transparent discussion of limitations such as unknown passenger loads and potential ghost flights.
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Data & Methods {#methods}
 
