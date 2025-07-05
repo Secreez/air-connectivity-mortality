@@ -1,135 +1,145 @@
 #!/usr/bin/env Rscript
-# OpenSky 2019-20  >  CN/HK/MO ➜ Eurocontrol-state flight counts
-# read every flightlist_YYYYMMDD_YYYYMMDD.csv.gz
-# count direct flights CN/HK/MO ➜ EU-41  (one row per country-month)
-# save long + wide tables
-# quick March-2020 comparison with EUROCONTROL
-source(here::here("R", "00_load_libs.R"))
+# CN / HK / MO  ➜  Eurocontrol states – OpenSky vs. EUROCONTROL
+# expects 3 plain CSVs  (Dec-19, Feb-20, Mar-20)    in  data/raw/Opensky/
+# needs flights_country.rds (EUROCONTROL pipeline) in data/processed/
+# outputs   data/processed/opensky/{cn2eu_long,cn2eu_wide}.{csv,rds}
+# writes 3 figures into  data/figures/
 
+source(here::here("R", "00_load_libs.R"))
 
 options(
   readr.num_threads      = max(1, parallel::detectCores() - 1),
   dplyr.summarise.inform = FALSE
 )
 
-
-## static lookups
-euro_map <- read_csv(here("data/eurocontrol_iso_map.csv"),
+## look up
+euro_map <- readr::read_csv(here::here("data/eurocontrol_iso_map.csv"),
   show_col_types = FALSE
 )
 euro_iso2 <- euro_map$iso2
 
-airports <- read_csv(
-  here("data/raw/OurAirports/airports.csv"),
+airports <- readr::read_csv(
+  here::here("data/raw/OurAirports/airports.csv"),
   col_select     = c(icao_code, iso_country),
   show_col_types = FALSE
-) |>
-  drop_na(icao_code)
+) |> tidyr::drop_na(icao_code)
 
 china_icao <- airports |>
-  filter(iso_country %in% c("CN", "HK", "MO")) |>
-  pull(icao_code)
+  dplyr::filter(iso_country %in% c("CN", "HK", "MO")) |>
+  dplyr::pull(icao_code)
 
 eu_icao <- airports |>
-  filter(iso_country %in% euro_iso2) |>
-  pull(icao_code)
+  dplyr::filter(iso_country %in% euro_iso2) |>
+  dplyr::pull(icao_code)
 
-## counting function
+all_iso3 <- euro_map |> dplyr::distinct(iso3)
+
+## helper func
 count_cn_eu <- function(csv_path) {
   message("→  ", basename(csv_path))
 
-  read_csv(
+  readr::read_csv(
     csv_path,
     col_select = c(origin, destination, day),
-    col_types = cols(
-      origin      = col_character(),
-      destination = col_character(),
-      day         = col_datetime(format = "%Y-%m-%d %H:%M:%S%z")
+    col_types = readr::cols(
+      origin      = readr::col_character(),
+      destination = readr::col_character(),
+      day         = readr::col_datetime("%Y-%m-%d %H:%M:%S%z")
     ),
     na = c("", "NA"),
     progress = FALSE
   ) |>
-    mutate(day = as_date(day)) |>
-    filter(
+    dplyr::mutate(day = lubridate::as_date(day)) |>
+    dplyr::filter(
       origin %in% china_icao,
       destination %in% eu_icao
     ) |>
-    left_join(airports, by = c(destination = "icao_code")) |>
-    left_join(euro_map, by = c(iso_country = "iso2")) |>
-    {
-      \(d) { # anonymous wrapper
-        stopifnot(!any(is.na(d$iso3)))
-        d # return the data
-      }
-    }() |>
-    count(
-      year = year(day),
-      month = month(day),
+    dplyr::left_join(airports, by = c(destination = "icao_code")) |>
+    dplyr::left_join(euro_map, by = c(iso_country = "iso2")) |>
+    dplyr::count(
+      year = lubridate::year(day),
+      month = lubridate::month(day),
       iso3,
       name = "n_flights"
     )
 }
 
-## run all files in the OpenSky directory
-opensky_dir <- here("data/raw/Opensky")
+## regex csv:
+opensky_dir <- here::here("data/raw/Opensky")
 files <- list.files(
   opensky_dir,
-  pattern     = "^flightlist_\\d{8}_\\d{8}\\.csv\\.gz$",
-  full.names  = TRUE
+  pattern    = "^flightlist_\\d{8}_\\d{8}\\.csv$",
+  full.names = TRUE
 )
 
-opensky_long <- map_dfr(files, count_cn_eu)
+if (length(files) == 0) {
+  stop(
+    "No plain .csv files found in ", opensky_dir,
+    "\n id you unzip the datasets into that folder?"
+  )
+}
 
+opensky_long <- purrr::map_dfr(files, count_cn_eu)
+
+## pad and pivot table
 opensky_wide <- opensky_long |>
-  mutate(month_lbl = sprintf("%04d-%02d", year, month)) |>
+  dplyr::right_join(all_iso3, by = "iso3") |>
+  dplyr::mutate(month_lbl = sprintf("%04d-%02d", year, month)) |>
   dplyr::select(iso3, month_lbl, n_flights) |>
   tidyr::pivot_wider(
-    names_from = month_lbl,
+    names_from  = month_lbl, # 2019-12 / 2020-02 / 2020-03
     values_from = n_flights,
     values_fill = 0
   ) |>
   dplyr::arrange(iso3)
 
-## saving both long and wide tables
-out_dir <- here("data/processed/opensky")
+## save
+out_dir <- here::here("data/processed/opensky")
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-write_rds(opensky_long, file.path(out_dir, "cn2eu_long.rds"))
-write_csv(opensky_long, file.path(out_dir, "cn2eu_long.csv"))
-write_rds(opensky_wide, file.path(out_dir, "cn2eu_wide.rds"))
-write_csv(opensky_wide, file.path(out_dir, "cn2eu_wide.csv"))
+readr::write_rds(opensky_long, file.path(out_dir, "cn2eu_long.rds"))
+readr::write_csv(opensky_long, file.path(out_dir, "cn2eu_long.csv"))
+readr::write_rds(opensky_wide, file.path(out_dir, "cn2eu_wide.rds"))
+readr::write_csv(opensky_wide, file.path(out_dir, "cn2eu_wide.csv"))
 
 message("✓ Saved: ", nrow(opensky_long), " rows total")
 
-## quick match comparison with EUROCONTROL
+## compare with EUROCONTROL march 2020 data
 euro_march <- readr::read_rds(here::here("data/processed/flights_country.rds")) |>
   dplyr::select(
     iso2 = iso_country,
     euro_mar20 = total_inbound_flights_mar20
   ) |>
-  dplyr::left_join(
-    dplyr::select(euro_map, iso2, iso3),
-    by = "iso2"
-  )
+  dplyr::left_join(dplyr::select(euro_map, iso2, iso3), by = "iso2")
 
 opensky <- opensky_wide |>
   dplyr::rename(
-    opensky_mar20 = `2020-03`,
+    opensky_dec19 = `2019-12`,
     opensky_feb20 = `2020-02`,
-    opensky_dec19 = `2019-12`
+    opensky_mar20 = `2020-03`
   )
 
 march_tbl <- euro_march |>
-  dplyr::full_join(
-    dplyr::select(opensky, iso3, opensky_mar20),
-    by = "iso3"
-  ) |>
+  dplyr::full_join(dplyr::select(opensky, iso3, opensky_mar20), by = "iso3") |>
+  dplyr::mutate(dplyr::across(
+    c(euro_mar20, opensky_mar20),
+    ~ tidyr::replace_na(.x, 0L)
+  ))
+
+## who misses
+missing_tbl <- march_tbl |>
   dplyr::mutate(
-    dplyr::across(
-      c(euro_mar20, opensky_mar20),
-      ~ tidyr::replace_na(.x, 0L)
-    )
-  )
+    euro_any = euro_mar20 > 0,
+    os_any   = opensky_mar20 > 0
+  ) |>
+  dplyr::select(iso3, euro_any, os_any) |>
+  dplyr::filter(xor(euro_any, os_any))
+
+print(missing_tbl, n = nrow(missing_tbl))
+
+## plots
+fig_dir <- here::here("data/figures")
+dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
 ## scatter
 p_scatter <- ggplot2::ggplot(
@@ -148,29 +158,30 @@ p_scatter <- ggplot2::ggplot(
   ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = .03))
 
 ggplot2::ggsave(
-  here::here("data/figures/A_scatter_opensky_vs_euro_mar2020.png"),
-  p_scatter,
+  filename = file.path(fig_dir, "A_scatter_opensky_vs_euro_mar2020.png"),
+  plot = p_scatter,
   width = 6.5, height = 5, dpi = 300
 )
 
-## grouped bars
+## grouped bar
 march_long <- march_tbl |>
   tidyr::pivot_longer(
     c(euro_mar20, opensky_mar20),
     names_to  = "source",
     values_to = "n"
   ) |>
-  dplyr::mutate(source = dplyr::recode(
-    source,
-    euro_mar20    = "EUROCONTROL",
-    opensky_mar20 = "OpenSky"
-  ))
+  dplyr::mutate(
+    source = dplyr::recode(
+      source,
+      euro_mar20    = "EUROCONTROL",
+      opensky_mar20 = "OpenSky"
+    )
+  )
 
 p_bars <- ggplot2::ggplot(
   march_long,
   ggplot2::aes(
-    forcats::fct_reorder(iso3, n, .fun = sum),
-    n,
+    forcats::fct_reorder(iso3, n, .fun = sum), n,
     fill = source
   )
 ) +
@@ -183,14 +194,13 @@ p_bars <- ggplot2::ggplot(
   )
 
 ggplot2::ggsave(
-  here::here("data/figures/B_bar_opensky_vs_euro_mar2020.png"),
-  p_bars,
+  filename = file.path(fig_dir, "B_bar_opensky_vs_euro_mar2020.png"),
+  plot = p_bars,
   width = 7, height = 7, dpi = 300
 )
 
 ## February bar (OpenSky only)
 feb_tbl <- opensky |>
-  dplyr::select(iso3, opensky_feb20) |>
   dplyr::filter(opensky_feb20 > 0)
 
 p_feb <- ggplot2::ggplot(
@@ -208,34 +218,25 @@ p_feb <- ggplot2::ggplot(
   )
 
 ggplot2::ggsave(
-  here::here("data/figures/C_bar_opensky_feb2020.png"),
-  p_feb,
+  filename = file.path(fig_dir, "C_bar_opensky_feb2020.png"),
+  plot = p_feb,
   width = 6.5, height = 6, dpi = 300
 )
 
-## summary stats
-spearman_test <- stats::cor.test(
-  march_tbl$euro_mar20,
+
+## corr
+spearman_test <- stats::cor.test(march_tbl$euro_mar20,
   march_tbl$opensky_mar20,
   method = "spearman", exact = FALSE
 )
-
-pearson_test <- stats::cor.test(
-  march_tbl$euro_mar20,
+pearson_test <- stats::cor.test(march_tbl$euro_mar20,
   march_tbl$opensky_mar20,
   method = "pearson"
 )
 
 cat(
   "\nSpearman ρ :", round(spearman_test$estimate, 2),
-  "(p =", format.pval(spearman_test$p.value, digits = 3), ")"
-)
-
-cat(
+  "(p =", format.pval(spearman_test$p.value, digits = 3), ")",
   "\nPearson  r :", round(pearson_test$estimate, 2),
   "(p =", format.pval(pearson_test$p.value, digits = 3), ")\n"
 )
-
-# OpenSky’s March-2020 sample aligns closely with EUROCONTROL’s comprehensive IFR records (Pearson r = 0.92, p ≈ 5.8 × 10⁻¹¹).
-# Rank agreement is moderate-to-strong as well (Spearman ρ = 0.67, p ≈ 2 × 10⁻⁴),
-# indicating that the ADS-B feed reproduces the broad exposure hierarchy but still omits a non-trivial share of low-volume flights.
