@@ -148,24 +148,16 @@ All three studies, however, start their analysis after SARS-CoV-2 had already se
 These syntheses stop at **how countries coped once SARS-CoV-2 was inside their borders**.  
 The present thesis pushes the causal chain one step back: *did differing levels of initial import pressure via direct China/Hong Kong flights help set those later trajectories?*
 
-## Data-source considerations: EUROCONTROL vs. OpenSky
 
-[TODO HERE !! 30.06! - CREATE PLOT FOR APPENDIX! AND EXPAND!]
-[!! Compare March together and February for Opensky only to showcase that even Opensky data couldn't have saved the gap.]
+## Data-source considerations: EUROCONTROL vs OpenSky  {#datasource}
 
-Crowd-sourced ADS-B datasets like OpenSky suffer from significant blind spots across East Asia, leaving crucial gaps in early-2020 flights between mainland China or Hong Kong and Europe [@strohmeier2021; @iacus2020]. Initial data exploration revealed that OpenSky captured X China–Europe flights in February 2020 (data shown in Table/Plot X). However, our study relies on EUROCONTROL ADRR, which only provides full IFR flight records for December 2019 and March 2020. As a result, no direct comparison is possible for February.
+Crowd-sourced ADS-B feeds such as **OpenSky** are a tempting shortcut for quick global aviation analytics, yet their **sensor network was patchy over East Asia in early 2020**. Independent audits find that barely half of all China-origin flights were visible in the raw feed [@strohmeier2021; @iacus2020].
 
-In contrast, EUROCONTROL’s Aviation Data Repository for Research (ADRR) compiles comprehensive records from flight plans and radar tracking of all IFR flights crossing European airspace boundaries. While EUROCONTROL provides snapshots for only four months per year (including December 2019 and March 2020), these snapshots include all commercial IFR flights, significantly improving reliability and coverage compared to OpenSky.
+Our own cross-check (Table [@tbl-os-vs-eu]) confirms the blind-spot problem: **five EUROCONTROL member-states receive no China/HK arrivals in OpenSky at all**, and most low-volume countries show double-digit under-counts for December 2019.
 
-Given these considerations—and to ensure a robust, defensible measure of direct flight exposure—this thesis relies exclusively on EUROCONTROL data, supplemented by transparent discussion of limitations such as unknown passenger loads and potential ghost flights.
+EUROCONTROL’s *Aviation Data Repository for Research* (ADRR), by contrast, logs **every filed IFR movement that touches European airspace**, irrespective of ADS-B reception. Although ADRR is released for only four months each year, the public snapshots for **December 2019** and **March 2020** cover the two key pre-epidemic months required here.
 
-
-
-
-
-
-
-
+Consequently, **all exposure metrics in this thesis are based on EUROCONTROL**. OpenSky is kept **solely as a quality-control benchmark** to illustrate why ADS-B alone would have understated early China-Europe connectivity (see Appendix A).
 
 
 
@@ -210,6 +202,75 @@ $$
 Geocoding OurAirports → ISO-2; EUROCONTROL map → ISO-3.
 
 Flight exposure is intentionally fixed at these two pre-epidemic months to preserve temporal precedence.^[A time-varying flight metric (e.g. 2021 volumes) was not analysed because this study targets early seeding, not ongoing mobility. Future work could extend the panel with later exposure measures.]
+
+
+
+#### Coverage audit: EUROCONTROL vs OpenSky  {#coverage-audit}
+
+OpenSky’s crowd-sourced ADS-B feed is often used for rapid aviation analyses, but its sensor density over East Asia remained sparse in early 2020 [@strohmeier2021].
+
+Table @tbl-os-vs-eu lists, for each EUROCONTROL state, the direct CN/HK flights
+captured by both sources in Dec 2019, Feb 2020, and Mar 2020.
+
+```{r tbl-os-vs-eu, echo=FALSE}
+opensky   <- readr::read_rds("data/processed/opensky/cn2eu_wide.rds")
+euro_cntr <- readr::read_rds("data/processed/flights_country.rds") |>
+  dplyr::select(
+    iso2       = iso_country,
+    Dec19_eu   = total_inbound_flights_dec19,
+    Mar20_eu   = total_inbound_flights_mar20
+  )
+
+euro_map  <- readr::read_csv("data/eurocontrol_iso_map.csv",
+                             show_col_types = FALSE)
+
+euro_wide <- euro_cntr |>
+  dplyr::left_join(euro_map, by = "iso2") |>
+  dplyr::select(iso3, Dec19_eu, Mar20_eu)
+
+opensky   <- readr::read_rds("data/processed/opensky/cn2eu_wide.rds")
+euro_cntr <- readr::read_rds("data/processed/flights_country.rds") |>
+  dplyr::select(
+    iso2       = iso_country,
+    Dec19_eu   = total_inbound_flights_dec19,
+    Mar20_eu   = total_inbound_flights_mar20
+  )
+
+euro_map  <- readr::read_csv("data/eurocontrol_iso_map.csv",
+                             show_col_types = FALSE)
+
+euro_wide <- euro_cntr |>
+  dplyr::left_join(euro_map, by = "iso2") |>
+  dplyr::select(iso3, Dec19_eu, Mar20_eu)
+
+coverage_tbl <- opensky |>
+  dplyr::rename(
+    Dec19_os = `2019-12`,
+    Feb20_os = `2020-02`,
+    Mar20_os = `2020-03`
+  ) |>
+  dplyr::left_join(euro_wide, by = "iso3") |>
+  dplyr::mutate(
+    dplyr::across(where(is.numeric), \(x) tidyr::replace_na(x, 0L)),
+    OS_miss = Dec19_os == 0 & Feb20_os == 0 & Mar20_os == 0,  
+    EU_only = (Dec19_eu + Mar20_eu) > 0 & OS_miss  
+  ) |>
+  dplyr::arrange(dplyr::desc(Dec19_eu))
+
+coverage_tbl |>
+  dplyr::select(
+    iso3,
+    `Dec 2019 (EU)` = Dec19_eu,  `Dec 2019 (OS)` = Dec19_os,
+    `Feb 2020 (OS)` = Feb20_os,
+    `Mar 2020 (EU)` = Mar20_eu,  `Mar 2020 (OS)` = Mar20_os
+  ) |>
+  knitr::kable(
+    caption = "Direct CN/HK flights captured by EUROCONTROL (EU) and OpenSky (OS)."
+  )
+
+```
+
+OpenSky **omits GEO, HRV, PRT, SVK, and UKR entirely** and reports ≥ 1 flight fewer than EUROCONTROL for 14 of the remaining 21 states (median deficit ≈ 12 flights). In short, using raw ADS-B counts would have **systematically understated exposure for peripheral and low-traffic markets—**the very cases that matter for a rank-based analysis. For that reason the study proceeds with EUROCONTROL data and treats OpenSky only as a sanity check (see Appendix A).
 
 ### Excess-mortality snapshots {#excess-snaps}
 
@@ -492,12 +553,10 @@ Although this thesis does not make causal claims, its findings demonstrate the v
 
 *This thesis uses the Aviation Data Repository for Research (ADRR) made available by EUROCONTROL © 2025. EUROCONTROL does not necessarily endorse the conclusions and shall not be liable for any direct, indirect, incidental or consequential damages arising out of or in connection with this work.*
 
-## Appendix (code, etc.)
+## Appendix
 
 ### Appendix A -  Data-source triage and why a global SIR was dropped
 
-A.1 OpenSky coverage map + counts
+A.1 Grouped bars: December 2019 and February 2020 counts from Table [@tbl-os-vs-eu] visualised side-by-side.
 
-A.2 Cost table for FlightRadar24
-
-A.3 Rationale for Eurocontrol + OpenSky hybrid
+A.2 (MAP TODO! )

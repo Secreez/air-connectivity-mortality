@@ -29,11 +29,12 @@ bachelor-thesis/
 ├─ notebooks/                   # analysis notebooks + tiny R scripts
 │  ├─ 01\_excess\_snapshots.R
 │  ├─ 02\_flight\_filter.R
+│  ├─ 02b\_flight\_opensky.R
 │  ├─ 03\_merge\_exposure.R
 │  ├─ 04\_population\_qc.qmd
 │  ├─ 05\_descriptive\_plots.qmd
 │  └─ 06\_correlation.qmd
-├─ R/                           # helper functions & QA scripts
+├─ R/                           # package update scripts
 ├─ thesis.qmd                   # main manuscript (Quarto)
 ├─ thesis\_ref.bib              # references
 ├─ \_quarto.yml                 # project configuration (pre-render, render list, theme…)
