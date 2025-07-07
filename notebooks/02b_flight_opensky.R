@@ -136,26 +136,53 @@ knitr::kable(
   caption = "Direct CN/HK flights captured by EUROCONTROL (EU, Dec 2019) and OpenSky (OS, Dec 2019 & Feb 2020)."
 )
 
-## Feb 2020 bar plot
 fig_dir <- here::here("data/figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
-p_feb <- opensky_wide |>
-  dplyr::rename(Feb20 = `2020-02`) |>
-  dplyr::filter(Feb20 > 0) |>
-  dplyr::mutate(iso3 = forcats::fct_reorder(iso3, Feb20)) |>
-  ggplot2::ggplot(ggplot2::aes(iso3, Feb20)) +
-  ggplot2::geom_col(fill = "#009E73", width = .65) +
-  ggplot2::coord_flip() +
-  ggplot2::labs(
-    title = "Direct CN/HK → EU flights (OpenSky), February 2020",
-    x = NULL, y = "# flights"
-  ) +
-  ggplot2::theme_minimal(base_size = 10) +
-  ggplot2::theme(plot.title.position = "plot")
+top_opensky <- opensky_wide |>
+  dplyr::rename(
+    `Dec 2019` = `2019-12`,
+    `Feb 2020` = `2020-02`,
+    `Mar 2020` = `2020-03`
+  ) |>
+  dplyr::mutate(
+    total = `Dec 2019` + `Feb 2020` + `Mar 2020`
+  ) |>
+  dplyr::filter(total > 0) |>
+  dplyr::arrange(desc(total)) |>
+  dplyr::slice_head(n = 10) |>
+  tidyr::pivot_longer(
+    cols = c(`Dec 2019`, `Feb 2020`, `Mar 2020`),
+    names_to = "month", values_to = "flights"
+  ) |>
+  dplyr::mutate(
+    iso3 = forcats::fct_reorder(iso3, -flights, .fun = sum) # sort by total
+  )
 
-ggplot2::ggsave(
-  file.path(fig_dir, "bar_opensky_feb2020.png"),
-  p_feb,
-  width = 6.5, height = 6, dpi = 300, bg = "transparent"
+ggplot(top_opensky, aes(x = iso3, y = flights, fill = month)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.65) +
+  coord_flip() +
+  scale_fill_manual(
+    values = c(
+      "Dec 2019" = "#E69F00",
+      "Feb 2020" = "#56B4E9",
+      "Mar 2020" = "#009E73"
+    )
+  ) +
+  labs(
+    title = "Top-10 destinations in OpenSky data",
+    subtitle = "Direct flights from CN/HK to EUROCONTROL countries",
+    y = "# flights", x = NULL
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    axis.text.y = element_text(size = 9)
+  )
+
+ggsave(
+  file.path(fig_dir, "bar_opensky_top10_dec_feb_mar.png"),
+  width = 6.5, height = 5.5, dpi = 300, bg = "transparent"
 )

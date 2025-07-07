@@ -16,7 +16,6 @@ We join EUROCONTROL IFR data with OWID’s excess-mortality series and:
 
 Everything is reproducible with **R ≥ 4.4** and **Quarto ≥ 1.6**.
 
-
 ## Repository map
 
 ```
@@ -27,17 +26,17 @@ bachelor-thesis/
 │  ├─ derived/                  # final data for the manuscript
 │  └─ figures/                  # PNGs for the manuscript
 ├─ notebooks/                   # analysis notebooks + tiny R scripts
-│  ├─ 01\_excess\_snapshots.R
-│  ├─ 02\_flight\_filter.R
-│  ├─ 02b\_flight\_opensky.R
-│  ├─ 03\_merge\_exposure.R
-│  ├─ 04\_population\_qc.qmd
-│  ├─ 05\_descriptive\_plots.qmd
-│  └─ 06\_correlation.qmd
+│  ├─ 01_excess_snapshots.R
+│  ├─ 02_flight_filter.R
+│  ├─ 02b_flight_opensky.R
+│  ├─ 03_merge_exposure.R
+│  ├─ 04_population_qc.qmd
+│  ├─ 05_descriptive_plots.qmd
+│  └─ 06_correlation.qmd
 ├─ R/                           # package update scripts
 ├─ thesis.qmd                   # main manuscript (Quarto)
-├─ thesis\_ref.bib              # references
-├─ \_quarto.yml                 # project configuration (pre-render, render list, theme…)
+├─ thesis_ref.bib              # references
+├─ _quarto.yml                 # project configuration (pre-render, render list, theme…)
 └─ README.md                    # you are here
 
 ```
@@ -89,11 +88,12 @@ Supplementary HTML notebooks are also in `_manuscript/`.
 
 ¹EUROCONTROL data are not redistributed here; copy the CSV drops (“Research Repository”) into `data/raw/flight_data/YYYYMM/` before rendering. If you have access to [the R&D programme](https://www.eurocontrol.int/dashboard/aviation-data-research).
 ²OpenSky data is for research only. Redistribution of raw files is not permitted.
+
 ## Reuse
 
 Code is MIT-licensed (see `LICENSE`).
 Figures and processed data inherit the licences of their upstream sources
 please credit them when you reuse.
 
-*Last updated 2025-06-04*   —  Maintainer: Maximilian Elixhauser
-[maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)
+*Last updated 2025-06-04* 
+— Maintainer: Maximilian Elixhauser [maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)

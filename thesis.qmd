@@ -1,5 +1,5 @@
 ---
-title: "Did early direct flights from China seed higher excess mortality in Europe? An exploratory correlation study"
+title: "Flight exposure and excess mortality: An exploratory study of early COVID-19 spread in Europe"
 author:
   - name: "Maximilian Elixhauser"
     corresponding: true
@@ -72,15 +72,18 @@ On **31 December 2019** the Wuhan Municipal Health Commission reported a cluster
 
 Europe detected its first laboratory-confirmed SARS-CoV-2 infections on **24 January 2020**, when three travel-associated cases were reported in France [@spiteri2020]. By **21 February** only 47 cases had been notified across nine European countries—most of them imported—but two incipient chains of local transmission were already recognised, one in Bavaria (Germany) and another in Haute-Savoie (France) [@spiteri2020]. Late that same evening Italy announced the region’s first COVID-19-related death and confirmed a rapidly growing cluster of autochthonous cases in Codogno and neighbouring towns in Lombardy [@ecdcitaly2020].
 
-The six-week hop from Wuhan to Northern Italy illustrates how long-haul aviation can relocate a pathogen within a single incubation cycle. A global metapopulation model by **@chinazzi2020** estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet still cut *international* exportations by roughly **78 %** through mid-February [@chinazzi2020]. A narrative review of ≈ 200 studies concludes that dense pre-2020 flight networks “shrank” Europe, enabling rapid cross-border seeding before March–April capacity collapses [@sun2022_a].
+The six-week hop from Wuhan to Northern Italy illustrates how long-haul aviation can relocate a pathogen within a single generation interval. A global metapopulation model by **@chinazzi2020** estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet still cut *international* exportations by roughly **78 %** through mid-February [@chinazzi2020]. A narrative review of ≈ 200 studies concludes that dense pre-2020 flight networks “shrank” Europe, enabling rapid cross-border seeding before March–April capacity collapses [@sun2022_a].
 
-Excess-mortality outcomes, however, diverged sharply thereafter. Latent-class analyses for high-income countries show that *domestic* factors—government effectiveness, early and stringent NPIs, vaccine roll-out, and baseline life expectancy—best explain the longer-run gaps [@rahmanian2024].  
+Excess-mortality outcomes, however, diverged sharply thereafter. Latent-class analyses for high-income countries show that domestic factors—government effectiveness, early and stringent NPIs, vaccine roll-out, and baseline life expectancy—best explain the longer-run gaps [@rahmanian2024]. While these factors explain amplification and suppression, the **initial seeding** of infections remains less understood.
 
-What remains unknown is how much of the first-wave mortality spread can be attributed to a country’s direct-flight exposure to **mainland China and its two Special Administrative Regions (Hong Kong and Macao)** before lockdowns. This thesis addresses that descriptive gap.
+What remains unknown is how much of the first-wave mortality spread can be attributed to a country’s direct-flight exposure to **mainland China and its two Special Administrative Regions (Hong Kong and Macao)** before lockdowns. This thesis addresses that empirical gap in descriptive terms.
 
 ## Research Question
 
 > Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?^[Although Macao was initially included, EUROCONTROL's dataset showed no direct flights from Macao to Europe in the study period, effectively limiting analysis to Mainland China and Hong Kong (see Chapter 3).]
+
+> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?^[Macao appears in the original acronym CN/HK/MO, but the EUROCONTROL snapshots used here show **zero** Macao–Europe flights in Dec 2019 or Mar 2020. Data handling details are given in [Data & Methods](#methods)].
+
 
 Snapshots for 2021–2023 are analysed as robustness checks.
 
@@ -93,9 +96,14 @@ Snapshots for 2021–2023 are analysed as robustness checks.
 
 3. **Appraise validity:** Discuss strengths and limitations of flight counts as a proxy for epidemic seeding.
 
-### Road-map
+## Road-map
 
 The remainder of the thesis is structured as follows. **Chapter 2** reviews existing literature on mobility-driven seeding and macro-level determinants of excess mortality. **Chapter 3** details data cleaning and correlation methods. Results and analyses are presented in **Chapter 4**, followed by interpretation and sensitivity checks in **Chapter 5**. Finally, **Chapter 6** summarises key findings and outlines next-step research.
+
+
+
+
+[READ TO DO NEXT: (Also need 02b in bash script)]
 
 # Literature Review {#litrev}
 
@@ -153,20 +161,26 @@ The present thesis pushes the causal chain one step back: *did differing levels 
 
 Crowd-sourced ADS-B feeds such as **OpenSky** are a tempting shortcut for quick global aviation analytics, yet their **sensor network was patchy over East Asia in early 2020**. Independent audits find that barely half of all China-origin flights were visible in the raw feed [@strohmeier2021; @iacus2020].
 
-Our own cross-check (Table [@tbl-os-vs-eu]) confirms the blind-spot problem: **five EUROCONTROL member-states receive no China/HK arrivals in OpenSky at all**, and most low-volume countries show double-digit under-counts for December 2019.
+Our own cross-check (Table [@tbl-os-vs-eu]) confirms the blind-spot problem: **five EUROCONTROL member states receive no China/HK arrivals in OpenSky at all**, and most low-volume countries show double-digit undercounts for December 2019.
 
 EUROCONTROL’s *Aviation Data Repository for Research* (ADRR), by contrast, logs **every filed IFR movement that touches European airspace**, irrespective of ADS-B reception. Although ADRR is released for only four months each year, the public snapshots for **December 2019** and **March 2020** cover the two key pre-epidemic months required here.
 
-Consequently, **all exposure metrics in this thesis are based on EUROCONTROL**. OpenSky is kept **solely as a quality-control benchmark** to illustrate why ADS-B alone would have understated early China-Europe connectivity (see Appendix A).
+Consequently, **all exposure metrics in this thesis are based on EUROCONTROL**. OpenSky is kept **solely as a quality-control benchmark** to illustrate why ADS-B alone would have understated early China–Europe connectivity (see [Appendix A](#appendix-a)).
 
 
 
 
 
-## Data & Methods {#methods}
 
-The EUROCONTROL schedule includes traffic from mainland China (CN), Hong Kong (HK).
-No Macao–Europe flights appear in December 2019 or March 2020, so subsequent figures refer effectively to CN + HK only. The acronym CN/HK/MO is retained for completeness the first time it is used; thereafter ‘CN/HK’ is shown on axes and captions.
+
+
+
+
+
+
+# Data & Methods {#methods}
+
+EUROCONTROL snapshots include all commercial IFR traffic from mainland China (CN) and Hong Kong (HK). No Macao–Europe flights were recorded in either December 2019 or March 2020. Accordingly, all exposure figures refer to CN + HK; the full acronym CN/HK/MO is kept only on first use.
 
 To ensure comparability, excess mortality was measured on or near 5 May of each year (2020–2023), using the closest available OWID data within ±7 days. The use of May is justified both by the timing of the initial European epidemic wave (Spring 2020) and by the World Health Organization's declaration on 5 May 2023 officially ending COVID-19 as a global public health emergency [@who2023end].
 
@@ -205,12 +219,11 @@ Flight exposure is intentionally fixed at these two pre-epidemic months to prese
 
 
 
-#### Coverage audit: EUROCONTROL vs OpenSky  {#coverage-audit}
+### Coverage audit: EUROCONTROL vs OpenSky  {#coverage-audit}
 
 OpenSky’s crowd-sourced ADS-B feed is often used for rapid aviation analyses, but its sensor density over East Asia remained sparse in early 2020 [@strohmeier2021].
 
-Table @tbl-os-vs-eu lists, for each EUROCONTROL state, the direct CN/HK flights
-captured by both sources in Dec 2019, Feb 2020, and Mar 2020.
+Table [@tbl-os-vs-eu] lists, for each EUROCONTROL state, the direct CN/HK flights captured by both sources in Dec 2019, Feb 2020, and Mar 2020.
 
 ```{r tbl-os-vs-eu, echo=FALSE}
 opensky   <- readr::read_rds("data/processed/opensky/cn2eu_wide.rds")
@@ -221,23 +234,7 @@ euro_cntr <- readr::read_rds("data/processed/flights_country.rds") |>
     Mar20_eu   = total_inbound_flights_mar20
   )
 
-euro_map  <- readr::read_csv("data/eurocontrol_iso_map.csv",
-                             show_col_types = FALSE)
-
-euro_wide <- euro_cntr |>
-  dplyr::left_join(euro_map, by = "iso2") |>
-  dplyr::select(iso3, Dec19_eu, Mar20_eu)
-
-opensky   <- readr::read_rds("data/processed/opensky/cn2eu_wide.rds")
-euro_cntr <- readr::read_rds("data/processed/flights_country.rds") |>
-  dplyr::select(
-    iso2       = iso_country,
-    Dec19_eu   = total_inbound_flights_dec19,
-    Mar20_eu   = total_inbound_flights_mar20
-  )
-
-euro_map  <- readr::read_csv("data/eurocontrol_iso_map.csv",
-                             show_col_types = FALSE)
+euro_map  <- readr::read_csv("data/eurocontrol_iso_map.csv", show_col_types = FALSE)
 
 euro_wide <- euro_cntr |>
   dplyr::left_join(euro_map, by = "iso2") |>
@@ -267,10 +264,20 @@ coverage_tbl |>
   knitr::kable(
     caption = "Direct CN/HK flights captured by EUROCONTROL (EU) and OpenSky (OS)."
   )
-
 ```
 
-OpenSky **omits GEO, HRV, PRT, SVK, and UKR entirely** and reports ≥ 1 flight fewer than EUROCONTROL for 14 of the remaining 21 states (median deficit ≈ 12 flights). In short, using raw ADS-B counts would have **systematically understated exposure for peripheral and low-traffic markets—**the very cases that matter for a rank-based analysis. For that reason the study proceeds with EUROCONTROL data and treats OpenSky only as a sanity check (see Appendix A).
+OpenSky **omits GEO, HRV, PRT, SVK, and UKR entirely**, and reports ≥1 flight fewer than EUROCONTROL for 14 of the remaining 21 states (median deficit ≈ 12 flights). In short, using raw ADS-B counts would have **systematically understated exposure for peripheral and low-traffic markets** the very cases that matter for a rank-based analysis. For that reason, the study proceeds with EUROCONTROL data and treats OpenSky only as a **sanity check** (see [Figure A.1 in Appendix A](#fig-opensky-bar)).
+
+
+
+
+
+
+
+
+
+
+
 
 ### Excess-mortality snapshots {#excess-snaps}
 
@@ -555,8 +562,10 @@ Although this thesis does not make causal claims, its findings demonstrate the v
 
 ## Appendix
 
-### Appendix A -  Data-source triage and why a global SIR was dropped
+### Appendix A – Data-source triage and supplementary plots {#appendix-a}
 
-A.1 Grouped bars: December 2019 and February 2020 counts from Table [@tbl-os-vs-eu] visualised side-by-side.
+![](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width=90%}
 
-A.2 (MAP TODO! )
+**Figure A.1**: Top-10 destinations by number of direct CN/HK flights in OpenSky data (Dec 2019, Feb 2020, Mar 2020). OpenSky data reflects community ADS-B coverage, not actual filed flights, and shows significant variation between months. The grouped bar format highlights erratic coverage patterns and explains why EUROCONTROL data was prioritized.
+
+
