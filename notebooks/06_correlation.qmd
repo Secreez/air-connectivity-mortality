@@ -132,7 +132,7 @@ spearman_res <- purrr::map_dfr(
     "flights_pm"
   ),
   spearman_by_year
-) %>%
+) |>
   mutate(variable = dplyr::recode(variable,
     total_inbound_flights_dec19    = "Dec 2019",
     total_inbound_flights_mar20    = "Mar 2020",
@@ -180,8 +180,8 @@ Early in the pandemic, countries most exposed to direct flights from China and H
 These findings underscore the narrow window during which travel restrictions can affect epidemic outcomes, and the overwhelming importance of internal factors once local transmission is widespread.
 
 ```{r quartile_gap, echo = FALSE}
-snap20 <- corr_df %>%
-  filter(target_date == as.Date("2020-05-05")) %>%
+snap20 <- corr_df |>
+  filter(target_date == as.Date("2020-05-05")) |>
   arrange(total_inbound_flights_combined)
 
 q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
@@ -595,24 +595,24 @@ knitr::kable(
 ```
 
 ```{r}
-exposure_q <- corr_df %>%                              
-  filter(target_date == as.Date("2020-05-05")) %>%     
-  mutate(q = ntile(total_inbound_flights_combined, 4)) %>% 
+exposure_q <- corr_df |>                             
+  filter(target_date == as.Date("2020-05-05")) |>     
+  mutate(q = ntile(total_inbound_flights_combined, 4)) |> 
   dplyr::select(iso3, q)
 
 vacc22 <- read_csv(
   here("data/raw/owid/owid-covid-data.csv"),
   col_select = c(iso_code, date, people_fully_vaccinated_per_hundred),
   show_col_types = FALSE
-) %>% 
-  filter(date == as.Date("2022-05-05")) %>% 
+) |> 
+  filter(date == as.Date("2022-05-05")) |> 
   transmute(iso3 = iso_code,
             vacc = people_fully_vaccinated_per_hundred)
 
 snap <- dplyr::left_join(exposure_q, vacc22, by = "iso3")
 
-snap %>% 
-  group_by(q) %>% 
+snap |> 
+  group_by(q) |> 
   summarise(median_vacc = median(vacc, na.rm = TRUE))
 
 ```

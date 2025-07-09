@@ -80,7 +80,7 @@ opensky_wide <- opensky_long |>
   dplyr::mutate(month_lbl = sprintf("%04d-%02d", year, month)) |>
   dplyr::select(iso3, month_lbl, n_flights) |>
   tidyr::pivot_wider(
-    names_from  = month_lbl, # 2019-12  / 2020-02 / 2020-03
+    names_from  = month_lbl, # 2019-12 / 2020-02 / 2020-03
     values_from = n_flights,
     values_fill = 0
   ) |>
@@ -97,44 +97,57 @@ readr::write_csv(opensky_wide, file.path(out_dir, "cn2eu_wide.csv"))
 
 message("✓ Saved: ", nrow(opensky_long), " rows total")
 
-## EUROCONTROL Dec counts
-euro_dec <- readr::read_rds(
+## EUROCONTROL snapshots
+euro_snap <- readr::read_rds(
   here::here("data/processed/flights_country.rds")
 ) |>
   dplyr::select(
-    iso2     = iso_country,
-    Dec19_eu = total_inbound_flights_dec19
+    iso2       = iso_country,
+    Dec19_eu   = total_inbound_flights_dec19,
+    Mar20_eu   = total_inbound_flights_mar20
   ) |>
-  dplyr::left_join(
-    dplyr::select(euro_map, iso2, iso3),
-    by = "iso2"
-  )
+  dplyr::left_join(dplyr::select(euro_map, iso2, iso3), by = "iso2")
+
 
 ## cov. audit tables
 coverage_tbl <- opensky_wide |>
   dplyr::rename(
     Dec19_os = `2019-12`,
-    Feb20_os = `2020-02`
+    Feb20_os = `2020-02`,
+    Mar20_os = `2020-03`
   ) |>
-  dplyr::left_join(euro_dec, by = "iso3") |>
+  dplyr::left_join(euro_snap, by = "iso3") |>
   dplyr::mutate(
     dplyr::across(where(is.numeric), \(x) tidyr::replace_na(x, 0L)),
-    EU_only = Dec19_eu > 0 & Dec19_os == 0,
-    OS_only = Dec19_eu == 0 & Dec19_os > 0
+    OS_miss = Dec19_os == 0 & Feb20_os == 0 & Mar20_os == 0,
+    EU_only = (Dec19_eu + Mar20_eu) > 0 & OS_miss,
+    OS_only = (Dec19_eu + Mar20_eu) == 0 & (Dec19_os + Feb20_os + Mar20_os) > 0
   ) |>
   dplyr::select(
     iso3,
     `Dec 2019 (EU)` = Dec19_eu,
+    `Mar 2020 (EU)` = Mar20_eu,
     `Dec 2019 (OS)` = Dec19_os,
     `Feb 2020 (OS)` = Feb20_os,
+    `Mar 2020 (OS)` = Mar20_os,
     EU_only, OS_only
   ) |>
   dplyr::arrange(dplyr::desc(`Dec 2019 (EU)`))
 
+
 knitr::kable(
   coverage_tbl,
-  caption = "Direct CN/HK flights captured by EUROCONTROL (EU, Dec 2019) and OpenSky (OS, Dec 2019 & Feb 2020)."
+  caption = "Direct CN/HK flights captured by EUROCONTROL (EU) and OpenSky (OS) — December 2019 to March 2020."
 )
+
+out_derived <- here::here("data/derived")
+dir.create(out_derived, showWarnings = FALSE, recursive = TRUE)
+
+readr::write_rds(coverage_tbl, file.path(out_derived, "coverage_tbl.rds"))
+readr::write_csv(coverage_tbl, file.path(out_derived, "coverage_tbl.csv"))
+
+message("✓ Saved coverage_tbl (", nrow(coverage_tbl), " rows)")
+
 
 fig_dir <- here::here("data/figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
