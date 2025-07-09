@@ -80,7 +80,7 @@ opensky_wide <- opensky_long |>
   dplyr::mutate(month_lbl = sprintf("%04d-%02d", year, month)) |>
   dplyr::select(iso3, month_lbl, n_flights) |>
   tidyr::pivot_wider(
-    names_from  = month_lbl, # 2019-12  / 2020-02 / 2020-03
+    names_from  = month_lbl, # 2019-12 / 2020-02 / 2020-03
     values_from = n_flights,
     values_fill = 0
   ) |>
@@ -97,65 +97,105 @@ readr::write_csv(opensky_wide, file.path(out_dir, "cn2eu_wide.csv"))
 
 message("✓ Saved: ", nrow(opensky_long), " rows total")
 
-## EUROCONTROL Dec counts
-euro_dec <- readr::read_rds(
+## EUROCONTROL snapshots
+euro_snap <- readr::read_rds(
   here::here("data/processed/flights_country.rds")
 ) |>
   dplyr::select(
-    iso2     = iso_country,
-    Dec19_eu = total_inbound_flights_dec19
+    iso2       = iso_country,
+    Dec19_eu   = total_inbound_flights_dec19,
+    Mar20_eu   = total_inbound_flights_mar20
   ) |>
-  dplyr::left_join(
-    dplyr::select(euro_map, iso2, iso3),
-    by = "iso2"
-  )
+  dplyr::left_join(dplyr::select(euro_map, iso2, iso3), by = "iso2")
+
 
 ## cov. audit tables
 coverage_tbl <- opensky_wide |>
   dplyr::rename(
     Dec19_os = `2019-12`,
-    Feb20_os = `2020-02`
+    Feb20_os = `2020-02`,
+    Mar20_os = `2020-03`
   ) |>
-  dplyr::left_join(euro_dec, by = "iso3") |>
+  dplyr::left_join(euro_snap, by = "iso3") |>
   dplyr::mutate(
     dplyr::across(where(is.numeric), \(x) tidyr::replace_na(x, 0L)),
-    EU_only = Dec19_eu > 0 & Dec19_os == 0,
-    OS_only = Dec19_eu == 0 & Dec19_os > 0
+    OS_miss = Dec19_os == 0 & Feb20_os == 0 & Mar20_os == 0,
+    EU_only = (Dec19_eu + Mar20_eu) > 0 & OS_miss,
+    OS_only = (Dec19_eu + Mar20_eu) == 0 & (Dec19_os + Feb20_os + Mar20_os) > 0
   ) |>
   dplyr::select(
     iso3,
     `Dec 2019 (EU)` = Dec19_eu,
+    `Mar 2020 (EU)` = Mar20_eu,
     `Dec 2019 (OS)` = Dec19_os,
     `Feb 2020 (OS)` = Feb20_os,
+    `Mar 2020 (OS)` = Mar20_os,
     EU_only, OS_only
   ) |>
   dplyr::arrange(dplyr::desc(`Dec 2019 (EU)`))
 
+
 knitr::kable(
   coverage_tbl,
-  caption = "Direct CN/HK flights captured by EUROCONTROL (EU, Dec 2019) and OpenSky (OS, Dec 2019 & Feb 2020)."
+  caption = "Direct CN/HK flights captured by EUROCONTROL (EU) and OpenSky (OS) — December 2019 to March 2020."
 )
 
-## Feb 2020 bar plot
+out_derived <- here::here("data/derived")
+dir.create(out_derived, showWarnings = FALSE, recursive = TRUE)
+
+readr::write_rds(coverage_tbl, file.path(out_derived, "coverage_tbl.rds"))
+readr::write_csv(coverage_tbl, file.path(out_derived, "coverage_tbl.csv"))
+
+message("✓ Saved coverage_tbl (", nrow(coverage_tbl), " rows)")
+
+
 fig_dir <- here::here("data/figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
-p_feb <- opensky_wide |>
-  dplyr::rename(Feb20 = `2020-02`) |>
-  dplyr::filter(Feb20 > 0) |>
-  dplyr::mutate(iso3 = forcats::fct_reorder(iso3, Feb20)) |>
-  ggplot2::ggplot(ggplot2::aes(iso3, Feb20)) +
-  ggplot2::geom_col(fill = "#009E73", width = .65) +
-  ggplot2::coord_flip() +
-  ggplot2::labs(
-    title = "Direct CN/HK → EU flights (OpenSky), February 2020",
-    x = NULL, y = "# flights"
-  ) +
-  ggplot2::theme_minimal(base_size = 10) +
-  ggplot2::theme(plot.title.position = "plot")
+top_opensky <- opensky_wide |>
+  dplyr::rename(
+    `Dec 2019` = `2019-12`,
+    `Feb 2020` = `2020-02`,
+    `Mar 2020` = `2020-03`
+  ) |>
+  dplyr::mutate(
+    total = `Dec 2019` + `Feb 2020` + `Mar 2020`
+  ) |>
+  dplyr::filter(total > 0) |>
+  dplyr::arrange(desc(total)) |>
+  dplyr::slice_head(n = 10) |>
+  tidyr::pivot_longer(
+    cols = c(`Dec 2019`, `Feb 2020`, `Mar 2020`),
+    names_to = "month", values_to = "flights"
+  ) |>
+  dplyr::mutate(
+    iso3 = forcats::fct_reorder(iso3, -flights, .fun = sum) # sort by total
+  )
 
-ggplot2::ggsave(
-  file.path(fig_dir, "bar_opensky_feb2020.png"),
-  p_feb,
-  width = 6.5, height = 6, dpi = 300, bg = "transparent"
+ggplot(top_opensky, aes(x = iso3, y = flights, fill = month)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.65) +
+  coord_flip() +
+  scale_fill_manual(
+    values = c(
+      "Dec 2019" = "#E69F00",
+      "Feb 2020" = "#56B4E9",
+      "Mar 2020" = "#009E73"
+    )
+  ) +
+  labs(
+    title = "Top-10 destinations in OpenSky data",
+    subtitle = "Direct flights from CN/HK to EUROCONTROL countries",
+    y = "# flights", x = NULL
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    axis.text.y = element_text(size = 9)
+  )
+
+ggsave(
+  file.path(fig_dir, "bar_opensky_top10_dec_feb_mar.png"),
+  width = 6.5, height = 5.5, dpi = 300, bg = "transparent"
 )
