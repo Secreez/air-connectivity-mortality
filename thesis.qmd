@@ -30,12 +30,12 @@ format:
 
 ```{r load_derived, include=FALSE}
 # needed
-collapse_tbl   <- readRDS("data/derived/collapse_tbl.rds")
-top_tbl        <- readRDS("data/derived/top_tbl.rds")
-spearman_res   <- readRDS("data/derived/spearman_res.rds")
+collapse_tbl <- readRDS("data/derived/collapse_tbl.rds")
+top_tbl <- readRDS("data/derived/top_tbl.rds")
+spearman_res <- readRDS("data/derived/spearman_res.rds")
 partial_by_year <- readRDS("data/derived/partial_by_year.rds")
-rho_restricted  <- readRDS("data/derived/rho_restricted_2020.rds")
-coverage_tbl   <- readRDS("data/derived/coverage_tbl.rds")
+rho_restricted <- readRDS("data/derived/rho_restricted_2020.rds")
+coverage_tbl <- readRDS("data/derived/coverage_tbl.rds")
 ```
 
 ## Glossary
@@ -152,53 +152,80 @@ Because completeness is critical here, **all exposure metrics in this thesis use
 
 # Data & Methods {#methods}
 
-EUROCONTROL’s public **ADRR** snapshots record every commercial IFR movement touching European airspace.  
-For this study we extract flights whose **origin** is any airport in **mainland China (CN)** or **Hong Kong (HK)** and whose **destination** is one of the 26 continental EUROCONTROL member states. (No Macao–Europe flights appear in the snapshots, so exposure is effectively CN + HK; the full acronym *CN/HK/MO* is kept only on first mention.)
+EUROCONTROL’s public **ADRR** snapshots record every commercial IFR movement that touches European air-space.  
+For this study we extract flights whose **origin** is any airport in **mainland China (CN)** or **Hong Kong (HK)** and whose **destination** is one of the 26 continental EUROCONTROL member states. (No Macao–Europe flights appear in either snapshot, so exposure is effectively CN + HK; the full acronym *CN/HK/MO* is retained only on first mention.)
 
-Excess-mortality outcomes come from **OWID’s** country-day series, which republishes the *World Mortality Dataset*.  For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 days).
+Excess-mortality outcomes come from **OWID’s** country-day series, which republishes the *World Mortality Dataset*.  
+For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 days).
 
-*Why 5 May?* It captures the tail of Europe’s first epidemic wave and—fortuitously—marks the WHO announcement (5 May 2023) that COVID-19 was no longer a global public-health emergency [@who2023end].
+*Why 5 May?* The date captures the tail of Europe’s first epidemic wave **and** coincides with the WHO announcement (5 May 2023) that COVID-19 was no longer a global public-health emergency [@who2023end].
+
 
 
 ## Study design
 
-| Element   | Choice | Rationale |
-|-----------|--------|-----------|
-| **Unit of analysis** | Country (n = 26) | Islands & micro-states excluded for missing flight or mortality data |
-| **Exposure** | Flight counts in **Dec 2019** (*F*<sub>DEC</sub>) and **Mar 2020** (*F*<sub>MAR</sub>); summed as *F*<sub>SUM</sub> | Brackets the entire January–February seeding window while preceding most EU lockdowns |
-| **Outcome** | *E*<sub>t</sub> = excess deaths per million on 5 May of year *t* (t = 2020…2023) | Snapshot avoids later seasonal waves; values from OWID/WMD |
-| **Statistic** | Spearman ρ with 5 000-draw bootstrap 95 % CI | Rank test robust to skew/outliers; bootstrap stabilises CI in small-n setting |
+| Element              | Operational choice                                                                                                                             | Rationale                                                                                                     |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| **Unit of analysis** | Country — 26 continental EUROCONTROL members in the exposure file; 25 in the four-year correlation panel (UKR dropped¹)                      | Other states lack flight or mortality data; Ukraine has no WMD observations after 2021              |
+| **Exposure**         | *F*<sub>DEC</sub> (Dec 2019) and *F*<sub>MAR</sub> (Mar 2020) direct flights CN / HK → EU, plus *F*<sub>SUM</sub> = *F*<sub>DEC</sub> + *F*<sub>MAR</sub> | Brackets the Jan–Feb seeding window while still preceding most EU lockdowns                                    |
+| **Outcome**          | *E*<sub>t</sub> = excess deaths / 10⁶ residents on 5 May of year *t* (2020 … 2023)                                                             | Early snapshot avoids later seasonal waves; values from OWID / WMD                                             |
+| **Statistic**        | Spearman ρ with 5 000-draw bootstrap 95 % CI                                                                                                   | Rank test robust to skew/outliers; bootstrap stabilises CI in small-*n* studies [@diciccio1996]               |
+
+¹ Ukraine kept for descriptive exposure tables (n = 26) but excluded from any analysis that requires a complete four-year mortality series (n = 25).
 
 
 ### Flight-exposure variable
 
-**Source.** EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) publishes full IFR flight plans for four “snapshot” months each year (Mar | Jun | Sep | Dec).
+**Source.** EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) releases full IFR
+flight plans for four “snapshot” months each year (Mar | Jun | Sep | Dec).
 
-For early‐COVID seeding only the **Dec-2019** and **Mar-2020** slices are available; February sits in the blind spot but, as @chinazzi2020 show, rerouting through non-Wuhan hubs began well before February, so December already captures the relevant network. Mar-2020, taken after Wuhan’s shutdown but just before most European lockdowns, shows the residual links.
+Only the **Dec-2019** and **Mar-2020** slices bracket the early-COVID seeding window; February
+is not publicly available, but rerouting via non-Wuhan hubs began well before February
+[@chinazzi2020].
 
-**Filters applied**
+| Step / field           | Rule                                                                                                   | Rationale                                                                                                   |
+|------------------------|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| **Month slice**        | Keep **Dec 2019** & **Mar 2020** ADRR snapshots                                                        | February missing; Dec + Mar still capture pre- and early-restriction traffic                                |
+| **Traffic type**       | ICAO codes **S** (scheduled pax) or **N** (non-scheduled charter pax)                                  | Exclude cargo-only **F**, military **M**, general aviation **G**, etc. [@eurocontrol2025meta]                |
+| **Origin (ADEP)**      | Any airport whose ISO-2 is **CN** or **HK**                                                             | Captures all hubs that substituted for Wuhan once PVG/PEK/CAN/HKG took over [@chinazzi2020]                  |
+| **Destination (ADES)** | Airport lies in the **26 continental EUROCONTROL states**                                              | Micro-states lack either direct CN/HK traffic *or* reliable mortality data                            |
+| **De-duplication**     | Collapse identical *callsign + off-block-time* rows                                                    | Removes re-filed flight plans, yields a unique movement count                                                |
+| **Metadata sanity**    | Drop rows missing ADEP, ADES or flight-type code                                                       | Prevents merge errors & mis-counts                                                                           |
 
-| Step                   | Rule                                                | Rationale                                                              |
-| ---------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
-| Traffic type           | ICAO *S* (scheduled) or *N* (non-scheduled charter) | Removes cargo-only *F* and general-aviation *G* plans                  |
-| Origin (**ADEP**)      | Any airport in **CN** or **HK**                     | Includes all hubs that substituted for Wuhan (e.g. PVG, PEK, CAN, HKG) |
-| Destination (**ADES**) | One of the **26** continental EUROCONTROL states    | Islands & micro-states excluded elsewhere for missing outcome data     |
-| De-duplication         | Same callsign + same wheels-off time collapsed      | Removes flight-plan re-filings                                         |
+<sup>†</sup> **What “S” and “N” actually include.** EUROCONTROL’s market-segment rules (STATFOR Doc 689 v1.1) place every type-**S** flight in **Mainline** (> 120-seat) or **Regional** (19–120-seat) and every type-**N** flight in **Charter** [@eurocontrol2022seg]. Military (**M**), all-cargo (**F**), biz-av, etc. are filtered out *up-stream* by the ADRR commercial slice (FNI Doc 25 v6) [@eurocontrol2025meta].
 
-> **Load-factor caveat.** Slot-retention “ghost flights” peaked in Mar-Apr 2020; @sun2022_b estimate that **30–50 %** of EU departures in that window flew with < 10 % seats filled. ADRR records the movement but not the payload, so a three-passenger A350 counts the same as a full one. At Frankfurt, for example, passenger volume collapsed **–73 %** while freighters + “preighters” kept **81 %** of cargo rotations alive [@fraport2021, p. 17]. Interpret flight counts as *potential seeding capacity*, not realised passenger flow.
+> **Why this matters.** ADS-B can, in principle, see *any* transponder-equipped aircraft, but the **OpenSky** receiver network is voluntary and geographically uneven.  Coverage is dense over Western Europe yet sparse over Eastern Europe and East Asia, leading to systematic  *under-counting* of CN/HK → EU flights in peripheral or low-traffic states [@strohmeier2021]. These coverage gaps generate the “phantom deficits” highlighted in the OpenSky audit (Section [#coverage-audit](#coverage-audit)). ADRR, by contrast, records every filed IFR plan, so it recovers the missing movements and offers a truer baseline for passenger-exposure analysis.
+
+> **Load-factor caveat.** Slot-retention “ghost flights” peaked in Mar–Apr 2020; @sun2022_b estimate **30–50 %** of EU departures in that window flew with < 10 % seats filled. ADRR counts the movement but not the payload; a three-passenger A350 counts the same as a full one. At Frankfurt passenger volume fell **–73 %** while freighters + “preighters” kept **81 %** of cargo rotations alive [@fraport2021, p. 17]. Treat flight counts as *potential seeding capacity*, not realised passenger flow.
 
 $$
-F_{\text{DEC}} = \text{# CN/HK ➝ EU flights in Dec 2019},\quad
-F_{\text{MAR}} = \text{# flights in Mar 2020},\quad
+F_{\text{DEC}} = \#\text{ CN/HK → EU flights in Dec 2019},\qquad
+F_{\text{MAR}} = \#\text{ flights in Mar 2020},\qquad
 F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}
 $$
 
-A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL’s own mapping (ISO-2 → ISO-3) assigns each flight to its destination country.
+A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL’s own mapping
+(ISO-2 → ISO-3) assigns each flight to its destination country.
 
-**Why fix exposure to these two months?**
-*Temporal precedence.* Both snapshots precede the 5 May outcome, eliminating reverse causation (deaths → fewer flights).  Later traffic volumes would mix cause and effect and reflect domestic restrictions rather than initial import pressure.  Extending the panel with post-2020 exposure is left for future work.
+**Why fix exposure to these two months?**  
+*Temporal precedence.* Both snapshots precede the 5 May outcome, eliminating reverse
+causation (deaths → fewer flights).  Later volumes would mix cause & effect and reflect domestic
+restrictions rather than initial import pressure.  Extending the panel with post-2020 exposure is
+left for future work.
 
-*(Full R pipeline in `notebooks/02b_flight_opensky.R`; the processed tables are stored in `data/processed/flights_country.rds`.)*
+
+
+
+
+
+
+
+
+[EXPAND.. !!!!!!!!!!!]
+
+*(Full R pipeline: `notebooks/...R`; processed tables in
+`data/processed///.rds`.)*
+
 
 ### Coverage audit: EUROCONTROL vs OpenSky {#coverage-audit}
 
