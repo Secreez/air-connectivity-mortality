@@ -29,13 +29,13 @@ format:
 ---
 
 ```{r load_derived, include=FALSE}
-# needed
-collapse_tbl   <- readRDS("data/derived/collapse_tbl.rds")
-top_tbl        <- readRDS("data/derived/top_tbl.rds")
-spearman_res   <- readRDS("data/derived/spearman_res.rds")
-partial_by_year <- readRDS("data/derived/partial_by_year.rds")
-rho_restricted  <- readRDS("data/derived/rho_restricted_2020.rds")
-coverage_tbl   <- readRDS("data/derived/coverage_tbl.rds")
+collapse_tbl     <- readRDS(here::here("data", "derived", "collapse_tbl.rds"))
+top_tbl          <- readRDS(here::here("data", "derived", "top_tbl.rds"))
+spearman_res     <- readRDS(here::here("data", "derived", "spearman_res.rds"))
+partial_by_year  <- readRDS(here::here("data", "derived", "partial_by_year.rds"))
+rho_restricted   <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
+coverage_tbl     <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
+big_gaps         <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
 ```
 
 ## Glossary
@@ -150,6 +150,9 @@ By contrast, EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) 
 
 Because completeness is critical here, **all exposure metrics in this thesis use ADRR**; OpenSky is retained only as a **sanity-check benchmark** (details in (Coverage-audit)[#coverage-audit] and (Appendix A)[#appendix-a]).
 
+
+
+
 # Data & Methods {#methods}
 
 EUROCONTROL’s public **ADRR** snapshots record every commercial IFR movement touching European airspace.  
@@ -162,54 +165,76 @@ Excess-mortality outcomes come from **OWID’s** country-day series, which repub
 
 ## Study design
 
-| Element   | Choice | Rationale |
-|-----------|--------|-----------|
-| **Unit of analysis** | Country (n = 26) | Islands & micro-states excluded for missing flight or mortality data |
-| **Exposure** | Flight counts in **Dec 2019** (*F*<sub>DEC</sub>) and **Mar 2020** (*F*<sub>MAR</sub>); summed as *F*<sub>SUM</sub> | Brackets the entire January–February seeding window while preceding most EU lockdowns |
-| **Outcome** | *E*<sub>t</sub> = excess deaths per million on 5 May of year *t* (t = 2020…2023) | Snapshot avoids later seasonal waves; values from OWID/WMD |
-| **Statistic** | Spearman ρ with 5 000-draw bootstrap 95 % CI | Rank test robust to skew/outliers; bootstrap stabilises CI in small-n setting |
+| Element               | Choice                                                                                         | Rationale                                                                              |
+|-----------------------|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| **Unit of analysis**  | Country (n = 26 in 2020; n = 25 from 2022 once UKR is dropped)                                  | Islands & micro-states removed for missing flight **or** mortality data; Ukraine exits after war‐time breaks |
+| **Primary exposure**  | Flight counts **Dec 2019** ($F_{\text{DEC}}$) and **Mar 2020** ($F_{\text{MAR}}$); summed as $F_{\text{SUM}}$ | Brackets the Jan–Feb seeding window while preceding most EU lockdowns                 |
+| **Alt. exposure**     | $FPM = F_{\text{SUM}} / \text{population}$ (flights per million)                                | Population-scaled sensitivity check (tests size artefact)                              |
+| **Outcome**           | $E_t =$ excess deaths / 10⁶ on 5 May of year $t$ ($t = 2020\dots2023$)                          | Fixes a uniform “first-wave” reference point; OWID/WMD snapshot                        |
+| **Statistic**         | Spearman $\rho$ (+ 5 000-draw bootstrap 95 % CI)                                                | Rank test robust to skew/outliers; bootstrapping stabilises CI in a small-$n$ panel    |
+| **Sensitivity tests** | (i) $FPM$ exposure; (ii) restrict to countries with complete 4-yr $E_t$ series; (iii) partial $\rho$ controlling % ≥ 65 y | Checks population scale, missing-data bias, and age confounding                       |
 
+*All analyses in **R 4.4.0**; fully reproducible Quarto notebooks live in `notebooks/`.*
 
 ### Flight-exposure variable
 
-**Source.** EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) publishes full IFR flight plans for four “snapshot” months each year (Mar | Jun | Sep | Dec).
+**Source.** EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) releases full IFR
+flight plans for four “snapshot” months each year (Mar | Jun | Sep | Dec).
 
-For early‐COVID seeding only the **Dec-2019** and **Mar-2020** slices are available; February sits in the blind spot but, as @chinazzi2020 show, rerouting through non-Wuhan hubs began well before February, so December already captures the relevant network. Mar-2020, taken after Wuhan’s shutdown but just before most European lockdowns, shows the residual links.
+Only the **Dec-2019** and **Mar-2020** slices bracket the early-COVID seeding window; February
+is not publicly available, but rerouting via non-Wuhan hubs began well before February
+[@chinazzi2020].
 
-**Filters applied**
+| Step / field           | Rule                                                                                                   | Rationale                                                                                                   |
+|------------------------|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| **Month slice**        | Keep **Dec 2019** & **Mar 2020** ADRR snapshots                                                        | February missing; Dec + Mar still capture pre- and early-restriction traffic                                |
+| **Traffic type**       | ICAO codes **S** (scheduled pax) or **N** (non-scheduled charter pax)                                  | Exclude cargo-only **F**, military **M**, general aviation **G**, etc. [@eurocontrol2025meta]                |
+| **Origin (ADEP)**      | Any airport whose ISO-2 is **CN** or **HK**                                                             | Captures all hubs that substituted for Wuhan once PVG/PEK/CAN/HKG took over [@chinazzi2020]                  |
+| **Destination (ADES)** | Airport lies in the **26 continental EUROCONTROL states**                                              | States that lack either direct CN/HK traffic *or* reliable mortality data                            |
+| **De-duplication**     | Collapse identical *callsign + off-block-time* rows                                                    | Removes re-filed flight plans, yields a unique movement count                                                |
+| **Metadata sanity**    | Drop rows missing ADEP, ADES or flight-type code                                                       | Prevents merge errors & mis-counts                                                                           |
 
-| Step                   | Rule                                                | Rationale                                                              |
-| ---------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
-| Traffic type           | ICAO *S* (scheduled) or *N* (non-scheduled charter) | Removes cargo-only *F* and general-aviation *G* plans                  |
-| Origin (**ADEP**)      | Any airport in **CN** or **HK**                     | Includes all hubs that substituted for Wuhan (e.g. PVG, PEK, CAN, HKG) |
-| Destination (**ADES**) | One of the **26** continental EUROCONTROL states    | Islands & micro-states excluded elsewhere for missing outcome data     |
-| De-duplication         | Same callsign + same wheels-off time collapsed      | Removes flight-plan re-filings                                         |
+<sup>†</sup> **What “S” and “N” actually include.**  
+EUROCONTROL’s market-segment rules (STATFOR Doc 689 v1.1) place every type-**S** flight in **Mainline** (> 120-seat) or **Regional** (19–120-seat) and every type-**N** flight in **Charter**
+[@eurocontrol2022seg]. Military (**M**), all-cargo (**F**), biz-av, etc. are filtered out *up-stream* by the ADRR commercial slice (FNI Doc 25 v6) [@eurocontrol2025meta].
 
-> **Load-factor caveat.** Slot-retention “ghost flights” peaked in Mar-Apr 2020; @sun2022_b estimate that **30–50 %** of EU departures in that window flew with < 10 % seats filled. ADRR records the movement but not the payload, so a three-passenger A350 counts the same as a full one. At Frankfurt, for example, passenger volume collapsed **–73 %** while freighters + “preighters” kept **81 %** of cargo rotations alive [@fraport2021, p. 17]. Interpret flight counts as *potential seeding capacity*, not realised passenger flow.
+> **Why this matters.** ADS-B can, in principle, see *any* transponder-equipped aircraft, but the **OpenSky** receiver network is voluntary and geographically uneven.  Coverage is dense over Western Europe yet sparse over Eastern Europe and East Asia, leading to systematic *under-counting* of CN/HK → EU flights in peripheral or low-traffic states [@strohmeier2021]. These coverage gaps generate the “phantom deficits” highlighted in the OpenSky audit (Section [#coverage-audit](#coverage-audit)). ADRR, by contrast, records every filed IFR plan, so it recovers the missing movements and offers a truer baseline for passenger-exposure analysis.
+
+> **Load-factor caveat.** Slot-retention “ghost flights” peaked in Mar–Apr 2020; @sun2022_b estimate **30–50 %** of EU departures in that window flew with < 10 % seats filled.  ADRR counts the movement but not the payload; a three-passenger A350 counts the same as a full one. At Frankfurt passenger volume fell **–73 %** while freighters + “preighters” kept **81 %** of cargo rotations alive [@fraport2021, p. 17]. Treat flight counts as *potential seeding capacity*, not realised passenger flow.
 
 $$
-F_{\text{DEC}} = \text{# CN/HK ➝ EU flights in Dec 2019},\quad
-F_{\text{MAR}} = \text{# flights in Mar 2020},\quad
+F_{\text{DEC}} = \#\text{ CN/HK → EU flights in Dec 2019},\qquad
+F_{\text{MAR}} = \#\text{ flights in Mar 2020},\qquad
 F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}
 $$
 
-A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL’s own mapping (ISO-2 → ISO-3) assigns each flight to its destination country.
+A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL’s own mapping
+(ISO-2 → ISO-3) assigns each flight to its destination country.
 
-**Why fix exposure to these two months?**
-*Temporal precedence.* Both snapshots precede the 5 May outcome, eliminating reverse causation (deaths → fewer flights).  Later traffic volumes would mix cause and effect and reflect domestic restrictions rather than initial import pressure.  Extending the panel with post-2020 exposure is left for future work.
+**Why fix exposure to these two months?**  
+*Temporal precedence.* Both snapshots precede the 5 May outcome, eliminating reverse
+causation (deaths → fewer flights).  Later volumes would mix cause & effect and reflect domestic
+restrictions rather than initial import pressure.  Extending the panel with post-2020 exposure is
+left for future work.
 
-*(Full R pipeline in `notebooks/02b_flight_opensky.R`; the processed tables are stored in `data/processed/flights_country.rds`.)*
+*(Full R pipeline: `notebooks/`; processed tables in `data/processed/`.)*
 
-### Coverage audit: EUROCONTROL vs OpenSky {#coverage-audit}
 
-OpenSky’s crowd-sourced ADS-B feed was thin over East Asia in early 2020.  
-Our audit shows that it
 
-* **misses GEO, HRV, PRT, SVK and UKR entirely**, and  
-* under-counts 14 of the remaining 21 EUROCONTROL states (median deficit ≈ 12 flights).
 
-Full details live in [Appendix A](#appendix-a}) (Table A.1, Figure A.1). The headline takeaway is clear: **using raw ADS-B would systematically understate exposure for the peripheral, low-traffic markets that matter most to a rank-based analysis.**
-Accordingly, the study relies on EUROCONTROL’s ADRR data and treats OpenSky only as a quality-control benchmark.
+
+
+### Coverage audit - EUROCONTROL vs OpenSky {#coverage-audit}
+
+OpenSky’s crowd-sourced ADS-B feed was thin over East Asia in early 2020.
+
+* **Misses** GEO, HRV, PRT, SVK, UKR entirely  
+* **Under-counts** 14 of the remaining 21 EUROCONTROL states (median deficit ≈ 12 flights)
+
+Full details are in Appendix A (Table A.1, Fig. A.1).
+
+Because raw ADS-B would systematically under-state exposure for peripheral markets,
+the analysis relies on ADRR data and uses OpenSky **only** as a QC benchmark..
 
 ```{r tbl-os-vs-eu, echo=FALSE}
 coverage_tbl |>
@@ -227,129 +252,126 @@ All 41 rows are reproduced in Appendix A."
   )
 ```
 
-The systematic shortfall for low-volume and peripheral markets would have biased any rank-based exposure analysis. Hence the study proceeds with EUROCONTROL data and treats OpenSky purely as a cross-check.
-
-
-
 ### Excess-mortality snapshots {#excess-snaps}
 
-* **Source.** **OWID**, which pipes the country-day series straight from the **World Mortality Dataset** (WMD) introduced by @karlinsky2021 and retains its published standard-error bands.
+* **Source.** **Our World in Data** (OWID) country-day series, which republish the **World Mortality Dataset** (WMD) of @karlinsky2021 and preserve its standard-error bands.  
 
-* **Reference date.** For each year we take the observation **nearest to 5 May, within ± 7 days**; Ukraine is excluded after 2021 owing to war-related breaks.
+* **Reference date.** For each calendar year we take the observation **nearest to 5 May** (within ± 7 days). Ukraine is excluded after 2021 because war disrupts reporting.  
 
-* **Why the ± 7-day rule?** WMD reports deaths in weekly blocks for ≈ 80 % of countries (fortnightly for most others). Selecting the closest block to 5 May therefore adds at most a ± ½-week blur—trivial beside the **3-12 %** standard errors that @karlinsky2021 document for high-income Europe **and still smaller than the credible-interval width in the WHO model published by @msemburi2023** [@karlinsky2021; @msemburi2023].
+* **Why ± 7 days?** WMD reports most countries weekly (≈ 80 %) and some fortnightly. A ± ½-week blur is trivial beside the **3 – 12 %** SEs documented for high-income Europe and still smaller than the WHO model CIs of @msemburi2023.
 
 
 ### Analytical variables
 
-| Symbol | Definition | Transformation |
-| ------ | ---------- | -------------- |
+| Symbol | Definition                                              | Transformation / note                |
+|--------|---------------------------------------------------------|--------------------------------------|
+| $F_{\text{DEC}}$ | Inbound CN/HK → EU flights, **Dec 2019**      | raw count (ADRR)                     |
+| $F_{\text{MAR}}$ | Inbound flights, **Mar 2020**                 | raw count (ADRR)                     |
+| $F_{\text{SUM}}$ | $F_{\text{DEC}}+F_{\text{MAR}}$               | main exposure metric                 |
+| $FPM$            | $F_{\text{SUM}} / \text{population}$          | flights per million residents        |
+| $E_t$            | excess deaths / 10⁶ on 5 May $t$              | $t = 2020, 21, 22, 23$               |
 
 
 ### Statistical approach
 
-* Spearman $ρ$ between each flight metric and $E_t$.  
-* 5000-sample bootstrap CIs. (Need a why here)
-* Sensitivity checks:
-  2. use $FPM$;
-  3. drop countries with any missing $E$ snapshot
+* **Association.** Spearman $\rho$ between each flight metric and $E_t$.  
+* **Uncertainty.** 5 000-sample percentile-bootstrap CIs (seed = 42).  
+* **Sensitivity.**  
+  1. replace $F_{\text{SUM}}$ with **$FPM$** (population-scaled);  
+  2. restrict to countries with **complete four-year $E_t$ series**;  
+  3. compute **partial Spearman** controlling for share of population ≥ 65 y.  
 
-Analyses were performed in **R 4.4**; the full script and data pipeline are available in `notebooks/`.
+All analyses in **R 4.4.0**; full, reproducible pipeline lives in `notebooks/`.
 
-As a simple confounder sanity-check we re-computed ρ for each year after controlling for the share of population aged ≥ 65 (partial Spearman). Adjusting for age changed ρ by < 0.02 in any year (see Table X in the Results), confirming that demographic structure is not driving the flight-mortality association. No other variables were added, as the study remains exploratory and correlation-focused
+A confounder sanity-check showed that adjusting for age ≥ 65 changed $\rho$ by < 0.02 in any year, so no further covariates were added (exploratory, correlation-focused study).
 
-### Population denominator: validation and choice
+### Population denominator – validation & choice
 
-Population denominators use the 2020 mid-year estimates from Our World in Data (OWID), which itself is based on the United Nations World Population Prospects (WPP 2024 revision). a fixed-denominator approach is standard in excess-mortality work [@karlinsky2021;
-@kelly2021], who both scale 2020 deaths by each country’s mid-2020 population.
+OWID mid-2020 population (UN **WPP 2024** reprint) is used – the fixed-denominator convention of excess-mortality work [@karlinsky2021; @kelly2021].
 
-To confirm that dataset differences do not bias results, OWID’s 2020 snapshot was directly compared to the official UN WPP figures for all EUROCONTROL countries. For 38 of 41, differences were under 5% (median 2%). The largest outliers—Cyprus (-31%), Ukraine (-11%), North Macedonia (+11%)—were due to boundary or census changes in the OWID series. Re-running all correlations with the raw WPP figures shifted results by less than 0.01, so OWID populations were retained for internal consistency with the excess-mortality rates.
+* Comparing OWID to raw UN WPP (via **wpp2024** R package) for all EUROCONTROL states:  
+  * 38 / 41 differ by **< 5 %** (median 2 %).  
+  * Largest gaps: CYP –31 %, UKR –11 %, MKD +11 % (boundary / census updates).  
+  * Re-running correlations with UN figures moved Spearman $\rho$ by **< 0.01**.  
 
-Population denominators use the mid-2020 estimates curated by **Our World in Data** (OWID) [@owid_pop2024]. OWID re-publishes the UN *World Population Prospects 2024* (WPP 2024) in a tidy CSV but does not alter the underlying values.  
+OWID values are therefore retained for consistency with the excess-mortality numerator.  
+(Details and code in `04_population_qc.qmd`.)
 
-As a robustness check, all correlations were re-run with the original UN series accessed through the **wpp2024** R package [@wpp2024_pkg].   Across the 41 EUROCONTROL countries the two sources differed by < 5 % for 38 of them (median 2 %); Spearman ρ shifted by < 0.01 in every case. The OWID snapshot was therefore kept for consistency with the excess-mortality rates.
+```{r tbl-big-gaps, echo = FALSE}
+big_gaps |>
+  dplyr::mutate(
+    `Δ %`      = scales::percent(rel_diff, accuracy = 0.1),
+    `OWID pop` = scales::comma(pop_owid),
+    `WPP pop`  = scales::comma(pop_wpp)
+  ) |>
+  dplyr::rename(`ISO-3` = iso3) |>
+  dplyr::select(
+    `ISO-3`,
+    `OWID pop`,
+    `WPP pop`,
+    `Δ %`
+  ) |>
+  knitr::kable(
+    caption = "EUROCONTROL countries where OWID vs. UN WPP mid-2020 population differs by > 10 %."
+  )
+```
 
-[see: 04_population_qc.qmd]
 
 ### Analysis workflow
 
-1. **Define fixed exposure metrics**  
-   $$F_{\mathrm{DEC}},\;F_{\mathrm{MAR}},\;
-   F_{\mathrm{SUM}} = F_{\mathrm{DEC}} + F_{\mathrm{MAR}}$$
-   (all measured once, in Dec 2019 & Mar 2020).
+1. **Define exposure metrics**
 
-2. **Assemble annual outcome series**  
-   $$E_t = \text{cumulative excess deaths / million on 5 May } t,
-   \quad t \in \{2020,\,21,\,22,\,23\}.$$
+   $$
+     F_{\text{DEC}},\;F_{\text{MAR}},\;
+     F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}
+   $$
 
-3. **Main test**  
-   Spearman rank correlation $ρ$ (two-tailed) for every $F_k \times E_t$ pair;  
-   5 000-sample percentile bootstrap for 95 % CI (`boot` package).
+2. **Assemble outcome series**
+
+   $$
+     E_t = \text{excess deaths / 10⁶ on 5 May } t,
+     \quad t \in \{2020, 2021, 2022, 2023\}
+   $$
+
+3. **Main test** – Spearman $\rho$ + 95 % bootstrap CI for every $F_k \times E_t$.
 
 4. **Sensitivity panel**
 
-   | Label       | Modification                                    | Purpose                        |
-   |-------------|-------------------------------------------------|--------------------------------|
-   | **FPM**     | $F_{\mathrm{SUM}}$ / population (per million)   | Checks population-size artefact |
-   | **COMPLETE**| Keep only 25 countries with a full four-year $E_t$ series | Missing-data bias              |
-   | **AGE 65 +**| Partial Spearman controlling for share ≥ 65 y   | Confounder sanity-check        |
+   | Label        | Modification                                   | Purpose                    |
+   |--------------|------------------------------------------------|----------------------------|
+   | **FPM**      | Scale exposure by population                   | Check size artefact        |
+   | **COMPLETE** | Keep only countries with 4-year $E_t$ series   | Missing-data bias          |
+   | **AGE 65 +** | Partial Spearman (control % ≥ 65 y)            | Confounder sanity-check    |
 
-5. **Reproducibility**  
-   Analyses in **R 4.4.0**; code and data pipeline in `notebooks/` (Git-tracked).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+5. **Reproducibility** – Code, data and rendered Quarto notebooks are version-tracked in the project repo.
 
 
 
 
 ## Digital Methods & Reproducibility {#digmethods}
 
-Digital workflows, open science, and a critical look at data infrastructures are baked
-into this project in five concrete ways:
+*This project is as much about **doing** digital research as it is about analysing digital traces.  Five design choices make the workflow transparent, portable, and criticisable.*
 
-- **Why sensors matter (2-line preface).** Crowd-sourced ADS-B feeds such as **OpenSky** are a powerful “digital telescope” on aviation—but they miss wide swathes of East Asia and carry no payload information. Regulator-grade **EUROCONTROL IFR plans** give full spatial coverage, yet still hide load factors. This trade-off frames the entire methods discussion that follows.
+1. **Data-infrastructure awareness** Two complementary data streams are interrogated: crowd-sourced ADS-B (**OpenSky**) with patchy East-Asian coverage and no load factors, versus regulator-grade IFR plans (**EUROCONTROL ADRR**) with full spatial coverage but equally no passenger counts.   Mapping the blind spots of each stream (Section [#coverage-audit](#coverage-audit)) is integral to the method, not an after-thought.
 
-2. **Single-command rebuild.** `build.sh` orchestrates the full pipeline—from raw CSVs to the final HTML via Quarto + R. No hidden steps; re-running the script recreates very figure and table.
+2. **Single-command rebuild** A bash wrapper `build.sh` orchestrates the complete pipeline *raw CSV → clean RDS → Quarto → final HTML Manuscript*.   Running the script on a fresh clone regenerates every table and figure without manual edits, except the CSV.
 
-3. **Frozen R environment.** The analysis will ship with a final **`renv.lock`**; reviewers reproduce the *exact* package set with `renv::restore()`. If the lockfile is absent, `R/00_load_libs.R` falls back to an on-the-fly bootstrap. [TODO! and planned]
+3. **Pinned R environment** The repository carries an `renv.lock` snapshot.  Restoring that lock guarantees the identical package stack used during development; in `R/00_load_libs.R` installs any missing packages if the lock is absent.
 
-4. **Path-safe, self-checking code.** Every notebook calls `here::here()` for file paths, so the project works from any working directory.  During startup `build.sh` verifies for the large EUROCONTROL CSV drops before any R code runs.
+4. **Path-safe, self-checking code** All notebooks build paths with `here::here()`, so the project runs from any working directory. `build.sh` stops early with a clear message, if the large ADRR CSV dumps are missing.
 
-5. **Transparent, licence-respecting version control.** All code and Quarto sources live in a private Git repo (released under MIT after grading).  Licensed data stay *outside* Git; users must obtain them via EUROCONTROL’s R&D portal.
-
-*Appendix A expands the “sensor-bias audit,” contrasting OpenSky and EUROCONTROL in detail and illustrating how the design of digital data streams shapes research outcomes.
-
-[Something like that.. need to work on a little excerpt for: req Excerpt: ("- Themen bzw. grobe Themengebiete für die Bachelorarbeit werden idealerweise von Studierenden vorgeschlagen. Ggf. können bei Bedarf aber auch Themen durch die/den BetreuerIn ausgegeben werden.
-- Die Arbeit muss sich an der Kernthematik des DiG-Studiums orientieren, also im
-Großbereich Digitalisierung angesiedelt sein mit einer klaren Fokussierung auf digitale Technologien und Entwicklungen.
-- Inhaltlich ist wichtig, dass die Thesis die Entwicklungen und Ziele der Arbeit in den aktuellen Stand der Forschung und der Technik einordnet.)" - Bachelorarbeit 512.121]
+5. **Licence-respecting version control** Code, Quarto sources and lightweight derived data live in a private Git repo (MIT licence on release). Large or restricted datasets, notably the EUROCONTROL snapshots stay outside Git; the README explains how researchers can obtain them under the proper R&D terms.
 
 
 
 
 
+[TODO 12.07: NEED A REORDERING FOR STRUC. BUT THEN DATA AND METHODS IS DONE!]
 
 
 
 
-
-
-## Results
+# Results
 
 Countries in the **top quartile** of December + March flight exposure recorded **≈ 55 % higher excess mortality** than the bottom quartile (Spearman ρ ≈ 0.53, 95 % CI 0.18 - 0.80, *p* < 0.01). As shown in Table @tbl-spearman, the baseline ρ for 2020 is 0.53 with the same confidence interval.
 
