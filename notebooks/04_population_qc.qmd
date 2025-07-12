@@ -7,9 +7,13 @@ EURO_ISO <- readr::read_csv(
   show_col_types = FALSE
 )$iso3
 
-DIFF_LIMIT <- 0.10 # alarm line
-OUT_DIR <- here::here("data", "processed")
-dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
+DIFF_LIMIT <- 0.10            # alarm line
+PROC_DIR  <- here::here("data", "processed")
+DER_DIR   <- here::here("data", "derived")
+
+dir.create(PROC_DIR, showWarnings = FALSE, recursive = TRUE)
+dir.create(DER_DIR,  showWarnings = FALSE, recursive = TRUE)
+
 
 # UN WPP mid-2020
 data(pop1dt, package = "wpp2024")
@@ -48,13 +52,21 @@ pop_owid20 <- readr::read_csv(
 pop_comp <- inner_join(pop_wpp20, pop_owid20, by = "iso3") |>
   mutate(rel_diff = (pop_owid - pop_wpp) / pop_wpp)
 
-write_csv(pop_comp, file.path(OUT_DIR, "pop_comparison_2020.csv"))
+write_csv(pop_comp, file.path(PROC_DIR, "pop_comparison_2020.csv"))
+saveRDS(pop_comp, file.path(DER_DIR,  "pop_comparison_2020.rds"))
 
-big_gaps <- pop_comp |> filter(abs(rel_diff) > DIFF_LIMIT)
+big_gaps <- pop_comp |>
+  filter(abs(rel_diff) > DIFF_LIMIT) |>
+  mutate(pct = scales::percent(rel_diff, accuracy = 0.1))
+
+write_csv(big_gaps, file.path(DER_DIR, "pop_big_gaps_2020.csv"))
+saveRDS(big_gaps, file.path(DER_DIR,  "pop_big_gaps_2020.rds"))
+
 if (nrow(big_gaps) == 0) {
   message("✔ OWID and WPP within ±10 % for all EUROCONTROL states.")
 } else {
-  warning("! Gap >10 % for: ", paste(big_gaps$iso3, collapse = ", "))
+  warning("! Gap >10 % for: ", paste(big_gaps$iso3, collapse = ", "),
+          "  (table saved to data/derived/pop_big_gaps_2020.*)")
 }
 ```
 
