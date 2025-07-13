@@ -36,6 +36,8 @@ partial_by_year  <- readRDS(here::here("data", "derived", "partial_by_year.rds")
 rho_restricted   <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
 coverage_tbl     <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
 big_gaps         <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
+
+analysis_df      <- readRDS(here::here("data", "processed", "analysis_df.rds"))
 ```
 
 ## Glossary
@@ -352,8 +354,9 @@ big_gaps |>
 
 5. **Reproducibility** – Code, data and rendered Quarto notebooks are version-tracked in the project repo.
 
+### Visual encoding & accessibility {#viz-note}
 
-
+All categorical plots use the **Okabe-Ito** colour-universal palette [@okabe2002] (`#009E73 green, #E69F00 orange, #56B4E9 blue …`). Viridis scales handle continuous variables. Axis titles, direct labels and dashed reference lines ensure information survives greyscale printing and the main forms of colour-vision deficiency. Hues with strong cultural valence (e.g. alert-red) are avoided to minimise framing bias.
 
 ## Digital Methods & Reproducibility {#digmethods}
 
@@ -472,6 +475,81 @@ Correlation analyses repeated separately for December 2019 and March 2020 to exp
 The following chapter discusses these findings in the broader context of structural factors and methodological considerations
 
 
+
+
+
+
+
+
+[NEW Struc]
+
+# Results {#results}
+
+## Data completeness & descriptive checks
+- 1 table with: number of countries, rows of flights, missing rows, etc. (analysis_df)
+- One‐liner on excess-mortality coverage
+
+```{r complete_tbl, echo=FALSE}
+comp_tbl <- analysis_df |>
+  dplyr::summarise(
+    n_rows = n(),
+    n_countries_total = dplyr::n_distinct(iso3),
+    n_target_dates = dplyr::n_distinct(target_date),
+
+    rows_with_flights = sum(!is.na(total_inbound_flights_combined)),
+    rows_missing_flights = sum(is.na(total_inbound_flights_combined)),
+
+    rows_with_mortality = sum(!is.na(excess_mortality_cumulative_per_million)),
+    rows_missing_mortality = sum(is.na(excess_mortality_cumulative_per_million))
+  ) |>
+  dplyr::mutate(
+    pct_missing_flights = sprintf("%.1f %%", 100 * rows_missing_flights  / n_rows),
+    pct_missing_mortality = sprintf("%.1f %%", 100 * rows_missing_mortality / n_rows)
+  ) |>
+  dplyr::select(
+    `Rows (panel)` = n_rows,
+    Countries = n_countries_total,
+    `Reference years` = n_target_dates,
+    `Rows with flights` = rows_with_flights,
+    `Rows missing flights` = rows_missing_flights,
+    `% flight NA` = pct_missing_flights,
+    `Rows with mortality` = rows_with_mortality,
+    `Rows missing mortality` = rows_missing_mortality,
+    `% mortality NA` = pct_missing_mortality
+  )
+
+knitr::kable(
+  comp_tbl,
+  caption = "Completeness of the analysis panel (Dec-2019 & Mar-2020 exposure × 2020-23 mortality snapshots)."
+)
+
+```
+
+The final analysis panel is fully balanced: all 26 continental EUROCONTROL states have complete flight-exposure and excess-mortality data for each of the four reference years (2020-2023), with 0 % missing cells.
+
+## Early exposure landscape
+- Figure 4.2a Top-10 destination bar (p_top10)
+- Figure 4.2b Route-diversity panel (panel_plot)
+
+
+## Flight exposure vs. excess mortality
+
+### Baseline 2020 snapshot
+
+Table: Spearman p + CI (with quartile gap in text) 
+Scatterplot: log flights vs death for 2020
+
+### Time-trend 2020-23
+Figure 4.4a – “Spearman ρ over time” (the multi-line plot).
+Caption: “Rank correlation between early CN/HK flight exposure and excess mortality, 2020-23. The seeding signal (ρ ≈ 0.55) vanishes within a year.”
+
+Figure 4.4b – caterpillar with CIs right below.
+Caption: “95 % bootstrap CIs confirm only the 2020 estimate differs from zero.”
+
+### Sensitivity & partial checks (one concise table)
+
+## Key takeaway 
+(enough of it, just one paragraph.)
 
 
 
