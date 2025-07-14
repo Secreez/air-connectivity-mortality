@@ -383,12 +383,9 @@ All categorical plots use the **Okabe-Ito** colour-universal palette [@okabe2002
 
 
 
+[OLD STRUC]
 
-
-[ NEXT UP! ]
-
-
-# Results
+## Results
 
 Countries in the **top quartile** of December + March flight exposure recorded **≈ 55 % higher excess mortality** than the bottom quartile (Spearman ρ ≈ 0.53, 95 % CI 0.18 - 0.80, *p* < 0.01). As shown in Table @tbl-spearman, the baseline ρ for 2020 is 0.53 with the same confidence interval.
 
@@ -410,7 +407,6 @@ Because all exposure measures precede the 5 May mortality snapshot, reverse caus
 
 ## Early air-connectivity patterns
 
-> **Note on visual encoding:** All categorical colours follow the Okabe-Ito colour-universal palette (@okabe2002). The palette’s nine hues (hex `#009E73` green, `#E69F00` orange, `#56B4E9` blue, …) remain distinguishable for readers with the main forms of colour-vision deficiency. For continuous variables the viridis family is used. Axis titles, direct labels and dashed reference lines complement hue so that information is recoverable in greyscale printouts. No colours with strong cultural valence (e.g. “warning” red) are used in maps or flow diagrams in order to avoid unwanted emotional framing.
 
 
 
@@ -486,8 +482,6 @@ The following chapter discusses these findings in the broader context of structu
 # Results {#results}
 
 ## Data completeness & descriptive checks
-- 1 table with: number of countries, rows of flights, missing rows, etc. (analysis_df)
-- One‐liner on excess-mortality coverage
 
 ```{r complete_tbl, echo=FALSE}
 comp_tbl <- analysis_df |>
@@ -528,8 +522,56 @@ knitr::kable(
 The final analysis panel is fully balanced: all 26 continental EUROCONTROL states have complete flight-exposure and excess-mortality data for each of the four reference years (2020-2023), with 0 % missing cells.
 
 ## Early exposure landscape
-- Figure 4.2a Top-10 destination bar (p_top10)
-- Figure 4.2b Route-diversity panel (panel_plot)
+
+A handful of gateways handled almost all traffic. Figure 1 (Top-10 bar chart) shows that Germany, the UK and the Netherlands alone handled > 60 % of all direct CN/HK arrivals in December 2019 and remained the top three even after the March collapse.
+Interpretation: import pressure was highly concentrated in a few Western hubs.
+
+Volume tracks route diversity. Figure 2 (origin-diversity panel) and Figure 3 (log-volume × diversity scatter) confirm a strong positive relationship (airport-level Spearman ρ ≈ 0.86, p < 0.001). Each extra ~100 flights added one-to-two new source airports.
+> Outlier note – **Liège (LGG)** sits well above the trend because it is a freight gateway, so its flight count over-states passenger exposure (see [Data Limitations](#data-limitation) for details).
+
+> Take-away: Both the amount of traffic and the variety of source cities funneled into the same Western European gateways, amplifying first-wave seeding risk.
+
+### A handful of gateways handled almost all traffic
+
+Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @top10-eu-dest-cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands—absorbed > 60 % of all arrivals** in December 2019 and still dominated after the March collapse.
+
+
+```{r top10-eu-dest-cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
+knitr::include_graphics("data/figures/bar_top10_destinations.png")
+```
+
+> Take-away: Import pressure was not evenly distributed across Europe: a few Western gateways shouldered the lion’s share of flights in both study months, setting the stage for a right-skewed country-level exposure index.
+
+### The same hubs drew the widest origin mix
+
+```{r origins_per_destination, out.width="80%", fig.align='center', fig.cap="How many distinct CN/HK airports fed each EUROCONTROL destination? Left = combined Dec 2019 + Mar 2020; right = month-by-month. Western megahubs such as **LHR (15 origins), CDG (13), FRA (12)** top the list. **Liège (LGG)** appears high despite modest volume because it is a cargo gateway, illustrating that flight counts can overstate passenger exposure at freight airports."}
+knitr::include_graphics("data/figures/bar_origins_per_destination.png")
+```
+
+> **Volume and diversity rise in tandem:** each extra ~100 flights brings one-to-two additional Chinese origin airports (airport-level Spearman ρ ≈ 0.86, p < 0.001).
+
+### Volume tracks diversity
+
+```{r, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman ρ ≈ 0.86 (p < 0.001, n = 47). Liège (LGG) lies above the trend high diversity for moderate volume—because almost all of its flights were cargo."}
+knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
+```
+
+**Interpretation.**
+Flight **volume** and **origin diversity** rise in lock-step (≈ 1–2 extra origins per +100 flights). The relationship is driven by the major passenger hubs in the upper-right corner; everywhere else remains low-volume and low-diversity. **Liège (LGG)** is the one clear freight-driven outlier—its seven Chinese origins supplied mainly cargo rotations, so it inflates exposure without adding many travellers (see [Data Limitations](#data-limitation)).
+
+> *So what?*  Because both dimensions of exposure are so right-skewed, we expect the country-level correlation with excess mortality to be pulled by the same handful of Western hubs. The next section tests exactly that.
+
+
+[NEXT TODO!]
+
+
+### The March cliff-edge
+
+```{r, out.width="80%", fig.align='center', fig.cap="March 2020 saw a cliff-edge drop in CN/HK → EU flights."}
+knitr::include_graphics("data/figures/pct_change_filtered.png")
+```
+
+By late March 2020 every country had cut ≥ 50 % of direct CN/HK traffic; 15 of 19 slashed > 90 %… (collapse_tbl appendix!)
 
 
 ## Flight exposure vs. excess mortality
@@ -592,7 +634,7 @@ Taken together, **initial flight exposure shaped only the first wave**; once SAR
 
 This study is deliberately exploratory and country-level; several caveats constrain interpretation.
 
-### Data limitations  
+### Data limitations {#data-limitation}
 
 * **Ghost / abnormal flights (load-factor bias).** “Slot-retention” flights peaked in Europe right after the first lockdown: Sun et al. detect **> 40 % low-load outliers** in April 2020 among major LCCs, clustered on dense Level-3 airport pairs such as AMS-BCN and ATH-MAD [@sun2022_b]. Because our exposure metric counts flight plans, not passengers, it over-weights these nearly empty sectors—and likewise any long-haul ghost service such as the high-fare, low-load **HKG-LHR** link documented by @warnocksmith2021.
 
@@ -660,7 +702,7 @@ Although this thesis does not make causal claims, its findings demonstrate the v
 
 ## A Data-source triage & supplementary plots {#appendix-a}
 
-### A.1  Full coverage table {#tbl-os-vs-eu-full}
+### Full coverage table {#tbl-os-vs-eu-full}
 
 ```{r tbl-os-vs-eu-full, echo=FALSE}
 knitr::kable(
@@ -670,7 +712,7 @@ versus OpenSky (OS). Rows sorted by EUROCONTROL’s December-2019 counts."
 )
 ```
 
-### A.2 OpenSky top-10 bar chart
+### OpenSky top-10 bar chart
 
 ![](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width=90%}
 
