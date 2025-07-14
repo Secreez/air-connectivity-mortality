@@ -78,7 +78,7 @@ p_top10 <- ggplot(
   scale_fill_manual(values = pal, name = NULL) +
   labs(
     title = "Top-10 EUROCONTROL destinations",
-    subtitle = "Direct passenger flights from China & Hong Kong*  (Dec 2019 and Mar 2020)",
+    subtitle = "Scheduled passenger IFR flights from China & Hong Kong*  (Dec 2019 and Mar 2020)",
     x = NULL, y = "Number of flights",
   ) +
   theme_minimal(base_size = 10) +
@@ -316,7 +316,7 @@ saveRDS(collapse_tbl, here::here("data/derived/collapse_tbl.rds"))
 * **Absolute exposure still diverged.** Germany, the UK and the Netherlands each retained **200 – 350 flights** despite large percentage drops, whereas Italy, Austria and the Nordics fell to **single-digit counts** (see "Δ flights" column).  Epidemiologically, residual *volume* matters more than the percentage.
 * **Read % with caution.** Extreme figures at tiny bases—e.g. Luxembourg –100 % (8→0), Georgia –100 % (14→0)—signal "service discontinued", not a large change in risk.
 
-## Top-10 drops and increases table
+## Top-5 drops and increases table
 
 ```{r top_tbl}
 top_tbl <- pct_df |>
@@ -329,7 +329,7 @@ top_tbl <- pct_df |>
   ) |>
   arrange(direction, pct) |>
   group_by(direction) |>
-  slice_head(n = 10) |>
+  slice_head(n = 5) |>
   mutate(Rank = row_number()) |>
   ungroup() |>
   dplyr::select(direction, Rank,

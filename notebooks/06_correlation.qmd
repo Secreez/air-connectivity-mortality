@@ -142,7 +142,7 @@ spearman_res <- purrr::map_dfr(
 ```
 
 
-```{r tbl-spearman}
+```{r tbl-cor-spearman}
 knitr::kable(
   spearman_res |>
     dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
