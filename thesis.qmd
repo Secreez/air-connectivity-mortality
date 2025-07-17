@@ -457,14 +457,14 @@ Flight **volume** and **origin diversity** rise in lock-step (≈ 1–2 extra or
 ### The March cliff‑edge {#march-cliff}
 
 Only countries with a **meaningful December baseline** are shown.  
-We keep the 21 EUROCONTROL states that logged **≥ 5 direct CN/HK flights in Dec 2019**; anything smaller (e.g. Croatia’s single inbound charter) would make a –100 % bar noisy but epidemiologically trivial.
+We keep the 21 EUROCONTROL states that logged **≥ 5 direct CN/HK flights in Dec 2019**; anything smaller (e.g. Croatia’s single inbound charter) would make a –100 % bar noisy but epidemiologically trivial.
 
 The same ≥ 5‑flight filter is used for:
 
 * **Figure @pct_change_filtered** (percentage‑change bar plot)  
 * **Table @tbl-collapse** (absolute Δ‑flights in the appendix)
 
-All later correlation work returns to the full 26‑country panel.
+All later correlation work (Section @exposure-mortality) returns to the full 26‑country panel.
 
 ```{r pct_change_filtered, out.width="80%", fig.align='center'}
 knitr::include_graphics("data/figures/pct_change_filtered.png")
@@ -488,6 +488,9 @@ With CN/HK traffic cut to a trickle after late March, any differences we still o
 *(External yard‑stick: by December 2020, CN–EU long‑haul capacity was ≈ 7 % of 2019 levels, while China’s domestic network had already rebounded to ≈ 93 % [@warnocksmith2021].)*
 
 
+
+
+[NEXT TODO! CHECKUP!]
 
 ### Baseline 2020 snapshot – 5 May 2020 {#baseline‑2020}
 
@@ -514,29 +517,73 @@ gap <- with(
           median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined >= q[2] ]) -
           median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined <= q[1] ])
          )
-gap <- round(gap)
+gap <- round(gap) # 465
 ```
 
 ```{r fig_scatter_2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
 print(p20)
 ```
 
+**Reading the 2020 snapshot.**  
+All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl-spearman-2020). Using the **combined Dec + Mar count**:
 
+* **Spearman ρ ≈ 0.53** (95 % CI 0.18 – 0.77, *p* = 0.007).
+* Countries in the **top exposure quartile** recorded **≈ `r gap` excess deaths / million** more than those in the bottom quartile.
+* Figure @fig-scatter-2020 shows that the right‑hand tail is pulled by the big Western gateways (**DEU, GBR, NLD, FRA, ESP, ITA**).
 
+Because exposure is measured **before** the 5 May outcome, reverse causation is implausible for the December slice and largely mitigated for the March slice.
 
-
+The next subsection tracks the same correlation through **2021–23** to see how quickly the signal fades.
 
 
 
 ### Does the signal persist? (2020 → 2023)
 
 
+```{r tbl-spearman-all, echo=FALSE}
+tbl_all <- spearman_res |>
+  dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
+  dplyr::mutate(across(where(is.numeric), ~round(.x, 3)))
+
+knitr::kable(
+  tbl_all,
+  caption = "Table X — Spearman $\\rho$ between early flight exposure and cumulative excess mortality, 2020–2023."
+)
+```
+
+```{r fig-rho-timeseries, fig.cap="Rank correlation between early CN/HK flight exposure and excess mortality, 2020–2023.  The seeding signal vanishes within a year.", fig.asp=0.6}
+p_rho
+```
+
+```{r fig-rho-caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
+gg_cater
+```
+
+@rho-timeseries makes the time‑trend clear: **ρ collapses to ≈ 0 in 2021 and flips negative thereafter.**  The caterpillar plot (@rho-caterpillar) shows that only the 2020 coefficient’s CI excludes zero.
 
 ### Sensitivity & partial checks
 
+```{r tbl-sensitivity, echo=FALSE}
+sens_tbl <- partial_by_year |>
+  dplyr::select(year,
+                `ρ baseline` = rho_baseline,
+                `ρ adj age 65+` = rho_adj_age,
+                `p adj` = p_adj_age) |>
+  dplyr::mutate(across(where(is.numeric), round, 3))
 
+knitr::kable(sens_tbl,
+  caption = "Sensitivity checks: baseline vs partial Spearman controlling for age ≥ 65."
+)
+```
+
+*Controlling for population share ≥ 65 changes ρ by ≤ 0.02 in any year (Table @tbl-sensitivity). The sign‑flip therefore cannot be explained by age structure.*
 
 ### Key take‑away
+
+Early direct flights from China and Hong Kong left a clear statistical footprint on Europe’s **first‑wave** excess mortality, but that imprint **evaporated within a year**.  Once SARS‑CoV‑2 was established, domestic factors—age, health‑system capacity, vaccination, socioeconomic vulnerability—overwhelmed any lingering signal from pre‑lockdown air connectivity.
+
+
+
 
 
 
@@ -548,10 +595,10 @@ print(p20)
 
 # Discussion
 
-## Interpretation of Findings
+## Interpretation of Findings 
 
 Early international connectivity mattered—but only briefly.  
-In 2020, countries in the top quartile of direct CN/HK flight exposure registered **≈ 55 % higher excess mortality** than the bottom quartile, and the rank-based association was moderate-to-strong (Spearman ρ = 0.526, 95 % CI 0.177 - 0.771, *p* = 0.007; Table @tbl-spearman).
+In 2020, countries in the top quartile of direct CN/HK flight exposure registered **≈ 55 % higher excess mortality** than the bottom quartile, and the rank-based association was moderate-to-strong (Spearman ρ = 0.526, 95 % CI 0.177 - 0.771, *p* = 0.007; Table @tbl-spearman-all).
 
 The signal then **collapsed**: ρ fell to -0.306 in 2021 (CI -0.622 - 0.111, n.s.) and turned **significantly negative** in 2022 (ρ = -0.460, 95 % CI -0.792 - -0.001, *p* = 0.021) and remained negative in 2023 (ρ = -0.419, 95 % CI -0.749 - 0.045, *p* = 0.037).  
 
@@ -593,7 +640,7 @@ noise [@kelly2021].
 
 * **Population denominator.** OWID mid-2020 estimates differ from raw UN-WPP by < 5 % for 38 / 41 countries; switching to WPP shifts ρ by < 0.01, so OWID values are retained (see *04_population_qc*).
 
-### Methodological limitations  
+### Methodological limitations
 
 * **Ecological design & small N.** Results rest on ≈ 25 national aggregates; sub-national heterogeneity is hidden, and bootstrap CIs remain wide.  
 * **No causal ranking.**  Ioannidis et al. stress that “*country vulnerability dominated the cumulative impact*” and warn that **ranking national responses on raw excess-death point estimates is misleading**.  Accordingly, our study remains exploratory: confounding from wealth, NPIs, vaccination and health-system resources cannot be ruled out [@ioannidis2023].
@@ -608,7 +655,7 @@ noise [@kelly2021].
 
 
 
-### Methodological Reflections
+### Methodological Reflections 
 
 The earliest project sketch—floated by Neuwirth on the Z_GIS thesis blog in Nov 2024 [@neuwirth2024]—envisioned a global SIR network on “effective-distance” air routes [@brockmann2013]. A quick reality-check of open ADS-B coverage (see Appendix A) showed that February-2020 China-Europe traffic is too thin for such simulation, so the design pivoted to a descriptive, Europe-only correlation.
 
@@ -654,10 +701,23 @@ versus OpenSky (OS). Rows sorted by EUROCONTROL’s December-2019 counts."
 )
 ```
 
+### Absolute change in flights, Mar 2020 vs Dec 2019 {#tbl-collapse}
+
+```{r tbl-collapse, echo = FALSE}
+knitr::kable(
+  collapse_tbl |>
+    dplyr::select(
+      Country,
+      `Dec 2019`,
+      `Mar 2020`,
+      `Δ flights`
+    ),
+  caption = "Table A.2 Absolute change in direct CN/HK → EUROCONTROL flights between December 2019 and March 2020 (countries with ≥ 5 December flights). Residual March counts highlight hubs that still handled 200 – 350 rotations after the policy cliff-edge."
+)
+```
+
 ### OpenSky top-10 bar chart
 
 ![](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width=90%}
 
 **Figure A.2**: Top-10 destinations by number of direct CN/HK flights in OpenSky data (Dec 2019, Feb 2020, Mar 2020). OpenSky data reflects community ADS-B coverage, not actual filed flights, and shows significant variation between months. The grouped bar format highlights erratic coverage patterns and explains why EUROCONTROL data was prioritized.
-
-
