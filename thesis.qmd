@@ -517,7 +517,7 @@ gap <- with(
           median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined >= q[2] ]) -
           median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined <= q[1] ])
          )
-gap <- round(gap)
+gap <- round(gap) # 465
 ```
 
 ```{r fig_scatter_2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
