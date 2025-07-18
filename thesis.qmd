@@ -9,12 +9,13 @@ author:
     affiliations:
       - University of Salzburg
 keywords:
-  - COVID-19
-  - excess mortality
-  - air connectivity
-  - Spearman rank
+  - Epidemiology
+  - COVID‑19 pandemic
+  - Excess mortality
+  - Air travel connectivity
+  - Spearman correlation
+  - International mobility
   - Europe
-  - mobility
 abstract: |
   *AFTER RESULTS!*
 key-points:
