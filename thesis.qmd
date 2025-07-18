@@ -508,8 +508,8 @@ knitr::kable(
 
 ```{r quartile_gap, echo = FALSE}
 snap20 <- corr_df |>
-  filter(target_date == as.Date("2020-05-05")) |>
-  arrange(total_inbound_flights_combined)
+  dplyr::filter(target_date == as.Date("2020-05-05")) |>
+  dplyr::arrange(total_inbound_flights_combined)
 
 q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
 gap <- with(
@@ -583,16 +583,6 @@ knitr::kable(sens_tbl,
 Early direct flights from China and Hong Kong left a clear statistical footprint on Europe’s **first‑wave** excess mortality, but that imprint **evaporated within a year**.  Once SARS‑CoV‑2 was established, domestic factors—age, health‑system capacity, vaccination, socioeconomic vulnerability—overwhelmed any lingering signal from pre‑lockdown air connectivity.
 
 
-
-
-
-
-
-
-
-
-
-
 # Discussion
 
 ## Interpretation of Findings 
@@ -619,7 +609,7 @@ Several country-level attributes likely modulated the time-varying ρ pattern:
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
-## Limitations  
+## Limitations  (CONCLUSION REIN BAUEN ! KRITIKPUNKTE !  Found out that bla , 2 Absätze dann limitations dannach ausblick / Future Work )
 
 This study is deliberately exploratory and country-level; several caveats constrain interpretation.
 
@@ -668,15 +658,26 @@ I prototyped that approach, together with SEIR-style extensions summarised for c
 Accordingly, I pivoted to a lean, descriptive design: rank-correlating fixed pre-epidemic flight exposure with subsequent excess mortality. While less mechanistic, the approach is fully reproducible with public data and still illuminates the early-seeding question.
 
 
-
 # Conclusion
 
-## Key Findings
+## Key Findings  
+
+Our exploratory rank‑correlation shows that heavy direct CN/HK traffic **explains a sizeable share of Europe’s first‑wave excess mortality (ρ≈0.53, p<0.01)**, but the signal disappears — and reverses — after 2020, once domestic factors dominate.
+
+## Limitations  
+
+* **Flight metric ≠ passengers.** Cargo‑ & Ghost‑flights inflation possible; loads unknown.  
+* **Snapshot gap.** No February ADRR slice ⇒ possible under‑/mis‑allocation of exposure.  
+* **Ecological n ≈ 25.** Country‑level design: residual confounding (wealth, NPI strength, ICU capacity) cannot be ruled out.
 
 ## Implications & Future Work
 
-## Why Exploratory Work Matters
-Although this thesis does not make causal claims, its findings demonstrate the value of transparent, reproducible exploratory analysis. When approached with methodological humility and critical awareness, even basic statistical patterns—such as the timing and structure of early international flight exposure—can yield insights into complex public health events. In a field often pressured by urgent narratives or overstated certainty, exploratory studies like this play a role in grounding interpretation and informing future research directions.
+Early border controls can *buy time*, but sustained mortality differences hinge on internal capacity (vaccines, healthcare, governance). Future work should  
+1. add passenger‑level data (IATA/OAG) to down‑weight cargo rotations,  
+2. extend exposure beyond direct flights (multi‑leg itineraries, maritime links), and  
+3. test sub‑national panels to reduce ecological fallacy.
+
+**Why Exploratory Work Matters.** Transparent, fully reproducible pipelines let other researchers critique, extend, or reuse every step — essential when policy stakes and data gaps are high.
 
 # References
 
