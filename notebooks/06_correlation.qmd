@@ -152,9 +152,10 @@ knitr::kable(
 ```
 
 ```{r save-spearman_res, echo=FALSE}
-# Spearman-Ergebnistabelle sichern
 saveRDS(spearman_res,
         here::here("data/derived/spearman_res.rds"))
+saveRDS(corr_df,
+        here::here("data/derived/corr_df.rds"))
 ```
 
 **Key patterns:**

@@ -1,55 +1,66 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 shopt -s failglob
 
+# --- directories -------------------------------------------------------------
 RAW=data/raw
 FLIGHTS="$RAW/flight_data"
 OURAIRPORTS="$RAW/OurAirports"
 OWID="$RAW/owid"
 
-log_time() {
-  END=$(date +%s)
-  ELAPSED=$((END-START))
-  echo "$1 took ${ELAPSED} seconds."
-}
+# --- helper ------------------------------------------------------------------
+timestamp() { date "+%Y-%m-%d %H:%M:%S"; }
+step()       { echo -e "\n[$(timestamp)] $*"; }
+timer_start(){ _t0=$(date +%s); }
+timer_end()  { echo "-> done in $(( $(date +%s) - _t0 )) s"; }
 
-echo "Checking data dependencies..."
-START=$(date +%s)
+# -----------------------------------------------------------------------------#
+step "1 Checking data dependencies"
+timer_start
 
-if ! find "$FLIGHTS/201912" -name '*.csv.gz' -print -quit | grep -q . && \
+# flight CSVs Dec‑2019 + Mar‑2020
+if ! find "$FLIGHTS/201912" -name '*.csv.gz' -print -quit | grep -q . ||
    ! find "$FLIGHTS/202003" -name '*.csv.gz' -print -quit | grep -q .; then
-  echo "ERROR: No .csv.gz files found..."
+  echo "✗ flight .csv.gz dumps missing in $FLIGHTS/{201912,202003}"
   exit 1
 fi
 
-if [ ! -f "$OURAIRPORTS/airports.csv" ]; then
-  echo "ERROR: airports.csv not found in $OURAIRPORTS"
-  exit 1
+# OurAirports & OWID
+for f in "$OURAIRPORTS/airports.csv" "$OWID/owid-covid-data.csv"; do
+  [[ -f "$f" ]] || { echo "✗ missing $f"; exit 1; }
+done
+timer_end
+
+# -----------------------------------------------------------------------------#
+step "2 Ensuring R package stack (renv / tinytex)"
+timer_start
+Rscript R/00_load_libs.R 
+Rscript -e 'if (!tinytex::is_tinytex()) tinytex::install_tinytex()'
+timer_end
+
+# -----------------------------------------------------------------------------#
+step "3 Running preprocessing notebooks"
+timer_start
+Rscript notebooks/01_excess_snapshots.R
+Rscript notebooks/02_flight_filter.R
+
+
+if [[ -f notebooks/02b_flight_opensky.R ]]; then
+  Rscript notebooks/02b_flight_opensky.R
+else
+  echo " 02b_flight_opensky.R not found – skipping OpenSky coverage audit"
 fi
 
-if [ ! -f "$OWID/owid-covid-data.csv" ]; then
-  echo "ERROR: owid-covid-data.csv not found in $OWID"
-  exit 1
-fi
+Rscript notebooks/03_merge_exposure.R
+timer_end
 
-log_time "Data dependency check"
-
-echo "Checking/Installing R packages..."
-START=$(date +%s)
-Rscript R/00_load_libs.R
-log_time "R package check/install"
-
-echo "Running data preprocessing (01-03)..."
-START=$(date +%s)
-Rscript notebooks/01_excess_snapshots.R || { echo "ERROR: 01_excess_snapshots.R failed"; exit 1; }
-Rscript notebooks/02_flight_filter.R     || { echo "ERROR: 02_flight_filter.R failed"; exit 1; }
-Rscript notebooks/03_merge_exposure.R    || { echo "ERROR: 03_merge_exposure.R failed"; exit 1; }
-log_time "Preprocessing scripts"
-
-echo "Rendering the Quarto project..."
-START=$(date +%s)
+# -----------------------------------------------------------------------------#
+step "4 Rendering Quarto (HTML + PDF)"
+timer_start
 quarto render
-log_time "Quarto render"
+timer_end
 
-echo "All done. Manuscript and notebooks built successfully."
-echo "Open _manuscript/index.html in your browser to view the main manuscript."
+# -----------------------------------------------------------------------------#
+step "✔ Build complete"
+echo "  ↪ HTML: _output/thesis.html"
+echo "  ↪  PDF: _output/thesis.pdf"

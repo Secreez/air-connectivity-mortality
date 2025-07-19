@@ -37,7 +37,7 @@ partial_by_year  <- readRDS(here::here("data", "derived", "partial_by_year.rds")
 rho_restricted   <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
 coverage_tbl     <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
 big_gaps         <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
-
+corr_df          <- readRDS(here::here("data", "derived", "corr_df.rds"))
 analysis_df      <- readRDS(here::here("data", "processed", "analysis_df.rds"))
 
 source(here::here("R", "00_load_libs.R"))
