@@ -495,7 +495,7 @@ With CN/HK traffic cut to a trickle after late March, any differences we still o
 
 ### Baseline 2020 snapshot – 5 May 2020 {#baseline‑2020}
 
-```{r tbl‑spearman‑2020, echo = FALSE}
+```{r tbl-spearman-2020, echo = FALSE}
 tbl_2020 <- spearman_res |>
   filter(year == 2020) |>
   dplyr::select(variable, rho, ci_lo, ci_hi, p, n) |>
@@ -521,9 +521,10 @@ gap <- with(
 gap <- round(gap) # 465
 ```
 
-```{r fig_scatter_2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
-print(p20)
+```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
+knitr::include_graphics("data/figures/scatter_2020.png")
 ```
+
 
 **Reading the 2020 snapshot.**  
 All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl-spearman-2020). Using the **combined Dec + Mar count**:
@@ -552,15 +553,12 @@ knitr::kable(
 )
 ```
 
-```{r fig-rho-timeseries, fig.cap="Rank correlation between early CN/HK flight exposure and excess mortality, 2020–2023.  The seeding signal vanishes within a year.", fig.asp=0.6}
-p_rho
-```
-
 ```{r fig-rho-caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
-gg_cater
+knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
-@rho-timeseries makes the time‑trend clear: **ρ collapses to ≈ 0 in 2021 and flips negative thereafter.**  The caterpillar plot (@rho-caterpillar) shows that only the 2020 coefficient’s CI excludes zero.
+Figure @fig-rho-caterpillar shows that only the 2020 coefficient is significantly positive; from 2021 onward the confidence intervals straddle (or fall below) zero, confirming the sign‑flip.
+
 
 ### Sensitivity & partial checks
 
@@ -593,7 +591,7 @@ In 2020, countries in the top quartile of direct CN/HK flight exposure registere
 
 The signal then **collapsed**: ρ fell to -0.306 in 2021 (CI -0.622 - 0.111, n.s.) and turned **significantly negative** in 2022 (ρ = -0.460, 95 % CI -0.792 - -0.001, *p* = 0.021) and remained negative in 2023 (ρ = -0.419, 95 % CI -0.749 - 0.045, *p* = 0.037).  
 
-A one-shot confounder check (@confounder_test) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
+A one-shot confounder check (@tbl-sensitivity) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
 
 
 [Here the Timeline Plot!]
