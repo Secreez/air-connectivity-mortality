@@ -9,12 +9,13 @@ author:
     affiliations:
       - University of Salzburg
 keywords:
-  - COVID-19
-  - excess mortality
-  - air connectivity
-  - Spearman rank
+  - Epidemiology
+  - COVID‑19 pandemic
+  - Excess mortality
+  - Air travel connectivity
+  - Spearman correlation
+  - International mobility
   - Europe
-  - mobility
 abstract: |
   *AFTER RESULTS!*
 key-points:
@@ -36,7 +37,7 @@ partial_by_year  <- readRDS(here::here("data", "derived", "partial_by_year.rds")
 rho_restricted   <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
 coverage_tbl     <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
 big_gaps         <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
-
+corr_df          <- readRDS(here::here("data", "derived", "corr_df.rds"))
 analysis_df      <- readRDS(here::here("data", "processed", "analysis_df.rds"))
 
 source(here::here("R", "00_load_libs.R"))
@@ -494,7 +495,7 @@ With CN/HK traffic cut to a trickle after late March, any differences we still o
 
 ### Baseline 2020 snapshot – 5 May 2020 {#baseline‑2020}
 
-```{r tbl‑spearman‑2020, echo = FALSE}
+```{r tbl-spearman-2020, echo = FALSE}
 tbl_2020 <- spearman_res |>
   filter(year == 2020) |>
   dplyr::select(variable, rho, ci_lo, ci_hi, p, n) |>
@@ -508,8 +509,8 @@ knitr::kable(
 
 ```{r quartile_gap, echo = FALSE}
 snap20 <- corr_df |>
-  filter(target_date == as.Date("2020-05-05")) |>
-  arrange(total_inbound_flights_combined)
+  dplyr::filter(target_date == as.Date("2020-05-05")) |>
+  dplyr::arrange(total_inbound_flights_combined)
 
 q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
 gap <- with(
@@ -520,9 +521,10 @@ gap <- with(
 gap <- round(gap) # 465
 ```
 
-```{r fig_scatter_2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
-print(p20)
+```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec 2019 + Mar 2020, log‑scale) versus excess deaths per million on 5 May 2020. Spearman $\\rho \\approx 0.53$ (*p*< 0.01)."}
+knitr::include_graphics("data/figures/scatter_2020.png")
 ```
+
 
 **Reading the 2020 snapshot.**  
 All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl-spearman-2020). Using the **combined Dec + Mar count**:
@@ -551,15 +553,12 @@ knitr::kable(
 )
 ```
 
-```{r fig-rho-timeseries, fig.cap="Rank correlation between early CN/HK flight exposure and excess mortality, 2020–2023.  The seeding signal vanishes within a year.", fig.asp=0.6}
-p_rho
-```
-
 ```{r fig-rho-caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
-gg_cater
+knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
-@rho-timeseries makes the time‑trend clear: **ρ collapses to ≈ 0 in 2021 and flips negative thereafter.**  The caterpillar plot (@rho-caterpillar) shows that only the 2020 coefficient’s CI excludes zero.
+Figure @fig-rho-caterpillar shows that only the 2020 coefficient is significantly positive; from 2021 onward the confidence intervals straddle (or fall below) zero, confirming the sign‑flip.
+
 
 ### Sensitivity & partial checks
 
@@ -583,16 +582,6 @@ knitr::kable(sens_tbl,
 Early direct flights from China and Hong Kong left a clear statistical footprint on Europe’s **first‑wave** excess mortality, but that imprint **evaporated within a year**.  Once SARS‑CoV‑2 was established, domestic factors—age, health‑system capacity, vaccination, socioeconomic vulnerability—overwhelmed any lingering signal from pre‑lockdown air connectivity.
 
 
-
-
-
-
-
-
-
-
-
-
 # Discussion
 
 ## Interpretation of Findings 
@@ -602,7 +591,7 @@ In 2020, countries in the top quartile of direct CN/HK flight exposure registere
 
 The signal then **collapsed**: ρ fell to -0.306 in 2021 (CI -0.622 - 0.111, n.s.) and turned **significantly negative** in 2022 (ρ = -0.460, 95 % CI -0.792 - -0.001, *p* = 0.021) and remained negative in 2023 (ρ = -0.419, 95 % CI -0.749 - 0.045, *p* = 0.037).  
 
-A one-shot confounder check (@confounder_test) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
+A one-shot confounder check (@tbl-sensitivity) showed that controlling for the share of population ≥ 65 y alters ρ by < 0.02 in any year, confirming that age structure is not driving the pattern.
 
 
 [Here the Timeline Plot!]
@@ -619,7 +608,7 @@ Several country-level attributes likely modulated the time-varying ρ pattern:
 
 Taken together, **initial flight exposure shaped only the first wave**; once SARS-CoV-2 circulated locally, domestic resources and policy dominated the death toll. This helps explain why the mobility signal vanishes—and even inverts—after 2020.
 
-## Limitations  
+## Limitations  (CONCLUSION REIN BAUEN ! KRITIKPUNKTE !  Found out that bla , 2 Absätze dann limitations dannach ausblick / Future Work )
 
 This study is deliberately exploratory and country-level; several caveats constrain interpretation.
 
@@ -668,15 +657,26 @@ I prototyped that approach, together with SEIR-style extensions summarised for c
 Accordingly, I pivoted to a lean, descriptive design: rank-correlating fixed pre-epidemic flight exposure with subsequent excess mortality. While less mechanistic, the approach is fully reproducible with public data and still illuminates the early-seeding question.
 
 
-
 # Conclusion
 
-## Key Findings
+## Key Findings  
+
+Our exploratory rank‑correlation shows that heavy direct CN/HK traffic **explains a sizeable share of Europe’s first‑wave excess mortality (ρ≈0.53, p<0.01)**, but the signal disappears — and reverses — after 2020, once domestic factors dominate.
+
+## Limitations  
+
+* **Flight metric ≠ passengers.** Cargo‑ & Ghost‑flights inflation possible; loads unknown.  
+* **Snapshot gap.** No February ADRR slice ⇒ possible under‑/mis‑allocation of exposure.  
+* **Ecological n ≈ 25.** Country‑level design: residual confounding (wealth, NPI strength, ICU capacity) cannot be ruled out.
 
 ## Implications & Future Work
 
-## Why Exploratory Work Matters
-Although this thesis does not make causal claims, its findings demonstrate the value of transparent, reproducible exploratory analysis. When approached with methodological humility and critical awareness, even basic statistical patterns—such as the timing and structure of early international flight exposure—can yield insights into complex public health events. In a field often pressured by urgent narratives or overstated certainty, exploratory studies like this play a role in grounding interpretation and informing future research directions.
+Early border controls can *buy time*, but sustained mortality differences hinge on internal capacity (vaccines, healthcare, governance). Future work should  
+1. add passenger‑level data (IATA/OAG) to down‑weight cargo rotations,  
+2. extend exposure beyond direct flights (multi‑leg itineraries, maritime links), and  
+3. test sub‑national panels to reduce ecological fallacy.
+
+**Why Exploratory Work Matters.** Transparent, fully reproducible pipelines let other researchers critique, extend, or reuse every step — essential when policy stakes and data gaps are high.
 
 # References
 
