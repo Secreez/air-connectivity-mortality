@@ -3,8 +3,8 @@
 # Compares OWID mid‑2020 population with UN‑WPP mid‑2020
 # Usage: Rscript notebooks/01_excess_snapshots.R
 
-source(here::here("R", "00_load_libs.R")) # defines load_dependencies()
-load_dependencies() # installs + attaches pkgs
+source(here::here("R", "00_load_libs.R"))
+load_dependencies()
 
 # helpers
 euro_ISO3 <- readr::read_csv(

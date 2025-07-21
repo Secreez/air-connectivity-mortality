@@ -4,9 +4,7 @@
 
 ## Research idea
 
-> **Question** Did European countries that received **more direct flights from  
-> Mainland China / Hong Kong in Dec 2019 & Mar 2020** suffer *higher* excess-
-> mortality during the first COVID-19 wave (May 2020)?
+> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
 
 We join EUROCONTROL IFR data with OWID’s excess-mortality series and:
 

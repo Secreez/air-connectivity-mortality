@@ -23,10 +23,6 @@ key-points:
 date: last-modified
 bibliography: thesis_ref.bib
 number-sections: true
-format:
-  html:
-    toc: true
-    toc-depth: 3
 ---
 
 ```{r load_derived, include=FALSE}
@@ -427,10 +423,10 @@ The final analysis panel is fully balanced: all 26 continental EUROCONTROL state
 
 ### A handful of gateways handled almost all traffic
 
-Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @top10-eu-dest-cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands—absorbed > 60 % of all arrivals** in December 2019 and still dominated after the March collapse.
+Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @fig-top10_eu_dest_cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands—absorbed > 60 % of all arrivals** in December 2019 and still dominated after the March collapse.
 
 
-```{r top10-eu-dest-cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
+```{r top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
 knitr::include_graphics("data/figures/bar_top10_destinations.png")
 ```
 
@@ -462,12 +458,12 @@ We keep the 21 EUROCONTROL states that logged **≥ 5 direct CN/HK flights in De
 
 The same ≥ 5‑flight filter is used for:
 
-* **Figure @pct_change_filtered** (percentage‑change bar plot)  
+* **Figure @fig-pct_change_filtered** (percentage‑change bar plot)  
 * **Table @tbl-collapse** (absolute Δ‑flights in the appendix)
 
 All later correlation work (Section @exposure-mortality) returns to the full 26‑country panel.
 
-```{r pct_change_filtered, out.width="80%", fig.align='center'}
+```{r pct_change_filtered, out.width="80%", fig-cap="..", fig.align='center'}
 knitr::include_graphics("data/figures/pct_change_filtered.png")
 ```
 
@@ -495,7 +491,7 @@ With CN/HK traffic cut to a trickle after late March, any differences we still o
 
 ### Baseline 2020 snapshot – 5 May 2020 {#baseline‑2020}
 
-```{r tbl-spearman-2020, echo = FALSE}
+```{r tbl_spearman_2020, echo = FALSE}
 tbl_2020 <- spearman_res |>
   filter(year == 2020) |>
   dplyr::select(variable, rho, ci_lo, ci_hi, p, n) |>
@@ -527,7 +523,7 @@ knitr::include_graphics("data/figures/scatter_2020.png")
 
 
 **Reading the 2020 snapshot.**  
-All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl-spearman-2020). Using the **combined Dec + Mar count**:
+All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl_spearman_2020). Using the **combined Dec + Mar count**:
 
 * **Spearman ρ ≈ 0.53** (95 % CI 0.18 – 0.77, *p* = 0.007).
 * Countries in the **top exposure quartile** recorded **≈ `r gap` excess deaths / million** more than those in the bottom quartile.
@@ -542,7 +538,7 @@ The next subsection tracks the same correlation through **2021–23** to see how
 ### Does the signal persist? (2020 → 2023)
 
 
-```{r tbl-spearman-all, echo=FALSE}
+```{r tbl_spearman_all, echo=FALSE}
 tbl_all <- spearman_res |>
   dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
   dplyr::mutate(across(where(is.numeric), ~round(.x, 3)))
@@ -553,16 +549,16 @@ knitr::kable(
 )
 ```
 
-```{r fig-rho-caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
+```{r rho_caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
 knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
-Figure @fig-rho-caterpillar shows that only the 2020 coefficient is significantly positive; from 2021 onward the confidence intervals straddle (or fall below) zero, confirming the sign‑flip.
+Figure @fig-rho_caterpillar shows that only the 2020 coefficient is significantly positive; from 2021 onward the confidence intervals straddle (or fall below) zero, confirming the sign‑flip.
 
 
 ### Sensitivity & partial checks
 
-```{r tbl-sensitivity, echo=FALSE}
+```{r tbl_sensitivity, echo=FALSE}
 sens_tbl <- partial_by_year |>
   dplyr::select(year,
                 `ρ baseline` = rho_baseline,
@@ -575,7 +571,7 @@ knitr::kable(sens_tbl,
 )
 ```
 
-*Controlling for population share ≥ 65 changes ρ by ≤ 0.02 in any year (Table @tbl-sensitivity). The sign‑flip therefore cannot be explained by age structure.*
+*Controlling for population share ≥ 65 changes ρ by ≤ 0.02 in any year (Table @tbl_sensitivity). The sign‑flip therefore cannot be explained by age structure.*
 
 ### Key take‑away
 
@@ -701,9 +697,9 @@ versus OpenSky (OS). Rows sorted by EUROCONTROL’s December-2019 counts."
 )
 ```
 
-### Absolute change in flights, Mar 2020 vs Dec 2019 {#tbl-collapse}
+### Absolute change in flights, Mar 2020 vs Dec 2019 {#collapse}
 
-```{r tbl-collapse, echo = FALSE}
+```{r tbl_collapse, echo = FALSE}
 knitr::kable(
   collapse_tbl |>
     dplyr::select(
@@ -717,6 +713,7 @@ knitr::kable(
 ```
 
 ### OpenSky top-10 bar chart
+
 
 ![](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width=90%}
 

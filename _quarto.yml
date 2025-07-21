@@ -19,12 +19,12 @@ format:
     comments:
       hypothesis: true
   pdf:
+    latex-engine: xelatex
     toc: true
     number-sections: true
     papersize: a4
-    geometry: "margin=1in"
+    geometry: margin=1in
 
-    
 manuscript:
   article: thesis.qmd   
   notebooks:    
