@@ -416,7 +416,7 @@ The final analysis panel is fully balanced: all 26 continental EUROCONTROL state
 
 ## Early exposure landscape
 
-> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @top10-eu-dest-cntry shows that DEU, GBR and NLD alone handled > 60 % of all arrivals in December 2019, and they kept that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London‑Heathrow was linked to 15, Paris‑CDG to 13, and Frankfurt to 12 source airports (@origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
+> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @top10_eu_dest_cntry shows that DEU, GBR and NLD alone handled > 60 % of all arrivals in December 2019, and they kept that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London‑Heathrow was linked to 15, Paris‑CDG to 13, and Frankfurt to 12 source airports (@fig-origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @fig-scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
 
 > *Together, these three plots show that both *how much* traffic and *how many* source cities were concentrated in the same Western hubs, setting up a right‑skewed exposure profile at country level.*
 
@@ -442,7 +442,7 @@ knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 
 ### Volume tracks diversity
 
-```{r, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman ρ ≈ 0.86 (p < 0.001, n = 47). Liège (LGG) lies above the trend high diversity for moderate volume—because almost all of its flights were cargo."}
+```{r scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman ρ ≈ 0.86 (p < 0.001, n = 47). Liège (LGG) lies above the trend high diversity for moderate volume—because almost all of its flights were cargo."}
 knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 ```
 
@@ -463,7 +463,7 @@ The same ≥ 5‑flight filter is used for:
 
 All later correlation work (Section @exposure-mortality) returns to the full 26‑country panel.
 
-```{r pct_change_filtered, out.width="80%", fig-cap="..", fig.align='center'}
+```{r pct_change_filtered, out.width="80%", fig.cap="Percentage change in direct CN/HK flights between the December 2019 baseline and March 2020 for countries with ≥5 December flights (n = 21). Every country cut traffic by at least 50%; 7/21 reduced >90%, and 14/21 ≥75%. Belgium, the Netherlands and Germany retained the highest residual volumes.", fig.align='center'}
 knitr::include_graphics("data/figures/pct_change_filtered.png")
 ```
 
@@ -523,7 +523,7 @@ knitr::include_graphics("data/figures/scatter_2020.png")
 
 
 **Reading the 2020 snapshot.**  
-All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl_spearman_2020). Using the **combined Dec + Mar count**:
+All four exposure metrics are positively associated with first‑wave excess mortality (Table @tbl-tbl_spearman_2020). Using the **combined Dec + Mar count**:
 
 * **Spearman ρ ≈ 0.53** (95 % CI 0.18 – 0.77, *p* = 0.007).
 * Countries in the **top exposure quartile** recorded **≈ `r gap` excess deaths / million** more than those in the bottom quartile.
@@ -571,7 +571,7 @@ knitr::kable(sens_tbl,
 )
 ```
 
-*Controlling for population share ≥ 65 changes ρ by ≤ 0.02 in any year (Table @tbl_sensitivity). The sign‑flip therefore cannot be explained by age structure.*
+*Controlling for population share ≥ 65 changes ρ by ≤ 0.02 in any year (Table @tbl-tbl_sensitivity). The sign‑flip therefore cannot be explained by age structure.*
 
 ### Key take‑away
 
