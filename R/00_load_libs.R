@@ -1,34 +1,34 @@
-options(repos = c(CRAN = "https://cloud.r-project.org"))
+# R/00_load_libs.R
+cran_packages <- c(
+  "styler", "tidyverse", "here", "countrycode",
+  "ggrepel", "scales", "boot", "ppcor", "lubridate", "data.table"
+)
 
-load_dependencies <- function() {
-  cran_packages <- c(
-    "styler", "tidyverse", "here", "countrycode",
-    "ggrepel", "scales", "boot", "ppcor", "lubridate", "data.table"
-  )
+github_specs <- c("PPgp/wpp2024")
+pkg_from_gh <- function(spec) sub(".*/", "", spec)
+github_pkgs <- vapply(github_specs, pkg_from_gh, character(1))
 
-  github_packages <- list(
-    wpp2024 = "PPgp/wpp2024"
-  )
+all_pkgs <- c(cran_packages, github_pkgs)
 
-  cran_missing <- setdiff(cran_packages, rownames(installed.packages()))
-  if (length(cran_missing)) install.packages(cran_missing)
-
-  for (pkg in names(github_packages)) {
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-      options(timeout = max(600, getOption("timeout")))
-      devtools::install_github(github_packages[[pkg]])
-    }
+load_or_stop <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(sprintf(
+      "Package '%s' is not installed. Run renv::restore() (or set INSTALL_MISSING=1).",
+      pkg
+    ), call. = FALSE)
   }
-
-  libs <- c(cran_packages, names(github_packages))
-  invisible(
-    suppressWarnings(
-      suppressPackageStartupMessages(
-        lapply(libs, require, character.only = TRUE)
-      )
-    )
-  )
+  suppressPackageStartupMessages(library(pkg, character.only = TRUE))
 }
 
-load_dependencies()
+install_missing <- identical(tolower(Sys.getenv("INSTALL_MISSING", "0")), "1")
+if (install_missing) {
+  if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+  missing_cran <- setdiff(cran_packages, rownames(installed.packages()))
+  if (length(missing_cran)) install.packages(missing_cran)
+  for (spec in github_specs) {
+    pkg <- pkg_from_gh(spec)
+    if (!requireNamespace(pkg, quietly = TRUE)) remotes::install_github(spec)
+  }
+}
+
+invisible(lapply(all_pkgs, load_or_stop))

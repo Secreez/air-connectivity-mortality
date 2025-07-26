@@ -1,15 +1,20 @@
 project:
   type: manuscript
+  render:
+    - thesis.qmd
+    - notebooks/04_population_qc.qmd
+    - notebooks/05_descriptive_plots.qmd
+    - notebooks/06_correlation.qmd
+  output-dir: _manuscript
 
-render:
-  - thesis.qmd
-  - notebooks/04_population_qc.qmd
-  - notebooks/05_descriptive_plot.qmd
-  - notebooks/06_correlation.qmd
+execute-dir: project
 
 execute:
-  dir: "." 
-  freeze: auto   
+  cache: true
+  freeze: auto
+  echo: false
+  warning: false
+  message: false
 
 format:
   html:
@@ -19,18 +24,22 @@ format:
     comments:
       hypothesis: true
   pdf:
-    latex-engine: xelatex
+    pdf-engine: xelatex
     toc: true
     number-sections: true
     papersize: a4
     geometry: margin=1in
+    fig-format: pdf
+    tbl-cap-location: top
+
+bibliography: thesis_ref.bib
 
 manuscript:
-  article: thesis.qmd   
-  notebooks:    
+  article: thesis.qmd
+  notebooks:
     - notebook: notebooks/04_population_qc.qmd
       title: Population QC
-    - notebook: notebooks/05_descriptive_plot.qmd
+    - notebook: notebooks/05_descriptive_plots.qmd
       title: Descriptive plots
     - notebook: notebooks/06_correlation.qmd
       title: Correlation analysis

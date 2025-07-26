@@ -426,7 +426,7 @@ The final analysis panel is fully balanced: all 26 continental EUROCONTROL state
 Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @fig-top10_eu_dest_cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands—absorbed > 60 % of all arrivals** in December 2019 and still dominated after the March collapse.
 
 
-```{r top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
+```{r fig-top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
 knitr::include_graphics("data/figures/bar_top10_destinations.png")
 ```
 
@@ -434,7 +434,7 @@ knitr::include_graphics("data/figures/bar_top10_destinations.png")
 
 ### The same hubs drew the widest origin mix
 
-```{r origins_per_destination, out.width="80%", fig.align='center', fig.cap="How many distinct CN/HK airports fed each EUROCONTROL destination? Left = combined Dec 2019 + Mar 2020; right = month-by-month. Western megahubs such as **LHR (15 origins), CDG (13), FRA (12)** top the list. **Liège (LGG)** appears high despite modest volume because it is a cargo gateway, illustrating that flight counts can overstate passenger exposure at freight airports."}
+```{r fig-origins_per_destination, out.width="80%", fig.align='center', fig.cap="How many distinct CN/HK airports fed each EUROCONTROL destination? Left = combined Dec 2019 + Mar 2020; right = month-by-month. Western megahubs such as **LHR (15 origins), CDG (13), FRA (12)** top the list. **Liège (LGG)** appears high despite modest volume because it is a cargo gateway, illustrating that flight counts can overstate passenger exposure at freight airports."}
 knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 ```
 
@@ -442,7 +442,7 @@ knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 
 ### Volume tracks diversity
 
-```{r scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman ρ ≈ 0.86 (p < 0.001, n = 47). Liège (LGG) lies above the trend high diversity for moderate volume—because almost all of its flights were cargo."}
+```{r fig-scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman ρ ≈ 0.86 (p < 0.001, n = 47). Liège (LGG) lies above the trend high diversity for moderate volume—because almost all of its flights were cargo."}
 knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 ```
 
@@ -463,7 +463,7 @@ The same ≥ 5‑flight filter is used for:
 
 All later correlation work (Section @exposure-mortality) returns to the full 26‑country panel.
 
-```{r pct_change_filtered, out.width="80%", fig.cap="Percentage change in direct CN/HK flights between the December 2019 baseline and March 2020 for countries with ≥5 December flights (n = 21). Every country cut traffic by at least 50%; 7/21 reduced >90%, and 14/21 ≥75%. Belgium, the Netherlands and Germany retained the highest residual volumes.", fig.align='center'}
+```{r fig-pct_change_filtered, out.width="80%", fig.cap="Percentage change in direct CN/HK flights between the December 2019 baseline and March 2020 for countries with ≥5 December flights (n = 21). Every country cut traffic by at least 50%; 7/21 reduced >90%, and 14/21 ≥75%. Belgium, the Netherlands and Germany retained the highest residual volumes.", fig.align='center'}
 knitr::include_graphics("data/figures/pct_change_filtered.png")
 ```
 
@@ -491,7 +491,7 @@ With CN/HK traffic cut to a trickle after late March, any differences we still o
 
 ### Baseline 2020 snapshot – 5 May 2020 {#baseline‑2020}
 
-```{r tbl_spearman_2020, echo = FALSE}
+```{r tbl-spearman_2020, echo = FALSE}
 tbl_2020 <- spearman_res |>
   filter(year == 2020) |>
   dplyr::select(variable, rho, ci_lo, ci_hi, p, n) |>
@@ -538,7 +538,7 @@ The next subsection tracks the same correlation through **2021–23** to see how
 ### Does the signal persist? (2020 → 2023)
 
 
-```{r tbl_spearman_all, echo=FALSE}
+```{r tbl-spearman_all, echo=FALSE}
 tbl_all <- spearman_res |>
   dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
   dplyr::mutate(across(where(is.numeric), ~round(.x, 3)))
@@ -549,7 +549,7 @@ knitr::kable(
 )
 ```
 
-```{r rho_caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
+```{r fig-rho_caterpillar, fig.cap="95 % bootstrap CIs confirm that only the 2020 estimate differs significantly from zero.", fig.asp=0.6}
 knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
@@ -558,7 +558,7 @@ Figure @fig-rho_caterpillar shows that only the 2020 coefficient is significantl
 
 ### Sensitivity & partial checks
 
-```{r tbl_sensitivity, echo=FALSE}
+```{r tbl-sensitivity, echo=FALSE}
 sens_tbl <- partial_by_year |>
   dplyr::select(year,
                 `ρ baseline` = rho_baseline,
@@ -575,7 +575,7 @@ knitr::kable(sens_tbl,
 
 ### Key take‑away
 
-Early direct flights from China and Hong Kong left a clear statistical footprint on Europe’s **first‑wave** excess mortality, but that imprint **evaporated within a year**.  Once SARS‑CoV‑2 was established, domestic factors—age, health‑system capacity, vaccination, socioeconomic vulnerability—overwhelmed any lingering signal from pre‑lockdown air connectivity.
+Early direct flights from China and Hong Kong left a clear statistical footprint on Europe’s **first‑wave** excess mortality, but that imprint **evaporated within a year**. Once SARS‑CoV‑2 was established, domestic factors—age, health‑system capacity, vaccination, socioeconomic vulnerability—overwhelmed any lingering signal from pre‑lockdown air connectivity.
 
 
 # Discussion
@@ -583,7 +583,7 @@ Early direct flights from China and Hong Kong left a clear statistical footprint
 ## Interpretation of Findings 
 
 Early international connectivity mattered—but only briefly.  
-In 2020, countries in the top quartile of direct CN/HK flight exposure registered **≈ 55 % higher excess mortality** than the bottom quartile, and the rank-based association was moderate-to-strong (Spearman ρ = 0.526, 95 % CI 0.177 - 0.771, *p* = 0.007; Table @tbl-spearman-all).
+In 2020, countries in the top quartile of direct CN/HK flight exposure registered **≈ 55 % higher excess mortality** than the bottom quartile, and the rank-based association was moderate-to-strong (Spearman ρ = 0.526, 95 % CI 0.177 - 0.771, *p* = 0.007; Table @tbl-spearman_all).
 
 The signal then **collapsed**: ρ fell to -0.306 in 2021 (CI -0.622 - 0.111, n.s.) and turned **significantly negative** in 2022 (ρ = -0.460, 95 % CI -0.792 - -0.001, *p* = 0.021) and remained negative in 2023 (ρ = -0.419, 95 % CI -0.749 - 0.045, *p* = 0.037).  
 
@@ -687,9 +687,9 @@ Early border controls can *buy time*, but sustained mortality differences hinge 
 
 ## A Data-source triage & supplementary plots {#appendix-a}
 
-### Full coverage table {#tbl-os-vs-eu-full}
+### Full coverage table
 
-```{r tbl-os-vs-eu-full, echo=FALSE}
+```{r tbl-os_vs_eu_full, echo=FALSE}
 knitr::kable(
   coverage_tbl,
   caption = "Table A.1  Direct CN/HK flights captured by EUROCONTROL (EU) \
@@ -697,9 +697,9 @@ versus OpenSky (OS). Rows sorted by EUROCONTROL’s December-2019 counts."
 )
 ```
 
-### Absolute change in flights, Mar 2020 vs Dec 2019 {#collapse}
+### Absolute change in flights, Mar 2020 vs Dec 2019
 
-```{r tbl_collapse, echo = FALSE}
+```{r tbl-collapse, echo = FALSE}
 knitr::kable(
   collapse_tbl |>
     dplyr::select(
