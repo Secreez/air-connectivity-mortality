@@ -510,7 +510,7 @@ A second, structural caveat is that EUROCONTROL releases only four “snapshot�
 
 Consequently, flight counts and exposure indices may significantly overstate real human exposure at major cargo airports. This explains why indices for Belgium and Germany remained high despite catastrophic drops in passenger travel (see Figure @pct_change_filtered)—a pattern also seen at other major cargo hubs. Such discrepancies highlight the importance of careful interpretation when relying on flight-based proxies for pandemic exposure.
 
-**Two-month window (Dec 2019 & Mar 2020).** EUROCONTROL's public archive releases only four sample months per year; February—a critical seeding month—is missing [@eurocontrolData2025].
+**Two-month window (Dec 2019 & Mar 2020).** EUROCONTROL's public archive releases only four sample months per year; February—a critical seeding month—is missing [@eurocontrol2025].
 
 **Excess-mortality uncertainty.** Outcome data merge the World Mortality Dataset with HMD-STMF. National registration lags, baseline-fit choices, and wartime disruption (Ukraine ≥ 2022) widen credible intervals [@karlinsky2021; @msemburi2023]. Notably, @msemburi2023. caution that "basing rankings on point estimates will often be misleading" and discuss the "hazards of ranking countries' epidemic responses" given large data and model uncertainties.
 

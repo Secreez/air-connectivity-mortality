@@ -8,6 +8,7 @@ project:
   output-dir: _manuscript
 
 execute-dir: project
+engine: knitr
 
 execute:
   cache: true

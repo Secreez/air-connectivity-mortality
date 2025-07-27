@@ -135,11 +135,6 @@ coverage_tbl <- opensky_wide |>
   dplyr::arrange(dplyr::desc(`Dec 2019 (EU)`))
 
 
-knitr::kable(
-  coverage_tbl,
-  caption = "Direct CN/HK flights captured by EUROCONTROL (EU) and OpenSky (OS) — December 2019 to March 2020."
-)
-
 out_derived <- here::here("data/derived")
 dir.create(out_derived, showWarnings = FALSE, recursive = TRUE)
 
