@@ -2,9 +2,7 @@ project:
   type: manuscript
   render:
     - thesis.qmd
-    - notebooks/04_population_qc.qmd
-    - notebooks/05_descriptive_plots.qmd
-    - notebooks/06_correlation.qmd
+
   output-dir: _manuscript
 
 execute-dir: project
@@ -37,10 +35,3 @@ bibliography: thesis_ref.bib
 
 manuscript:
   article: thesis.qmd
-  notebooks:
-    - notebook: notebooks/04_population_qc.qmd
-      title: Population QC
-    - notebook: notebooks/05_descriptive_plots.qmd
-      title: Descriptive plots
-    - notebook: notebooks/06_correlation.qmd
-      title: Correlation analysis
