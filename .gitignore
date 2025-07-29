@@ -1,26 +1,51 @@
-# System / IDE miscellany
+# OS / editor miscellany
+.DS_Store
+
+# R / RStudio
 .Rproj.user/
 .Rhistory
+.Rapp.history
 .RData
 .RDataTmp*
-.ipynb_checkpoints/
-*/.ipynb_checkpoints/
-trackchanges.sty
-/.luarc.json
-# Quarto build artefacts
-**/.quarto/
+.Ruserdata
+.Renviron
+.Rprofile.local
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Quarto / knitr caches & artifacts
+.quarto/
 _freeze/
-docs/**/_freeze/
-# GitHub config (not required for analysis)
-.github/
-# Data
-# 1) Raw source files (large / licensed)
+**/_freeze/
+.knit_cache/
+*_cache/
+cache/
+_cache/
+thesis_cache/
+
+# Manuscript outputs (rendered PDFs/HTML, logs etc.)
+_manuscript/
+
+# Data (large / reproducible)
+
 data/raw/
-# 2) Processed derivatives (can be rebuilt)
 data/processed/
 data/derived/
-# 3) Legacy proposal data (archived, unused)
 archive/proposal/data/
+
+# (unsure about it right now)
+# data/figures/ 
+
+
+# renv
+renv/library/
+renv/staging/
+renv/python/
+!renv/activate.R
+
+# Misc project files
+/.luarc.json
 /.quarto/
-/_manuscript/
-.vscode
+
