@@ -9,10 +9,6 @@
 
 source("R/00_load_libs.R", chdir = TRUE)
 
-quiet <- identical(Sys.getenv("QUIET"), "1")
-strict <- identical(Sys.getenv("STRICT"), "1")
-say <- function(...) if (!quiet) message(...)
-
 EURO_ISO <- readr::read_csv(
   here::here("data", "eurocontrol_iso_map.csv"),
   show_col_types = FALSE
@@ -43,8 +39,8 @@ pop_owid20 <- readr::read_csv(
   here::here("data", "raw", "owid", "owid-covid-data.csv"),
   col_select = c(iso_code, date, population),
   col_types = readr::cols(
-    iso_code   = readr::col_character(),
-    date       = readr::col_date(),
+    iso_code = readr::col_character(),
+    date = readr::col_date(),
     population = readr::col_double()
   ),
   show_col_types = FALSE

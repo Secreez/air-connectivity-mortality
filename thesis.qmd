@@ -28,15 +28,15 @@ number-sections: true
 ```{r load_derived, include=FALSE}
 source(here::here("R", "00_load_libs.R"))
 
-collapse_tbl     <- readRDS(here::here("data", "derived", "collapse_tbl.rds"))
-top_tbl          <- readRDS(here::here("data", "derived", "top_tbl.rds"))
-spearman_res     <- readRDS(here::here("data", "derived", "spearman_res.rds"))
-partial_by_year  <- readRDS(here::here("data", "derived", "partial_by_year.rds"))
-rho_restricted   <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
-coverage_tbl     <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
-big_gaps         <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
-corr_df          <- readRDS(here::here("data", "derived", "corr_df.rds"))
-analysis_df      <- readRDS(here::here("data", "processed", "analysis_df.rds"))
+collapse_tbl <- readRDS(here::here("data", "derived", "collapse_tbl.rds"))
+top_tbl <- readRDS(here::here("data", "derived", "top_tbl.rds"))
+spearman_res <- readRDS(here::here("data", "derived", "spearman_res.rds"))
+partial_by_year <- readRDS(here::here("data", "derived", "partial_by_year.rds"))
+rho_restricted <- readRDS(here::here("data", "derived", "rho_restricted_2020.rds"))
+coverage_tbl <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
+big_gaps <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
+corr_df <- readRDS(here::here("data", "derived", "corr_df.rds"))
+analysis_df <- readRDS(here::here("data", "processed", "analysis_df.rds"))
 ```
 
 ## Glossary
@@ -381,15 +381,13 @@ comp_tbl <- analysis_df |>
     n_rows = n(),
     n_countries_total = dplyr::n_distinct(iso3),
     n_target_dates = dplyr::n_distinct(target_date),
-
     rows_with_flights = sum(!is.na(total_inbound_flights_combined)),
     rows_missing_flights = sum(is.na(total_inbound_flights_combined)),
-
     rows_with_mortality = sum(!is.na(excess_mortality_cumulative_per_million)),
     rows_missing_mortality = sum(is.na(excess_mortality_cumulative_per_million))
   ) |>
   dplyr::mutate(
-    pct_missing_flights = sprintf("%.1f %%", 100 * rows_missing_flights  / n_rows),
+    pct_missing_flights = sprintf("%.1f %%", 100 * rows_missing_flights / n_rows),
     pct_missing_mortality = sprintf("%.1f %%", 100 * rows_missing_mortality / n_rows)
   ) |>
   dplyr::select(
@@ -408,7 +406,6 @@ knitr::kable(
   comp_tbl,
   caption = "Completeness of the analysis panel (Dec-2019 & Mar-2020 exposure × 2020-23 mortality snapshots)."
 )
-
 ```
 
 The final analysis panel is fully balanced: all 26 continental EUROCONTROL states have complete flight-exposure and excess-mortality data for each of the four reference years (2020-2023), with 0 % missing cells.
@@ -509,10 +506,10 @@ snap20 <- corr_df |>
 
 q <- quantile(snap20$total_inbound_flights_combined, probs = c(.25, .75))
 gap <- with(
-          snap20,
-          median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined >= q[2] ]) -
-          median(excess_mortality_cumulative_per_million[ total_inbound_flights_combined <= q[1] ])
-         )
+  snap20,
+  median(excess_mortality_cumulative_per_million[total_inbound_flights_combined >= q[2]]) -
+    median(excess_mortality_cumulative_per_million[total_inbound_flights_combined <= q[1]])
+)
 gap <- round(gap) # 465
 ```
 
@@ -540,7 +537,7 @@ The next subsection tracks the same correlation through **2021–23** to see how
 ```{r tbl-spearman_all, echo=FALSE}
 tbl_all <- spearman_res |>
   dplyr::select(year, variable, rho, ci_lo, ci_hi, p, n) |>
-  dplyr::mutate(across(where(is.numeric), ~round(.x, 3)))
+  dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
 knitr::kable(
   tbl_all,
@@ -560,9 +557,10 @@ Figure @fig-rho_caterpillar shows that only the 2020 coefficient is significantl
 ```{r tbl-sensitivity, echo=FALSE}
 sens_tbl <- partial_by_year |>
   dplyr::select(year,
-                `ρ baseline` = rho_baseline,
-                `ρ adj age 65+` = rho_adj_age,
-                `p adj` = p_adj_age) |>
+    `ρ baseline` = rho_baseline,
+    `ρ adj age 65+` = rho_adj_age,
+    `p adj` = p_adj_age
+  ) |>
   dplyr::mutate(across(where(is.numeric), round, 3))
 
 knitr::kable(sens_tbl,
