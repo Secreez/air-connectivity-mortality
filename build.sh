@@ -76,29 +76,29 @@ timer_end
 step "3 Running preprocessing scripts"
 timer_start
 # core pipeline
-QUIET="$QUIET" Rscript notebooks/01_excess_snapshots.R       2>&1 | tee "$LOGDIR/pre_01_excess_snapshots_${STAMP}.log"
-QUIET="$QUIET" Rscript notebooks/02_flight_filter.R          2>&1 | tee "$LOGDIR/pre_02_flight_filter_${STAMP}.log"
-if [[ -f notebooks/02b_flight_opensky.R ]]; then
-  QUIET="$QUIET" Rscript notebooks/02b_flight_opensky.R      2>&1 | tee "$LOGDIR/pre_02b_opensky_${STAMP}.log"
+QUIET="$QUIET" Rscript R/01_excess_snapshots.R       2>&1 | tee "$LOGDIR/pre_01_excess_snapshots_${STAMP}.log"
+QUIET="$QUIET" Rscript R/02_flight_filter.R          2>&1 | tee "$LOGDIR/pre_02_flight_filter_${STAMP}.log"
+if [[ -f R/02b_flight_opensky.R ]]; then
+  QUIET="$QUIET" Rscript R/02b_flight_opensky.R      2>&1 | tee "$LOGDIR/pre_02b_opensky_${STAMP}.log"
 else
-  echo "i  notebooks/02b_flight_opensky.R not found – skipping OpenSky coverage audit"
+  echo "i  R/02b_flight_opensky.R not found – skipping OpenSky coverage audit"
 fi
-QUIET="$QUIET" Rscript notebooks/03_merge_exposure.R         2>&1 | tee "$LOGDIR/pre_03_merge_exposure_${STAMP}.log"
+QUIET="$QUIET" Rscript R/03_merge_exposure.R         2>&1 | tee "$LOGDIR/pre_03_merge_exposure_${STAMP}.log"
 
-if [[ -f notebooks/04_population_qc.R ]]; then
-  QUIET="$QUIET" Rscript notebooks/04_population_qc.R        2>&1 | tee "$LOGDIR/pre_04_population_qc_${STAMP}.log"
+if [[ -f R/04_population_qc.R ]]; then
+  QUIET="$QUIET" Rscript R/04_population_qc.R        2>&1 | tee "$LOGDIR/pre_04_population_qc_${STAMP}.log"
 else
-  echo "i  notebooks/04_population_qc.R not found – skipping"
+  echo "i  R/04_population_qc.R not found – skipping"
 fi
-if [[ -f notebooks/05_descriptive_plots.R ]]; then
-  QUIET="$QUIET" Rscript notebooks/05_descriptive_plots.R    2>&1 | tee "$LOGDIR/pre_05_descriptive_plots_${STAMP}.log"
+if [[ -f R/05_descriptive_plots.R ]]; then
+  QUIET="$QUIET" Rscript R/05_descriptive_plots.R    2>&1 | tee "$LOGDIR/pre_05_descriptive_plots_${STAMP}.log"
 else
-  echo "i  notebooks/05_descriptive_plots.R not found – skipping"
+  echo "i  R/05_descriptive_plots.R not found – skipping"
 fi
-if [[ -f notebooks/06_correlation.R ]]; then
-  QUIET="$QUIET" Rscript notebooks/06_correlation.R          2>&1 | tee "$LOGDIR/pre_06_correlation_${STAMP}.log"
+if [[ -f R/06_correlation.R ]]; then
+  QUIET="$QUIET" Rscript R/06_correlation.R          2>&1 | tee "$LOGDIR/pre_06_correlation_${STAMP}.log"
 else
-  echo "i  notebooks/06_correlation.R not found – skipping"
+  echo "i  R/06_correlation.R not found – skipping"
 fi
 timer_end
 

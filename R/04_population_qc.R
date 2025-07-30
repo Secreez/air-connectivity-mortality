@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-# notebooks/04_population_qc.R
 # Compare OWID "population" vs WPP baseline anchored to start-2020.
 # (wpp2024 pop1dt uses Dec-31 of year t, so year==2019 ≈ start-2020.)
 # Outputs:

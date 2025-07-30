@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Picks the row closest to 5‑May (± 7 d) for 2020‑2023 from OWID
 # Compares OWID mid‑2020 population with UN‑WPP mid‑2020
-# Usage: Rscript notebooks/01_excess_snapshots.R
+
 source(here::here("R", "00_load_libs.R"))
 
 # helpers

@@ -3,10 +3,11 @@
 # compares Dec-2019 (EU & OS) + Feb-2020 (OS only)
 # Saves tidy OpenSky tables →  data/processed/opensky/
 # Writes one PNG (Feb bar)
+
 source(here::here("R", "00_load_libs.R"))
 
 options(
-  readr.num_threads      = max(1, parallel::detectCores() - 1),
+  readr.num_threads = max(1, parallel::detectCores() - 1),
   dplyr.summarise.inform = FALSE
 )
 
@@ -39,9 +40,9 @@ count_cn_eu <- function(csv_path) {
     csv_path,
     col_select = c(origin, destination, day),
     col_types = readr::cols(
-      origin      = readr::col_character(),
+      origin = readr::col_character(),
       destination = readr::col_character(),
-      day         = readr::col_datetime("%Y-%m-%d %H:%M:%S%z")
+      day = readr::col_datetime("%Y-%m-%d %H:%M:%S%z")
     ),
     na = c("", "NA"),
     progress = FALSE
@@ -51,10 +52,10 @@ count_cn_eu <- function(csv_path) {
     dplyr::left_join(airports, by = c(destination = "icao_code")) |>
     dplyr::left_join(euro_map, by = c(iso_country = "iso2")) |>
     dplyr::count(
-      year  = lubridate::year(day),
+      year = lubridate::year(day),
       month = lubridate::month(day),
       iso3,
-      name  = "n_flights"
+      name = "n_flights"
     )
 }
 
@@ -62,7 +63,7 @@ count_cn_eu <- function(csv_path) {
 opensky_dir <- here::here("data/raw/Opensky")
 files <- list.files(
   opensky_dir,
-  pattern    = "^flightlist_\\d{8}_\\d{8}\\.csv$",
+  pattern = "^flightlist_\\d{8}_\\d{8}\\.csv$",
   full.names = TRUE
 )
 
@@ -80,7 +81,7 @@ opensky_wide <- opensky_long |>
   dplyr::mutate(month_lbl = sprintf("%04d-%02d", year, month)) |>
   dplyr::select(iso3, month_lbl, n_flights) |>
   tidyr::pivot_wider(
-    names_from  = month_lbl, # 2019-12 / 2020-02 / 2020-03
+    names_from = month_lbl, # 2019-12 / 2020-02 / 2020-03
     values_from = n_flights,
     values_fill = 0
   ) |>
@@ -102,9 +103,9 @@ euro_snap <- readr::read_rds(
   here::here("data/processed/flights_country.rds")
 ) |>
   dplyr::select(
-    iso2       = iso_country,
-    Dec19_eu   = total_inbound_flights_dec19,
-    Mar20_eu   = total_inbound_flights_mar20
+    iso2 = iso_country,
+    Dec19_eu = total_inbound_flights_dec19,
+    Mar20_eu = total_inbound_flights_mar20
   ) |>
   dplyr::left_join(dplyr::select(euro_map, iso2, iso3), by = "iso2")
 

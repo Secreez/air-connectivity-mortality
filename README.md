@@ -23,18 +23,19 @@ bachelor-thesis/
 │  ├─ processed/                # tidy RDS/CSV created by the pipeline
 │  ├─ derived/                  # final data for the manuscript
 │  └─ figures/                  # PNGs for the manuscript
-├─ notebooks/                   # analysis notebooks + tiny R scripts
-│  ├─ 01\_excess\_snapshots.R
-│  ├─ 02\_flight\_filter.R
-│  ├─ 02b\_flight\_opensky.R
-│  ├─ 03\_merge\_exposure.R
-│  ├─ 04\_population\_qc.qmd
-│  ├─ 05\_descriptive\_plots.qmd
-│  └─ 06\_correlation.qmd
-├─ R/                           # package loaders/helpers
+├─ R/                           # analysis and package loader
+│  ├─ style_all.R
+│  ├─ 00_load_libs.R
+│  ├─ 01_excess_snapshots.R
+│  ├─ 02_flight_filter.R
+│  ├─ 02b_flight_opensky.R
+│  ├─ 03_merge_exposure.R
+│  ├─ 04_population_qc.R
+│  ├─ 05_descriptive_plots.R
+│  └─ 06_correlation.R
 ├─ thesis.qmd                   # main manuscript (Quarto)
-├─ thesis\_ref.bib               # references
-├─ \_quarto.yml                  # project configuration
+├─ thesis_ref.bib               # references
+├─ _quarto.yml                  # project configuration
 └─ README.md                    # you are here
 
 ```

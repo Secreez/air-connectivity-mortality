@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Filters raw EUROCONTROL data to CN/HK/MO → EUROCONTROL flights,
 # builds summary tables and a slim airport lookup.
-# Usage: Rscript notebooks/02_flight_filter.R
+
 source(here::here("R", "00_load_libs.R"))
 
 # read

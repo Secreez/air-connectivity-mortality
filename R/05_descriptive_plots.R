@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-# notebooks/05_descriptive_plots.R
 # Generates:
 #   data/figures/bar_top10_destinations.png
 #   data/figures/bar_origins_per_destination.png

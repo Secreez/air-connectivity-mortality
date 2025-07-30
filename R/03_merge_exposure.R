@@ -4,7 +4,6 @@
 # and exports both:
 # - analysis_df.{csv,rds} (full join: exposures + mortality)
 # - flight_exposure_mapped.{csv,rds} (exposures only, plus ISO3)
-# Usage: Rscript notebooks/03_merge_exposure.R
 
 source(here::here("R", "00_load_libs.R"))
 
@@ -22,7 +21,7 @@ flight_exposure_mapped <- flights_country |>
   left_join(euro_map, by = c(iso_country = "iso2"))
 
 unmapped <- flight_exposure_mapped |> filter(is.na(iso3))
-stopifnot(nrow(unmapped) == 0) # fail loud if any iso-2 not mapped
+stopifnot(nrow(unmapped) == 0) # fail if any iso-2 not mapped
 
 # merge in OWID snapshots (four per country)
 analysis_df <- flight_exposure_mapped |>
