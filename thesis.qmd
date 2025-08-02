@@ -149,7 +149,7 @@ Our own test (coverage audit) shows that OpenSky records **no** CN/HK arrivals f
 
 By contrast, EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) stores **every filed IFR flight that touches European airspace**, independent of ADS-B reception.  Public dumps are released only for four “snapshot” months (Mar | Jun | Sep | Dec); the **Dec 2019** and **Mar 2020** snapshots neatly bracket the pre-lockdown seeding window.
 
-Because completeness is critical here, **all exposure metrics in this thesis use ADRR**; OpenSky is retained only as a **sanity-check benchmark** (details in (Coverage-audit)[#coverage-audit] and (Appendix A)[#appendix-a]).
+Because completeness is critical here, **all exposure metrics use ADRR**; OpenSky is retained only as a **sanity-check benchmark**, see [Coverage audit](#coverage-audit) and [Appendix A](#appendix-a).
 
 
 
@@ -177,7 +177,7 @@ For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 d
 | **Statistic**         | Spearman $\rho$ (+ 5 000-draw bootstrap 95 % CI)                                                | Rank test robust to skew/outliers; bootstrapping stabilises CI in a small-$n$ panel    |
 | **Sensitivity tests** | (i) $FPM$ exposure; (ii) restrict to countries with complete 4-yr $E_t$ series; (iii) partial $\rho$ controlling % ≥ 65 y | Checks population scale, missing-data bias, and age confounding                       |
 
-*All analyses in **R 4.4.0**; fully reproducible Quarto notebooks live in `notebooks/`.*
+*All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in R/.*
 
 
 ### Analytical variables
@@ -234,7 +234,7 @@ EUROCONTROL’s market-segment rules (STATFOR Doc 689 v1.1) place every type-**S
 
 ##### Why this matters  
 
-ADS-B can, in principle, see *any* transponder-equipped aircraft, but the **OpenSky** receiver network is voluntary and geographically uneven.  Coverage is dense over Western Europe yet sparse over Eastern Europe and East Asia, leading to systematic *under-counting* of CN/HK → EU flights in peripheral or low-traffic states [@strohmeier2021]. These coverage gaps generate the “phantom deficits” highlighted in the OpenSky audit (Section [#coverage-audit](#coverage-audit)). ADRR, by contrast, records every filed IFR plan, so it recovers the missing movements and offers a truer baseline for passenger-exposure analysis.
+ADS-B can, in principle, see *any* transponder-equipped aircraft, but the **OpenSky** receiver network is voluntary and geographically uneven.  Coverage is dense over Western Europe yet sparse over Eastern Europe and East Asia, leading to systematic *under-counting* of CN/HK → EU flights in peripheral or low-traffic states [@strohmeier2021]. These coverage gaps generate the “phantom deficits” highlighted in the OpenSky audit (Section [Coverage-audit](#coverage-audit)). ADRR, by contrast, records every filed IFR plan, so it recovers the missing movements and offers a truer baseline for passenger-exposure analysis.
 
 #### Load-factor caveat
 
@@ -254,7 +254,7 @@ A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL�
 
 *Temporal precedence*: Both snapshots precede the 5 May outcome, eliminating reverse causation (deaths → fewer flights). Later volumes would mix cause & effect and reflect domestic restrictions rather than initial import pressure.  Extending the panel with post-2020 exposure is left for future work.
 
-*(Full R pipeline: `notebooks/`; processed tables in `data/processed/`.)*
+*(Full R pipeline: `R/`; processed tables in `data/processed/`.)*
 
 
 ## Coverage audit - EUROCONTROL vs OpenSky {#coverage-audit}
@@ -412,7 +412,7 @@ The final analysis panel is fully balanced: all 26 continental EUROCONTROL state
 
 ## Early exposure landscape
 
-> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @top10_eu_dest_cntry shows that DEU, GBR and NLD alone handled > 60 % of all arrivals in December 2019, and they kept that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London‑Heathrow was linked to 15, Paris‑CDG to 13, and Frankfurt to 12 source airports (@fig-origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @fig-scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
+> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @fig-top10_eu_dest_cntry shows that DEU, GBR and NLD alone handled > 60 % of all arrivals in December 2019, and they kept that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London‑Heathrow was linked to 15, Paris‑CDG to 13, and Frankfurt to 12 source airports (@fig-origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @fig-scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
 
 > *Together, these three plots show that both *how much* traffic and *how many* source cities were concentrated in the same Western hubs, setting up a right‑skewed exposure profile at country level.*
 
@@ -443,7 +443,7 @@ knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 ```
 
 **Interpretation.**
-Flight **volume** and **origin diversity** rise in lock-step (≈ 1–2 extra origins per +100 flights). The relationship is driven by the major passenger hubs in the upper-right corner; everywhere else remains low-volume and low-diversity. **Liège (LGG)** is the one clear freight-driven outlier—its seven Chinese origins supplied mainly cargo rotations, so it inflates exposure without adding many travellers (see [Data Limitations](#data-limitation)).
+Flight **volume** and **origin diversity** rise in lock-step (≈ 1–2 extra origins per +100 flights). The relationship is driven by the major passenger hubs in the upper-right corner; everywhere else remains low-volume and low-diversity. **Liège (LGG)** is the one clear freight-driven outlier—its seven Chinese origins supplied mainly cargo rotations, so it inflates exposure without adding many travellers (see [Data Limitations](#data-limitations)).
 
 > **So what?**  Because both dimensions of exposure are so right-skewed, we expect the country-level correlation with excess mortality to be pulled by the same handful of Western hubs. The next section tests exactly that.
 
@@ -605,7 +605,7 @@ Taken together, **initial flight exposure shaped only the first wave**; once SAR
 
 This study is deliberately exploratory and country-level; several caveats constrain interpretation.
 
-### Data limitations {#data-limitation}
+### Data limitations {#data-limitations}
 
 * **Ghost / abnormal flights (load-factor bias).** “Slot-retention” flights peaked in Europe right after the first lockdown: Sun et al. detect **> 40 % low-load outliers** in April 2020 among major LCCs, clustered on dense Level-3 airport pairs such as AMS-BCN and ATH-MAD [@sun2022_b]. Because our exposure metric counts flight plans, not passengers, it over-weights these nearly empty sectors—and likewise any long-haul ghost service such as the high-fare, low-load **HKG-LHR** link documented by @warnocksmith2021.
 
