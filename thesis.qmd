@@ -63,6 +63,7 @@ analysis_df <- readRDS(here::here("data", "processed", "analysis_df.rds"))
 | **WMD**                | *World Mortality Dataset* (source of excess-death figures)                                                                     |
 | **WPP**                | UN *World Population Prospects* (population denominator)                                                                       |
 | **n.s.**               | Not significant                                                                                                                |
+| **Preighters**         | Passenger aircraft temporarily converted to carry cargo                                                                        |
 
 *Table 1. Key acronyms and symbols used in this thesis.*
 
@@ -160,9 +161,9 @@ EUROCONTROL’s public **ADRR** snapshots record every commercial IFR movement t
 For this study we extract flights whose **origin** is any airport in **mainland China (CN)** or **Hong Kong (HK)** and whose **destination** is one of the 26 continental EUROCONTROL member states. (No Macao–Europe flights appear in either snapshot, so exposure is effectively CN + HK; the full acronym *CN/HK/MO* is retained only on first mention.)
 
 Excess-mortality outcomes come from **OWID’s** country-day series, which republishes the *World Mortality Dataset*.  
-For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 days).
+For each year 2020-2023 we take the observation **closest to 5 May** (± 7 days).
 
-*Why 5 May?* The date captures the tail of Europe’s first epidemic wave **and** coincides with the WHO announcement (5 May 2023) that COVID-19 was no longer a global public-health emergency [@who2023end].
+*Why 5 May?* The date captures the tail of Europe’s first epidemic wave wave — and coincides with the WHO announcement (5 May 2023) that COVID-19 was no longer a global public-health emergency [@who2023end].
 
 
 
@@ -170,15 +171,12 @@ For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 d
 
 | Element               | Choice                                                                                         | Rationale                                                                              |
 |-----------------------|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| **Unit of analysis**  | Country (n = 26 in 2020; n = 25 from 2022 once UKR is dropped)                                  | Islands & micro-states removed for missing flight **or** mortality data; Ukraine exits after war‐time breaks |
+| **Unit of analysis**  | Country (n = 26 in 2020; n = 25 from 2022, when UKR is dropped)                                  | Islands & micro-states removed for missing flight **or** mortality data; Ukraine exits after war‐time breaks |
 | **Primary exposure**  | Flight counts **Dec 2019** ($F_{\text{DEC}}$) and **Mar 2020** ($F_{\text{MAR}}$); summed as $F_{\text{SUM}}$ | Brackets the Jan–Feb seeding window while preceding most EU lockdowns                 |
 | **Alt. exposure**     | $FPM = F_{\text{SUM}} / \text{population}$ (flights per million)                                | Population-scaled sensitivity check (tests size artefact)                              |
 | **Outcome**           | $E_t =$ excess deaths / 10⁶ on 5 May of year $t$ ($t = 2020\dots2023$)                          | Fixes a uniform “first-wave” reference point; OWID/WMD snapshot                        |
-| **Statistic**         | Spearman $\rho$ (+ 5 000-draw bootstrap 95 % CI)                                                | Rank test robust to skew/outliers; bootstrapping stabilises CI in a small-$n$ panel    |
+| **Statistic**         | Spearman $\rho$ (5 000-draw bootstrap 95 % CI)                                                  | Rank test robust to skew/outliers; bootstrapping stabilises CI in a small-$n$ panel    |
 | **Sensitivity tests** | (i) $FPM$ exposure; (ii) restrict to countries with complete 4-yr $E_t$ series; (iii) partial $\rho$ controlling % ≥ 65 y | Checks population scale, missing-data bias, and age confounding                       |
-
-*All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in R/.*
-
 
 ### Analytical variables
 
@@ -200,7 +198,7 @@ For each year 2020-2023 we take the observation **closest to 5 May** (≤ ± 7 d
   2. restrict to countries with **complete four-year $E_t$ series**;  
   3. compute **partial Spearman** controlling for share of population ≥ 65 y.  
 
-All analyses in **R 4.4.0**; full, reproducible pipeline lives in `notebooks/`.
+All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in `R/`
 
 A confounder sanity-check showed that adjusting for age ≥ 65 changed $\rho$ by < 0.02 in any year, so no further covariates were added (exploratory, correlation-focused study).
 
@@ -213,8 +211,7 @@ EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) releases full
 flight plans for four “snapshot” months each year (Mar | Jun | Sep | Dec).
 
 Only the **Dec-2019** and **Mar-2020** slices bracket the early-COVID seeding window; February
-is not publicly available, but rerouting via non-Wuhan hubs began well before February
-[@chinazzi2020].
+is not publicly available; rerouting via non-Wuhan hubs had begun well before [@chinazzi2020].
 
 ### Filtering steps
 
@@ -240,11 +237,10 @@ ADS-B can, in principle, see *any* transponder-equipped aircraft, but the **Open
 
 Slot-retention “ghost flights” peaked in Mar–Apr 2020; @sun2022_b estimate **30–50 %** of EU departures in that window flew with < 10 % seats filled.  ADRR counts the movement but not the payload; a three-passenger A350 counts the same as a full one. At Frankfurt passenger volume fell **–73 %** while freighters + “preighters” kept **81 %** of cargo rotations alive [@fraport2021, p. 17]. Treat flight counts as *potential seeding capacity*, not realised passenger flow.
 
-
 $$
-F_{\text{DEC}} = \#\text{ CN/HK → EU flights in Dec 2019},\qquad
-F_{\text{MAR}} = \#\text{ flights in Mar 2020},\qquad
-F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}
+F_{\text{DEC}} = \text{number of CN/HK \rightarrow EU flights in Dec 2019},\qquad
+F_{\text{MAR}} = \text{number of flights in Mar 2020},\qquad
+F_{\text{SUM}} = F_{\text{DEC}} + F_{\text{MAR}}.
 $$
 
 A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL’s own mapping
@@ -256,18 +252,17 @@ A look-up table built from **OurAirports** (airport → ISO-2) plus EUROCONTROL�
 
 *(Full R pipeline: `R/`; processed tables in `data/processed/`.)*
 
-
 ## Coverage audit - EUROCONTROL vs OpenSky {#coverage-audit}
 
-OpenSky’s crowd-sourced ADS-B feed was thin over East Asia in early 2020.
+OpenSky’s crowd-sourced ADS-B feed was thin over **East Asia and parts of Eastern Europe** in early 2020.
 
-* **Misses** GEO, HRV, PRT, SVK, UKR entirely  
-* **Under-counts** 14 of the remaining 21 EUROCONTROL states (median deficit ≈ 12 flights)
+* **Misses** \texttt{GEO, HRV, PRT, SVK, UKR} entirely  
+* **Under-counts** 14 of those **21 states** (median deficit ≈ 12)
 
-Full details are in Appendix A (Table A.1, Fig. A.1).
+Full details are in [Appendix A](#appendix-a) (Table A.1, Fig. A.1).
 
 Because raw ADS-B would systematically under-state exposure for peripheral markets,
-the analysis relies on ADRR data and uses OpenSky **only** as a QC benchmark.
+the analysis relies on ADRR data, and uses OpenSky **only** as a QC benchmark.
 
 ```{r tbl-os-vs-eu, echo=FALSE}
 coverage_tbl |>
@@ -279,6 +274,7 @@ coverage_tbl |>
     `Mar 2020 (EU)` = `Mar 2020 (EU)`,
     `Mar 2020 (OS)` = `Mar 2020 (OS)`
   ) |>
+  head(20) |>
   knitr::kable(
     caption = "Excerpt of the coverage audit (top half of the table). \
 All 41 rows are reproduced in Appendix A."
@@ -351,25 +347,29 @@ big_gaps |>
    | **COMPLETE** | Keep only countries with 4-year $E_t$ series   | Missing-data bias          |
    | **AGE 65 +** | Partial Spearman (control % ≥ 65 y)            | Confounder sanity-check    |
 
-5. **Reproducibility** – Code, data and rendered Quarto notebooks are version-tracked in the project repo.
+5. **Reproducibility** – Code, data and rendered Quarto reports are version-tracked in the project repo.
 
 ### Visual encoding & accessibility {#viz-note}
 
-All categorical plots use the **Okabe-Ito** colour-universal palette [@okabe2002] (`#009E73 green, #E69F00 orange, #56B4E9 blue …`). Viridis scales handle continuous variables. Axis titles, direct labels and dashed reference lines ensure information survives greyscale printing and the main forms of colour-vision deficiency. Hues with strong cultural valence (e.g. alert-red) are avoided to minimise framing bias.
+All plots use the **Okabe–Ito** colour-universal palette [@okabe2002] (`#009E73 green, #E69F00 orange, #56B4E9 blue …`). Axis titles, direct labels and dashed reference lines ensure figures remain legible in greyscale printing and for the main forms of colour-vision deficiency. Hues with strong cultural valence (e.g., alert-red) are avoided to minimise framing bias.
 
 ## Digital Methods & Reproducibility {#digmethods}
 
 *This project is as much about **doing** digital research as it is about analysing digital traces. Five design choices make the workflow transparent, portable, and criticisable.*
 
-1. **Data-infrastructure awareness** Two complementary data streams are interrogated: crowd-sourced ADS-B (**OpenSky**) with patchy East-Asian coverage and no load factors, versus regulator-grade IFR plans (**EUROCONTROL ADRR**) with full spatial coverage but equally no passenger counts.   Mapping the blind spots of each stream (Section [#coverage-audit](#coverage-audit)) is integral to the method, not an after-thought.
+1. **Data-infrastructure awareness** Two complementary data streams are interrogated: crowd-sourced ADS-B (**OpenSky**) with patchy East-Asian coverage and no load factors, versus regulator-grade IFR plans (**EUROCONTROL ADRR**) with full spatial coverage but equally no passenger counts. Mapping the blind spots of each stream (see [Coverage audit](#coverage-audit)) is integral to the method, not an after-thought.
 
-2. **Single-command rebuild** A bash wrapper `build.sh` orchestrates the complete pipeline *raw CSV → clean RDS → Quarto → final HTML Manuscript*.   Running the script on a fresh clone regenerates every table and figure without manual edits, except the CSV.
+2. **Single-command rebuild** A bash wrapper `build.sh` orchestrates the complete pipeline *raw CSV → clean RDS → Quarto → final PDF/HTML Manuscript*. Running the script on a fresh clone regenerates every table and figure without manual edits, except the CSV.
 
-3. **Pinned R environment** The repository carries an `renv.lock` snapshot.  Restoring that lock guarantees the identical package stack used during development; in `R/00_load_libs.R` installs any missing packages if the lock is absent.
+3. **Pinned R environment** The repository carries an `renv.lock` snapshot. Restoring that lock guarantees the identical package stack used during development; in `R/00_load_libs.R` automatically installs any missing packages if the lock is absent.
 
-4. **Path-safe, self-checking code** All notebooks build paths with `here::here()`, so the project runs from any working directory. `build.sh` stops early with a clear message, if the large ADRR CSV dumps are missing.
+4. **Path-safe, self-checking code** All scripts build paths with `here::here()`, so the project runs from any working directory. `build.sh` stops early with a clear message, if the large ADRR CSV dumps are missing.
 
 5. **Licence-respecting version control** Code, Quarto sources and lightweight derived data live in a private Git repo (MIT licence on release). Large or restricted datasets, notably the EUROCONTROL snapshots stay outside Git; the README explains how researchers can obtain them under the proper R&D terms.
+
+::: {.callout-note}
+**Transition.** With data quality, exposure/outcome definitions, and reproducibility safeguards in place, we now turn to the empirical results.
+:::
 
 # Results {#results}
 
@@ -408,19 +408,17 @@ knitr::kable(
 )
 ```
 
-The final analysis panel is fully balanced: all 26 continental EUROCONTROL states have complete flight-exposure and excess-mortality data for each of the four reference years (2020-2023), with 0 % missing cells.
+The final analysis panel is fully balanced: all 26 continental EUROCONTROL states have complete flight-exposure and excess-mortality data for each of the four reference years (2020 – 2023); no cells are missing.
 
 ## Early exposure landscape
 
-> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @fig-top10_eu_dest_cntry shows that DEU, GBR and NLD alone handled > 60 % of all arrivals in December 2019, and they kept that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London‑Heathrow was linked to 15, Paris‑CDG to 13, and Frankfurt to 12 source airports (@fig-origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @fig-scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
+> **Early exposure landscape.** Direct CN/HK flights funnelled into just a few Western gateways. @fig-top10_eu_dest_cntry shows that **DEU, GBR and NLD handled more than 60 % of all arrivals** in December 2019 and retained that lead even after traffic collapsed in March. Those same hubs also drew from the *widest mix* of Chinese origins: London–Heathrow linked to 15, Paris–CDG to 13, and Frankfurt to 12 source airports (@fig-origins_per_destination). Finally, volume and diversity rose in lock‑step (Spearman ρ ≈ 0.86; @fig-scatter_volume_vs_origins). **Liège (LGG)** is the one clear outlier high diversity for only ~200 flights because most of its rotations were freighters (see [Data Limitations](#data-limitations)).
 
-> *Together, these three plots show that both *how much* traffic and *how many* source cities were concentrated in the same Western hubs, setting up a right‑skewed exposure profile at country level.*
-
+> *Together, these three plots show that both **how much** traffic and **how many** source cities were concentrated in the same Western hubs, setting up a right-skewed exposure profile for Europe’s countries.*
 
 ### A handful of gateways handled almost all traffic
 
-Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @fig-top10_eu_dest_cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands—absorbed > 60 % of all arrivals** in December 2019 and still dominated after the March collapse.
-
+Before the pandemic shock, direct CN/HK traffic into Europe was extremely skewed. @fig-top10_eu_dest_cntry ranks the **Top-10 destination countries** and already shows that three Western hubs—**Germany, the UK, and the Netherlands**—absorbed more than 60 % of all arrivals in December 2019 and still dominated after the March collapse.
 
 ```{r fig-top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
 knitr::include_graphics("data/figures/bar_top10_destinations.png")
@@ -434,7 +432,7 @@ knitr::include_graphics("data/figures/bar_top10_destinations.png")
 knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 ```
 
-> **Volume and diversity rise in tandem:** each extra ~100 flights brings one-to-two additional Chinese origin airports (airport-level Spearman ρ ≈ 0.86, p < 0.001).
+> **Volume and diversity rise in tandem:** each extra ~100 flights brings one-to-two additional Chinese origin airports (airport-level Spearman ρ ≈ 0.86, p < 0.001, n = 47).
 
 ### Volume tracks diversity
 
@@ -446,6 +444,13 @@ knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 Flight **volume** and **origin diversity** rise in lock-step (≈ 1–2 extra origins per +100 flights). The relationship is driven by the major passenger hubs in the upper-right corner; everywhere else remains low-volume and low-diversity. **Liège (LGG)** is the one clear freight-driven outlier—its seven Chinese origins supplied mainly cargo rotations, so it inflates exposure without adding many travellers (see [Data Limitations](#data-limitations)).
 
 > **So what?**  Because both dimensions of exposure are so right-skewed, we expect the country-level correlation with excess mortality to be pulled by the same handful of Western hubs. The next section tests exactly that.
+
+
+
+
+[CHECKUP NEXT!]
+
+
 
 ### The March cliff‑edge {#march-cliff}
 
