@@ -37,6 +37,7 @@ coverage_tbl <- readRDS(here::here("data", "derived", "coverage_tbl.rds"))
 big_gaps <- readRDS(here::here("data", "derived", "pop_big_gaps_2020.rds"))
 corr_df <- readRDS(here::here("data", "derived", "corr_df.rds"))
 analysis_df <- readRDS(here::here("data", "processed", "analysis_df.rds"))
+vacc_exposure <- readRDS("data/derived/vacc_by_exposure_quartile_2022.rds")
 ```
 
 ## Glossary
@@ -108,7 +109,6 @@ Analyzing 35 countries, **@kelly2021** contrasted reported COVID-19 deaths with 
 
 Because this thesis tracks excess mortality **at the same calendar cut-off (5 May) for four consecutive years**, each snapshot captures the tail of Europe’s spring wave while avoiding later seasonal confounders (the rationale is detailed [Data & Methods](#methods))
 
-
 ## Mobility-driven seeding
 
 A global metapopulation simulation by @chinazzi2020 showed that Wuhan’s 23 January 2020 travel ban delayed—but did not prevent—intercontinental exportations; even a 90 % cut in air traffic merely postponed the spread unless local transmission was also halved.
@@ -151,9 +151,6 @@ Our own test (coverage audit) shows that OpenSky records **no** CN/HK arrivals f
 By contrast, EUROCONTROL’s *Aviation Data Repository for Research* (**ADRR**) stores **every filed IFR flight that touches European airspace**, independent of ADS-B reception.  Public dumps are released only for four “snapshot” months (Mar | Jun | Sep | Dec); the **Dec 2019** and **Mar 2020** snapshots neatly bracket the pre-lockdown seeding window.
 
 Because completeness is critical here, **all exposure metrics use ADRR**; OpenSky is retained only as a **sanity-check benchmark**, see [Coverage audit](#coverage-audit) and [Appendix A](#appendix-a).
-
-
-
 
 # Data & Methods {#methods}
 
@@ -200,8 +197,6 @@ All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in 
 
 A confounder sanity-check showed that adjusting for age ≥ 65 changed $\rho$ by < 0.02 in any year, so no further covariates were added (exploratory, correlation-focused study).
 We did not model vaccination, NPIs, GDP, or other covariates; any references to these in the Discussion are descriptive context rather than part of the statistical tests.
-
-**Scope note.** We did not model vaccination, NPIs, GDP, or other covariates; any references to these in the Discussion are descriptive context rather than part of the statistical tests.
 
 ## Flight-exposure variable
 
@@ -282,9 +277,9 @@ coverage_tbl |>
 
 ## Excess-mortality snapshots {#excess-snaps}
 
-* **Source.** **Our World in Data** (OWID) country-day series, which republish the **World Mortality Dataset** (WMD) of @karlinsky2021 and preserve its standard-error bands.  
+* **Source.** Excess-mortality **and vaccination** variables come from the **Our World in Data COVID-19 dataset** [@owid_covid2025], which republishes the *World Mortality Dataset* [@karlinsky2021] and the OWID vaccination series [@mathieu2021owidvaccinations].
 
-* **Reference date.** For each calendar year we take the observation **nearest to 5 May** (within ± 7 days). Ukraine is excluded after 2021 because war disrupts reporting.  
+* **Reference date.** For each calendar year we take the observation **nearest to 5 May** (± 7 days). Ukraine is excluded after 2021 because war disrupts reporting.
 
 * **Why ± 7 days?** WMD reports most countries weekly (≈ 80 %) and some fortnightly. A ± ½-week blur is trivial beside the **3 – 12 %** SEs documented for high-income Europe and still smaller than the WHO model CIs of @msemburi2023.
 
@@ -568,20 +563,39 @@ Controlling for the share of population ≥ 65 changes ρ by **≤ 0.02** in any
 * ρ ≈ 0 in 2021 (ns)  
 * ρ ≈ **–0.45** and significant in 2022-23
 
+## Main finding in one breath  
 
-
-
-# Discussion
-
-## Main finding in one breath
-
-Across the 26 continental EUROCONTROL states, heavier direct CN/HK traffic was linked to **substantially higher first-wave excess mortality** (ρ = 0.53, *p* = 0.007).  
-Within one year the association faded, and by 2022-23 it had flipped negative (ρ ≈ –0.45).
+Among the 26 continental EUROCONTROL states, heavier direct **CN/HK → EU** traffic was associated with **substantially higher first-wave excess mortality** (Spearman ρ = 0.53, *p* = 0.007, *n* = 26).  
+The rank-based link weakened during 2021 and reversed by 2022-23 (ρ ≈ –0.45, *n* = 25 after Ukraine’s exit).
 
 ## Why did the signal fade?
 
-* **Wealth & vulnerability.** A 34-country panel finds that excess-death percentage falls as GDP-per-capita rises (Pearson r ≈ –0.60; Spearman ρ ≈ –0.69) and climbs with poverty and inequality [@ioannidis2023]. The hubs with the heaviest CN/HK traffic (DEU, GBR, NLD, FRA) also sit in Europe’s upper GDP tercile, which helps explain why the positive flight–mortality link vanishes after 2020.
+* **Wealth & structural vulnerability.** A 34-country panel shows excess-death percentages **fall** with GDP-per-capita (Pearson *r* ≈ –0.60; Spearman ρ ≈ –0.69) and **rise** with poverty and inequality [@ioannidis2023]. The four most connected hubs (DEU, GBR, NLD, FRA) sit in Europe’s top GDP tercile, helping to explain why the positive flight–mortality link disappears after 2020.
 
+* **Vaccination rollout.** On **5 May 2022** the high-exposure quartile (**Q4**, *n* = 6) had a median **78 %** of their populations fully vaccinated versus **≈ 62 %** in the low-exposure quartile (**Q1**, *n* = 7) (OWID variable `people_fully_vaccinated_per_hundred` [@mathieu2021].)
+  
+```{r tbl-vaccination_exposure, echo=FALSE}
+  vacc_exposure |>
+    dplyr::mutate(
+      `Exposure quartile` = paste0("Q", q),
+      `Median full-vax %` = sprintf("%.1f %%", median_vacc),
+      n = sprintf("n = %d", n)
+    ) |>WS
+    dplyr::select(`Exposure quartile`, `Median full-vax %`, n) |>
+    knitr::kable(
+      caption = "Full-vaccination coverage on 5 May 2022 by flight-exposure quartile (baseline = Dec 2019 + Mar 2020 flights)."
+    )
+```
+
+* **Policy timing & capacity.** Countries that paired **high government effectiveness** with **early, stringent NPIs** cluster in the lowest excess-mortality band [@rahmanian2024]. Complementary aviation work shows that stand-alone travel bans are blunt unless combined with domestic measures and that the EU “slot waiver” quickly eliminated **40 %+ low-load ‘ghost flights’** in April 2020 [@sun2022_a; @sun2022_b].
+
+## Strengths
+
+* **Regulator-grade data.** ADRR captures *every* IFR passenger movement; the East-Asia coverage gaps of ADS-B are avoided.  
+* **Lean, transparent cleaning.** Only S/N codes kept, exact duplicates removed; raw CSVs and scripts live in the repo.  
+* **Reproducibility.** End-to-end R + Quarto workflow (`build.sh`, `renv.lock`), 5 000-draw bootstrap CIs for every ρ.
+
+[todo..]
 
 # References
 
@@ -626,3 +640,33 @@ knitr::kable(
 ![](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width=90%}
 
 **Figure A.2**: Top-10 destinations by number of direct CN/HK flights in OpenSky data (Dec 2019, Feb 2020, Mar 2020). OpenSky data reflects community ADS-B coverage, not actual filed flights, and shows significant variation between months. The grouped bar format highlights erratic coverage patterns and explains why EUROCONTROL data was prioritized.
+
+### Vaccination by exposure quartile (May 2022)
+
+```{r vacc_by_exposure_quartile, echo=FALSE}
+corr_df |>
+  dplyr::filter(target_date == as.Date("2020-05-05")) |>
+  dplyr::mutate(q = dplyr::ntile(total_inbound_flights_combined, 4)) |>
+
+  dplyr::group_by(q) |>
+  dplyr::summarise(
+    countries = paste(sort(iso3), collapse = ", "),
+    .groups = "drop"
+  ) |>
+
+  tidyr::pivot_wider(
+    names_from  = q,
+    values_from = countries,
+    names_prefix = "Q"
+  ) |>
+
+  knitr::kable(
+    col.names = c("Q1 (low)", "Q2", "Q3", "Q4 (high)"),
+    caption   = "Table A.3 Country membership of the flight-exposure quartiles \
+(Dec 2019 + Mar 2020 baseline, *n* = 25; quartiles contain 6–7 countries each)."
+  )
+```
+
+For the descriptive comparison in the Discussion we extracted `people_fully_vaccinated_per_hundred` from the OWID series, taking the observation nearest to **5 May 2022 (± 7 days)** for the same set of EUROCONTROL states (script `01b_extract_vax.R`, saved as `data/processed/vax_snapshot.{csv,rds}`).
+
+These figures are *not* used in any regression or correlation test.
