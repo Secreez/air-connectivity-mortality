@@ -4,7 +4,7 @@
 
 ## Research question
 
-> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
+> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
 
 We join EUROCONTROL IFR data with OWID’s excess‑mortality series and:
 - build country‑level exposure metrics (Dec 19, Mar 20, Dec+Mar; flights per million),  
@@ -27,6 +27,7 @@ bachelor-thesis/
 │  ├─ style_all.R
 │  ├─ 00_load_libs.R
 │  ├─ 01_excess_snapshots.R
+│  ├─ 01b_vax_snap.R
 │  ├─ 02_flight_filter.R
 │  ├─ 02b_flight_opensky.R
 │  ├─ 03_merge_exposure.R
