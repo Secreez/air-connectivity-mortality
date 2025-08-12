@@ -16,7 +16,7 @@ keywords:
   - Europe
   - Spearman rank correlation
 abstract: |
-  *AFTER RESULTS!*
+  We test whether direct long-haul exposure to China/Hong Kong just before Europe’s COVID-19 shutdown helps explain first-wave excess mortality. Using EUROCONTROL’s Aviation Data Repository for Research (ADRR), we count inbound IFR passenger flights from Mainland China and Hong Kong in December 2019 and March 2020 (F_DEC, F_MAR, F_SUM) across 25 continental EUROCONTROL states. Outcomes are excess deaths per million on 5 May each year from 2020 to 2023 (nearest available value within seven days; Our World in Data / World Mortality Dataset). A coverage check shows that community ADS-B (OpenSky) undercounts arrivals from China and Hong Kong, often severely, so ADRR provides exposure while OpenSky is used only for quality control. In 2020, exposure is positively associated with excess mortality (Spearman ρ = 0.526; 95% CI 0.177 to 0.771; p = 0.007); the top exposure quartile recorded ≈465 more deaths per million than the bottom quartile. The association weakens in 2021 and reverses in 2022 (negative and significant), remaining negative but borderline in 2023. Limitations include the missing February ADRR snapshot, lack of passenger-load information (“ghost flights”), and unobserved multi-leg itineraries.
 date: last-modified
 bibliography: thesis_ref.bib
 number-sections: true
@@ -80,12 +80,12 @@ This thesis asks how much of Europe’s first-wave mortality spread is associate
 
 ## Research question
 
-> Among the **continental EUROCONTROL states**, is a higher volume of **direct inbound flights** from Mainland China/Hong Kong in **Dec 2019** and **Mar 2020** associated with higher cumulative **excess mortality** on **5 May 2020**?^\[Macao appears in the initial CN/HK/MO acronym but shows **zero** Europe-bound flights in the EUROCONTROL snapshots used here; analyses therefore refer to CN/HK. See [Methods](#methods).]
+> Among the **continental EUROCONTROL states**, is a higher volume of **direct inbound flights** from Mainland China/Hong Kong in **Dec 2019** and **Mar 2020** associated with higher cumulative **excess mortality** on **5 May 2020**?^[Macao appears in the initial CN/HK/MO acronym but shows **zero** Europe-bound flights in the EUROCONTROL snapshots used here; analyses therefore refer to CN/HK. See [Methods](#methods).]
 
 ## Objectives
 
 1. **Measure exposure:** Build a country-level index of inbound IFR flights (Dec 2019, Mar 2020, and their sum) from EUROCONTROL ADRR.
-2. **Rank & correlate:** Compute Spearman *p* between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021–2023.
+2. **Rank & correlate:** Compute Spearman p between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021–2023.
 3. **Assess validity:** Discuss strengths and limitations of flight counts as a proxy for epidemic seeding.
 
 ## Road map
@@ -164,8 +164,8 @@ Table: Study design choices. {#tbl-design}
 | **Primary exposure**  | **Dec 2019** flights ($F_{\text{DEC}}$) and **Mar 2020** flights ($F_{\text{MAR}}$); sum $F_{\text{SUM}}$        | Brackets Jan–Feb seeding window while preceding most EU lockdowns                                          |
 | **Alt. exposure**     | $FPM = F_{\text{SUM}} / \text{population}$                                                                             | Population-scaled sensitivity check (size artefact)                                                        |
 | **Outcome**           | $E_t =$ excess deaths per 10⁶ on 5 May of year $t$ ($t=2020\text{–}2023$)                                          | Uniform “first-wave” reference point; OWID/WMD snapshot                                                    |
-| **Statistic**         | Spearman’s $\rho$ with 95 % bootstrap CI (5,000 draws)                                                                  | Rank test robust to skew/outliers; bootstrap stabilises CI in a small-$n$ panel                          |
-| **Sensitivity tests** | (i) **FPM** exposure; (ii) restrict to countries with complete 4-year $E_t$; (iii) partial $\rho$ controlling % ≥ 65 | Checks population scale, missing-data bias, and age confounding                                            |
+| **Statistic**         | Spearman’s ρ with 95 % bootstrap CI (5,000 draws)                                                                  | Rank test robust to skew/outliers; bootstrap stabilises CI in a small-$n$ panel                          |
+| **Sensitivity tests** | (i) **FPM** exposure; (ii) restrict to countries with complete 4-year $E_t$; (iii) partial ρ controlling % ≥ 65 | Checks population scale, missing-data bias, and age confounding                                            |
 
 ### Analytical variables
 
@@ -177,11 +177,12 @@ Table: Analytical variables. {#tbl-vars}
 | $F_{\text{MAR}}$ | Inbound flights, **Mar 2020**            | raw count (ADRR)               |
 | $F_{\text{SUM}}$ | $F_{\text{DEC}} + F_{\text{MAR}}$    | main exposure metric           |
 | $FPM$             | $F_{\text{SUM}} / \text{population}$  | flights per million residents  |
-| $E_t$            | excess deaths / 10⁶ on 5 May $t\       | $t = 2020,2021,2022,2023$ |
+| $E_t$ | excess deaths per 10^6 on 5 May of year $t$ | $t \in \{2020, 2021, 2022, 2023\}$ |
+
 
 ### Statistical approach
 
-* **Association.** Spearman’s \$\rho\$ between each flight metric and \$E\_t\$.
+* **Association.** Spearman’s ρ between each flight metric and $E_t$.
 * **Uncertainty.** 95 % percentile-bootstrap CIs (5,000 draws; seed = 42).
 * **Sensitivity.**
 
@@ -192,7 +193,7 @@ Table: Analytical variables. {#tbl-vars}
 
 All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in `R/`.
 
-A confounder sanity-check showed that adjusting for age ≥ 65 changed $\rho$ by **< 0.02** in any year, so no further covariates were added (exploratory, correlation-focused study). We did **not** model vaccination, NPIs, GDP or other covariates; any mentions in the Discussion are descriptive context rather than part of the statistical tests.
+A [confounder sanity-check](#tbl-sensitivity) showed that adjusting for age ≥ 65 changed $\rho$ by **< 0.02** in any year, so no further covariates were added (exploratory, correlation-focused study). We did **not** model vaccination, NPIs, GDP or other covariates; any mentions in the Discussion are descriptive context rather than part of the statistical tests.
 
 ## Flight-exposure variable
 
@@ -208,8 +209,8 @@ Table: Filtering steps for ADRR snapshots. {#tbl-filtering}
 | Step / field           | Rule                                                              | Rationale                                                                         |
 | ---------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | **Month slice**        | Keep **Dec 2019** and **Mar 2020**                                | February missing; Dec + Mar capture pre- and early-restriction traffic            |
-| **Traffic type**       | Keep ICAO **S** (scheduled pax) and **N** (non-scheduled charter) | Exclude cargo-only **F**, military **M**, GA **G**, etc. [@eurocontrol2025meta]  |
-| **Origin (ADEP)**      | Airport ISO-2 ∈ **CN** or **HK**                                  | Includes non-Wuhan mainland hubs that substituted after Jan 2020 [@chinazzi2020] |
+| **Traffic type**       | Keep ICAO **S** (scheduled pax) and **N** (non-scheduled charter) | Exclude cargo-only **F**, military **M**, GA **G**, etc. [@eurocontrol2025meta]   |
+| **Origin (ADEP)**      | Airport ISO-2 $\in$ **CN** or **HK**                              | Includes non-Wuhan mainland hubs that substituted after Jan 2020 [@chinazzi2020]  |
 | **Destination (ADES)** | Airport lies in the **25 continental EUROCONTROL states**         | Aligns exposure with mortality panel                                              |
 | **De-duplication**     | Collapse identical *callsign + off-block time* rows               | Removes re-filed plans; yields unique movements                                   |
 | **Metadata sanity**    | Drop rows missing ADEP/ADES/flight-type                           | Prevents merge errors & mis-counts                                                |
@@ -323,7 +324,7 @@ big_gaps |>
    $$
 
 3. **Main test**
-   Spearman **ρ** with **95 % bootstrap CIs** (5 000 draws) for each $F_k \times E_t$.
+   Spearman ρ with **95 % bootstrap CIs** (5 000 draws) for each $F_k \times E_t$.
 
 4. **Sensitivity panel**
 
@@ -417,9 +418,9 @@ knitr::include_graphics("data/figures/bar_top10_destinations.png")
 knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 ```
 
-**Volume and diversity move together.** Each additional ~100 flights brings roughly **1–2 extra** Chinese origin airports (*p* ≈ 0.86, *p* < 0.001, *n* = 47).
+**Volume and diversity move together.** Each additional ~100 flights brings roughly **1–2** extra Chinese origin airports (**$\rho \approx 0.86$; *p* < 0.001; *n* = 47**).
 
-```{r fig-scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap="Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman *p* ≈ 0.86 (*p* < 0.001, *n* = 47). **Liège (LGG)** lies above the trend—high diversity for moderate volume—because most flights were cargo."}
+```{r fig-scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap = "Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman $\\rho \\approx 0.86$ (*p* < 0.001; *n* = 47). Liège (LGG) lies above the trend—high diversity for moderate volume—because most flights were cargo."}
 knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 ```
 
@@ -472,14 +473,14 @@ tbl_2020 <- spearman_res |>
 
 knitr::kable(
   tbl_2020,
-  caption = "Spearman $\\rho$ between early flight-exposure metrics and excess mortality on 5 May 2020 (95% bootstrap CI, n = 25). Significant results (*p* < 0.05) marked ✓."
+  caption = "Spearman $\\rho$ between early flight-exposure metrics and excess mortality on 5 May 2020 (95% bootstrap CI; n = 25). Significant results (*p* < 0.05) marked ✓."
 )
 ```
 
 **Reading the 2020 snapshot.**
 All four exposure metrics are **positively** associated with first-wave excess mortality (@tbl-spearman_2020). Three are statistically significant; the population-scaled metric is positive but not significant. Using the **Dec + Mar combined** count:
 
-* **Spearman *ρ* = 0.526** (95 % CI **0.177–0.771**, *p* = 0.007).
+* **Spearman $\rho = 0.526$** (95 % CI **0.177–0.771**, *p* = 0.007).
 * Countries in the **top exposure quartile** recorded **≈ 465 excess deaths / million** more than those in the bottom quartile.
 * @fig-scatter-2020 shows the right-hand tail driven by the big Western gateways (**DEU, GBR, NLD, FRA, ESP, ITA**).
 
@@ -499,17 +500,17 @@ gap <- with(
 gap <- round(gap) # 465
 ```
 
-```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = "Direct CN/HK flights (Dec-2019 + Mar-2020, log-scale) versus excess deaths per million on 5 May 2020 (n = 25 countries). Spearman $\\rho \\approx 0.53$ (*p* < 0.01)."}
+```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = fig.cap = "Direct CN/HK flights (Dec-2019 + Mar-2020, log-scale) versus excess deaths per million on 5 May 2020 (n = 25 countries). Spearman $\\rho \\approx 0.53$ (*p* < 0.01)."}
 knitr::include_graphics("data/figures/scatter_2020.png")
 ```
 
 ## Evolution 2021–2023 {#evolution-2021-2023}
 
-```{r fig-rho_caterpillar, fig.cap="Spearman *p* (points) with 95% bootstrap CIs (bars) for Dec-2019, Mar-2020, and their sum. Estimates are positive in 2020. From 2021 onward they are zero or negative; in 2022 the Mar and Combined metrics are significantly below zero. In 2023 they remain negative, with CIs that touch or narrowly include zero.", fig.asp=0.6}
+```{r fig-rho_caterpillar,fig.cap = "Spearman $\\rho$ (points) with 95% bootstrap CIs (bars) for Dec-2019, Mar-2020, and their sum. Estimates are positive in 2020. From 2021 onward they are zero or negative; in 2022 the Mar and Combined metrics are significantly below zero. In 2023 they remain negative, with CIs that touch or narrowly include zero.", fig.asp=0.6}
 knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
-**Pattern.** Estimates are **positive** in 2020, weaken toward **zero** in 2021, and turn **negative** in 2022–2023. For the **Combined** metric: 2020 *p* = 0.526 (95% CI 0.177–0.771, *p* = 0.007); 2021 *p* = −0.306 (95% CI −0.622–0.111, n.s.); 2022 *p* = −0.460 (95% CI −0.792––0.001, *p* ≈ 0.02); 2023 *p* = −0.419 (95% CI −0.749–0.045, *p* ≈ 0.04; CI narrowly spans zero). Scaling exposure by population (**Flights per million**) makes the flip visible **already in 2021**.
+“**Pattern.** Estimates are **positive** in 2020, weaken toward **zero** in 2021, and turn **negative** in 2022–2023. For the **Combined** metric: **2020 $\rho = 0.526$** (95% CI 0.177–0.771; ***p* = 0.007**); **2021 $\rho = -0.306$** (95% CI −0.622–0.111; n.s.); **2022 $\rho = -0.460$** (95% CI −0.792 to −0.001; ***p* ≈ 0.02**); **2023 $\rho = -0.419$** (95% CI −0.749–0.045; ***p* ≈ 0.04**; CI narrowly includes zero). Scaling exposure by population (**Flights per million**) makes the flip visible **already in 2021**.”
 
 ```{r tbl-sensitivity, echo=FALSE}
 sens_tbl <- partial_by_year |>
@@ -529,7 +530,7 @@ knitr::kable(
 
 ## Results summary
 
-* **2020:** heavier direct CN/HK exposure ↔ **higher** first-wave excess mortality (*p* ≈ 0.53).
+* **2020:** heavier direct CN/HK exposure ↔ **higher** first-wave excess mortality ($\rho \approx 0.53$).
 * **2021:** association ≈ **zero**.
 * **2022–2023:** association **negative** (significant in 2022; negative and borderline in 2023).
 * **Population-scaled exposure** flips **earlier** (negative by 2021).
@@ -561,7 +562,7 @@ vacc_exposure |>
 
 * **Regulator-grade exposure.** ADRR captures every filed IFR passenger movement, avoiding East-Asia ADS-B gaps.
 * **Lean, transparent cleaning.** S/N only; exact re-files de-duplicated; scripts and derived tables in repo.
-* **Reproducibility.** End-to-end R + Quarto (`build.sh`, `renv.lock`); 5,000-draw bootstrap CIs for every *p*.
+* **Reproducibility.** End-to-end R + Quarto (`build.sh`, `renv.lock`); 5,000-draw bootstrap CIs for every $\rho$.
 
 ## Limitations {#limitations}
 
