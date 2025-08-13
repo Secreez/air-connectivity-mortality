@@ -56,8 +56,9 @@ vacc_exposure <- readRDS("data/derived/vacc_by_exposure_quartile_2022.rds")
 | **LCC**                | Low-Cost Carrier                                                                                                                                     |
 | **NPI**                | Non-Pharmaceutical Intervention (lockdown, mask mandate, etc.)                                                                                       |
 | **OWID**               | *Our World in Data* COVID-19 dataset                                                                                                                 |
-| **P-score**            | Percent excess mortality = $(\text{Excess}/\text{Expected} − 1) × 100$                                                                               |
-| **ρ (rho)**            | Spearman rank-correlation coefficient                                                                                                                |
+| **P-score**            | Percent excess mortality = $(\text{Excess}/\text{Expected} - 1) \times 100$ (a mortality *outcome*, not a statistical significance measure)          |
+| **ρ (rho)**            | Spearman rank-correlation coefficient (association measure between two ranked variables)                                                             |
+| **p (p-value)**        | Probability of observing the test statistic (here, for Spearman’s ρ) under the null hypothesis; “n.s.” means *p* ≥ 0.05                              |
 | **Slot waiver**        | EU March 2020 rule suspending “use-it-or-lose-it” airport-slot requirement                                                                           |
 | **WMD**                | *World Mortality Dataset* (source of excess-death figures)                                                                                           |
 | **WPP**                | UN *World Population Prospects* (population denominator)                                                                                             |
@@ -70,9 +71,9 @@ Table: Glossary of acronyms and symbols. {#tbl-glossary}
 
 ## Context & motivation
 
-On **31 December 2019**, the Wuhan Municipal Health Commission reported a cluster of “viral pneumonia of unknown aetiology”; WHO issued its first Disease-Outbreak News five days later [@who2022timeline]. Europe’s first laboratory-confirmed SARS-CoV-2 infections were detected on **24 January 2020** in France [@spiteri2020]. By **21 February**, only 47 cases had been notified across nine countries—mostly imported—yet local transmission chains were already recognised in Bavaria and Haute-Savoie. Late that evening Italy reported the region’s first COVID-19 death and a fast-growing cluster in Lombardy [@ecdcitaly2020].
+On **31 December 2019**, the Wuhan Municipal Health Commission reported a cluster of “viral pneumonia of unknown aetiology”; WHO issued its first Disease-Outbreak News five days later [@who2022timeline]. Europe’s first laboratory-confirmed SARS-CoV-2 infections were detected on **24 January 2020** in France [@spiteri2020]. By **21–23 February 2020**, Italy reported its **first COVID-19 death** and rapidly expanding **local-transmission clusters** centred on **Lombardy**, with additional cases in **Veneto, Piedmont, and Emilia-Romagna**; ECDC assessed the risk of similar clusters elsewhere in the EU/EEA as **moderate to high**. [@ecdcitaly2020]
 
-The six-week hop from Wuhan to Northern Italy shows how long-haul aviation can relocate a pathogen within a single generation interval. A global metapopulation model estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet reduced *international* exportations by roughly **78 %** through mid-February [@chinazzi2020]. A review of ≈ 200 studies concludes that dense pre-2020 flight networks **shrank** Europe, enabling rapid cross-border seeding before the March–April capacity collapse [@sun2022_a].
+The six-week hop from Wuhan to Northern Italy shows how long-haul aviation can relocate a pathogen within a single generation interval. A global metapopulation model estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet reduced *international* exportations by roughly **78 %** through mid-February [@chinazzi2020]. A **review of nearly 200** studies on COVID-19 and air transports concludes that dense pre-2020 flight networks **shrank** Europe, enabling rapid cross-border seeding before the March–April capacity collapse [@sun2022_a].
 
 Excess-mortality outcomes diverged sharply thereafter. Latent-class analyses for high-income countries indicate that government effectiveness, early and stringent NPIs, vaccine roll-out, and baseline life expectancy explain much of the longer-run gap [@rahmanian2024]. These factors speak to **amplification and suppression after importation**. Less clear is the role of **initial seeding**.
 
@@ -85,7 +86,7 @@ This thesis asks how much of Europe’s first-wave mortality spread is associate
 ## Objectives
 
 1. **Measure exposure:** Build a country-level index of inbound IFR flights (Dec 2019, Mar 2020, and their sum) from EUROCONTROL ADRR.
-2. **Rank & correlate:** Compute Spearman p between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021–2023.
+2. **Rank & correlate:** Compute Spearman **ρ** between exposure ranks and excess-mortality ranks on 5 May 2020; repeat for 2021–2023.
 3. **Assess validity:** Discuss strengths and limitations of flight counts as a proxy for epidemic seeding.
 
 ## Road map
@@ -187,7 +188,7 @@ Table: Analytical variables. {#tbl-vars}
 * **Sensitivity.**
 
   1. replace $F_{\text{SUM}}$ with $FPM$ (population-scaled);
-  2. restrict to countries with a **complete four-year \$E\_t\$ series**;
+  2. restrict to countries with a **complete four-year $E\_t$ series**;
   3. compute **partial Spearman** controlling for the share of population ≥ 65 (rank-residualisation; see code).
 * **Inference stance.** Two-sided tests; $\alpha=0.05$. Given the exploratory aim, **no multiple-testing correction** is applied; emphasis is on effect sizes and CIs.
 
@@ -459,7 +460,7 @@ Among the **21 ≥ 5-flight countries**, every one cut traffic by **≥ 50 %** b
 
 With direct CN/HK traffic reduced to a trickle after late March, any variation in **first-wave** excess mortality must trace back to flights that arrived **before** the cliff-edge. The next subsection asks whether that pre-collapse exposure leaves a statistical imprint in the **5 May 2020** snapshot.
 
-*(For scale: by December 2020, CN–EU long-haul capacity was ~**7 %** of 2019 levels, while China’s domestic network had rebounded to ~**93 %** [@warnocksmith2021].)*
+*(For scale: by December 2020, CN–EU **seat capacity (OAG)** ~**7%** of 2019 by Dec 2020, while **China’s domestic seat capacity** rebounded to ~**93%** [@warnocksmith2021].)*
 
 ## Association with first-wave mortality {#baseline-2020}
 
