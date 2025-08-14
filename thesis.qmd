@@ -71,11 +71,11 @@ Table: Glossary of acronyms and symbols. {#tbl-glossary}
 
 ## Context & motivation
 
-On **31 December 2019**, the Wuhan Municipal Health Commission reported a cluster of “viral pneumonia of unknown aetiology”; WHO issued its first Disease-Outbreak News five days later [@who2022timeline]. Europe’s first laboratory-confirmed SARS-CoV-2 infections were detected on **24 January 2020** in France [@spiteri2020]. By **21–23 February 2020**, Italy reported its **first COVID-19 death** and rapidly expanding **local-transmission clusters** centred on **Lombardy**, with additional cases in **Veneto, Piedmont, and Emilia-Romagna**; ECDC assessed the risk of similar clusters elsewhere in the EU/EEA as **moderate to high**. [@ecdcitaly2020]
+On **31 December 2019**, the Wuhan Municipal Health Commission reported a cluster of “viral pneumonia of unknown aetiology”; WHO issued its first Disease Outbreak News five days later [@who2022timeline]. Europe’s first laboratory-confirmed SARS-CoV-2 infections were detected on **24 January 2020** in France [@spiteri2020]. By **21–23 February 2020**, Italy had reported its **first COVID-19 death** and **rapidly expanding local-transmission clusters** centred on **Lombardy**, with additional cases in **Veneto, Piedmont, and Emilia-Romagna**; **ECDC** assessed the risk of **similar clusters elsewhere in the EU/EEA and UK** as **moderate to high** [@ecdcitaly2020].
 
 The six-week hop from Wuhan to Northern Italy shows how long-haul aviation can relocate a pathogen within a single generation interval. A global metapopulation model estimated that Wuhan’s **23 January** cordon sanitaire delayed local growth by only **3–5 days**, yet reduced *international* exportations by roughly **78 %** through mid-February [@chinazzi2020]. A **review of nearly 200** studies on COVID-19 and air transports concludes that dense pre-2020 flight networks **shrank** Europe, enabling rapid cross-border seeding before the March–April capacity collapse [@sun2022_a].
 
-Excess-mortality outcomes diverged sharply thereafter. Latent-class analyses for high-income countries indicate that government effectiveness, early and stringent NPIs, vaccine roll-out, and baseline life expectancy explain much of the longer-run gap [@rahmanian2024]. These factors speak to **amplification and suppression after importation**. Less clear is the role of **initial seeding**.
+Excess-mortality outcomes diverged sharply thereafter. A latent-class mixed-model analysis of **21 countries** found **COVID-19 incidence** (lagged) to be the strongest positive correlate of excess mortality, while **vaccination** and **policy stringency** (via interactions with incidence) were **negatively associated** with excess mortality (not always significant in every cluster). **Government revenue** and **government effectiveness** were among the most protective structural factors; the lower-mortality cluster also had higher **life expectancy/HAQ/UHC** [@rahmanian2024].
 
 This thesis asks how much of Europe’s first-wave mortality spread is associated with a country’s **direct-flight exposure to Mainland China and Hong Kong** just before lockdowns.
 
@@ -125,9 +125,9 @@ Table: Key aviation studies motivating data choices and caveats. {#tbl-studies}
 | ---------------------- | -------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
 | **Chinazzi 2020**      | IATA/OAG pax matrix + GLEaM model      | Global                       | Travel bans delay exports by days; multiple mainland hubs sustain residual risk.                     |
 | **Sun 2022a**          | Narrative review (≈ 200 papers)        | Global/EU                    | Dense pre-2020 network enabled rapid seeding; travel bans work only when layered with domestic NPIs. |
-| **Sun 2022b**          | Sabre load-factor panel 2017–21        | 24 EU airlines               | **30–50 %** “ghost-flight” share in Mar–Apr 2020; EU slot waiver curtailed the practice.             |
-| **Strohmeier 2021**    | OpenSky ADS-B (~46 % of 2019 flights) | Global coverage audit        | Community ADS-B misses large parts of East Asia → unsuitable for early-2020 China–EU counts.         |
-| **Warnock-Smith 2021** | OAG seats + Sabre MIDT 2017–20         | CN/HK ↔ EU/Asia; CN domestic | Secondary CN–EU links collapsed to < 2 % of 2017 revenue; Chinese domestic LCCs rebounded first.     |
+| **Sun 2022b**          | Sabre load-factor panel 2017–21         | 24 European airlines         | Airline-level shares of statistically “abnormal” low-load flights **spiked in Mar–Apr 2020** (often >30% for several carriers) and **waned by late-2021**; **EU slot waivers (30 Mar 2020)** reduced incentives. |
+**Strohmeier 2021** | OpenSky ADS-B (≈45% of 2019 flights) | Global coverage audit | Community ADS-B under-represents East Asia → unsuitable as a sole source for CN/HK→EU counts in early 2020.
+| **Warnock-Smith 2021** | OAG seats + Sabre MIDT 2017–20         | CN/HK ↔ EU/Asia; CN domestic | By **Dec 2020**, China–Europe **seat capacity ≈ 7% of 2019** while **China domestic ≈ 93%**;f international markets lagged; Chinese domestic rebounded first. |
 
 ### Macro drivers of excess mortality {#macrodrivers}
 
@@ -141,7 +141,7 @@ These speak to **amplification after importation**. The present thesis steps one
 
 ### Data-source considerations: EUROCONTROL vs OpenSky {#datasource}
 
-Crowd-sourced ADS-B (OpenSky) provides open historical data but with uneven geography—coverage is strongest in Europe/North America and sparse over East Asia [@iacus2020]. The OpenSky dataset paper estimates **~45–50 % global flight coverage** in 2019–2020 [@strohmeier2021]. In our coverage audit, OpenSky recorded **no** CN/HK arrivals for five EUROCONTROL states and **under-counted most others** relative to **ADRR** (Appendix @tbl-os-vs-eu-full; @fig-opensky-bar).
+OpenSky’s 2019 archive **lists ≈ 31.0 million, flights ≈ 45% of the 68.95 million flights tracked by Flightradar24** that year—with much stronger coverage over Europe than East Asia; because FR24 also uses non-ADS-B sources, this is an upper-bound comparison. [@strohmeier2021] In our coverage audit, OpenSky recorded **no** CN/HK arrivals for five EUROCONTROL states and **under-counted most others** relative to **ADRR** (Appendix @tbl-os-vs-eu-full; @fig-opensky-bar).
 
 By contrast, EUROCONTROL’s **ADRR** stores **every filed IFR flight touching European airspace**, independent of ADS-B reception. Public dumps are available for four “snapshot” months (Mar | Jun | Sep | Dec); **Dec 2019** and **Mar 2020** bracket the pre-lockdown seeding window.
 
@@ -224,9 +224,11 @@ Per STATFOR rules, **S** flights map to **Mainline** (>120 seats) or **Regional*
 
 ADS-B networks like **OpenSky** are voluntary and geographically uneven: dense over Western Europe, sparse over Eastern Europe and East Asia. This leads to systematic **under-counting** of CN/HK → EU flights, including **zero** recorded arrivals for several states in our audit (see [Coverage audit](#coverage-audit)). **ADRR** records **every filed IFR** touching European airspace, so it recovers movements missed by ADS-B and provides a more reliable exposure baseline. [@strohmeier2021]
 
+
+
 #### Load-factor caveat (movement ≠ passengers)
 
-“Ghost-flight” behaviour spiked in Mar–Apr 2020: **30–50 %** of EU departures flew with <10 % seats filled [@sun2022_b]. **ADRR counts movements, not load**—a three-passenger A350 counts the same as a full one. At Frankfurt, pax volume fell **–73 %** while freighters and “preighters” sustained **81 %** of cargo rotations [@fraport2021, p. 17]. Treat $F$ as **potential seeding capacity**, not realised traveller volume.
+Load factors **collapsed in Mar–Apr 2020**: per-airline shares of **statistically abnormal (ghost-like)** flights were often **>30%** in 2020H1 and **receded by late-2021** [@sun2022_b]. **ADRR counts movements, not load**—a three-passenger A350 counts the same as a full one. At Frankfurt, pax volume fell **–73%** while freighters and “preighters” sustained **81%** of cargo rotations [@fraport2021, p. 17]. Treat $F$ as **potential seeding capacity**, not realised traveller volume.
 
 $$
 F_{\text{DEC}}=\text{CN/HK}\rightarrow\text{EU flights in Dec 2019},\quad
@@ -273,9 +275,7 @@ coverage_tbl |>
 
 ## Excess-mortality snapshots {#excess-snaps}
 
-* **Source.** Country-day series from **Our World in Data’s COVID-19 dataset**, which republishes the **World Mortality Dataset** for excess deaths and OWID’s vaccination series [@karlinsky2021; @mathieu2021owidvaccinations].
-* **Reference date.** For each year **2020–2023**, take the observation **nearest to 5 May** (± 7 days). **Ukraine is excluded ex ante** due to war-time breaks after 2021.
-* **Why ± 7 days?** Most WMD feeds are weekly (some fortnightly). A ±½-week jitter is negligible relative to the **3–12 %** standard errors reported for high-income Europe and smaller than WHO model CIs [@msemburi2023].
+> **Why ±7 days?** Most WMD series (as republished by OWID) are **weekly** (some **fortnightly** or **monthly**). Picking the observation **nearest to 5 May (±7 days)** keeps countries aligned within **one reporting interval** and avoids artefacts from different week cut-offs. For monthly reporters, the rule collapses to the same month snapshot. \[@karlinsky2021; @mathieu2021owidvaccinations]
 
 ## Population denominator — validation & choice
 
