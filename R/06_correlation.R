@@ -1,17 +1,5 @@
 #!/usr/bin/env Rscript
 # Correlation between early flight exposure and excess mortality
-# Generates:
-#   data/derived/spearman_res.{rds,csv}
-#   data/derived/corr_df.rds
-#   data/derived/quartile_gap_2020.{rds,csv}
-#   data/derived/partial_by_year.{rds,csv}
-#   data/derived/rho_restricted_2020.{rds,csv}
-#   data/derived/vacc_by_exposure_quartile_2022.{rds,csv}
-#   data/figures/rho_timeseries.png
-#   data/figures/scatter_2020.png
-#   data/figures/scatter_dec_mar.png
-#   data/figures/rho_caterpillar.png
-
 
 # setup
 source(here::here("R", "00_load_libs.R"))
