@@ -396,72 +396,61 @@ knitr::kable(
 )
 ```
 
-**Completeness.** The panel is fully balanced: all **25** EUROCONTROL member states have flight-exposure and excess-mortality entries at each of the four reference years; no cells are missing.
+Output confirms a fully balanced panel:
+
+**Completeness.** All 25 EUROCONTROL states have flight-exposure and excess-mortality entries at each of the four reference years; no cells are missing.
 
 ## Exposure landscape (Dec 2019 & Mar 2020)
 
-> **Early exposure landscape.** Direct CN/HK flights funnelled into a handful of Western European gateways. @fig-top10_eu_dest_cntry shows that **DEU, GBR, and NLD handled > 60%** of all arrivals in December 2019 and retained that lead after the March collapse. Those same hubs also drew from the **widest mix** of Chinese origins—**LHR 15**, **CDG 13**, **FRA 12** (@fig-origins_per_destination). Volume and diversity rose in lock-step (airport-level Spearman **ρ ≈ 0.86**; @fig-scatter_volume_vs_origin). **Liège (LGG)** is the clear outlier—high origin diversity for ~200 flights—because most rotations were freighters (see [Limitations](#limitations)).
+> **Early exposure landscape.** Direct CN/HK flights funneled into a handful of Western European gateways. @fig-top10_eu_dest_cntry shows **Germany, the UK, and the Netherlands** handling a majority of arrivals in December 2019 and retaining that lead after the March collapse. Those same hubs also drew from the **widest mix** of Chinese origins—**LHR 15**, **CDG 13**, **FRA 12** (@fig-origins_per_destination). Volume and diversity rose in lock-step (airport-level Spearman **ρ ≈ 0.86**; @fig-scatter_volume_vs_origin). **Liège (LGG)** sits above the trend—high origin diversity for ~200 rotations—because many S/N movements there are **cargo charters** (see [Limitations](#limitations)).
 
-> *Together, the three plots show that both **how much** traffic and **how many** source cities concentrated in the same Western hubs, producing a right-skewed exposure profile at country level.*
+> *Together, the three plots show that both **how much** traffic and **how many** source cities concentrated in the same Western hubs, yielding a right-skewed exposure profile at country level.*
 
 ### Gateway concentration
 
-Before the pandemic shock, direct CN/HK traffic into Europe was highly skewed. @fig-top10_eu_dest_cntry (Top-10 destination **countries**) shows **Germany, the UK, and the Netherlands** absorbing over 60% of all arrivals in December 2019 and still dominating after the [March cliff-edge](#march-cliff).
+Before the pandemic shock, direct CN/HK traffic into Europe was highly skewed. @fig-top10_eu_dest_cntry (Top-10 destination **countries**) shows **Germany, the UK, and the Netherlands** absorbing over half of all arrivals in December 2019 and still dominating after the [March cliff-edge](#march-cliff).
 
-```{r fig-top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destinations for direct CN/HK passenger flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR passenger plans."}
+```{r fig-top10_eu_dest_cntry, out.width="80%", fig.align='center', fig.cap="Top-10 European destination countries for direct CN/HK **IFR S/N** flights in December 2019 (orange), March 2020 (blue), and combined (green). Bars are counts of filed IFR scheduled/charter movements (cargo-only F excluded).""}
 knitr::include_graphics("data/figures/bar_top10_destinations.png")
 ```
 
-**Take-away.** Import pressure was not evenly distributed: a few Western gateways carried most flights in both study months, setting up a right-skewed country-level exposure index.
+**Take-away.** Import pressure was not evenly distributed: a few Western gateways carried most movements in both study months, producing a right-skewed country-level exposure index.
 
 ### Route diversity vs. volume
 
-```{r fig-origins_per_destination, out.width="80%", fig.align='center', fig.cap="How many distinct CN/HK origin airports fed each EUROCONTROL destination? Left: combined Dec-2019 + Mar-2020; right: month-by-month. Western megahubs (**LHR 15**, **CDG 13**, **FRA 12**) top the list. **Liège (LGG)** ranks high on diversity despite modest volume because it is a cargo gateway—illustrating how flight counts can overstate passenger exposure at freight airports."}
+```{r fig-origins_per_destination, out.width="80%", fig.align='center', fig.cap="How many distinct CN/HK origin airports fed each EUROCONTROL destination? Left: combined Dec-2019 + Mar-2020; right: month-by-month. Western megahubs (**LHR 15**, **CDG 13**, **FRA 12**) top the list. **Liège (LGG)** ranks high on diversity despite modest volume because many **N** flights are cargo charters—illustrating how movement counts can overstate **passenger** exposure at freight-biased airports."}
 knitr::include_graphics("data/figures/bar_origins_per_destination.png")
 ```
 
-**Volume and diversity move together.** Each additional ~100 flights brings roughly **1–2** extra Chinese origin airports (**$\rho \approx 0.86$; *p* < 0.001; *n* = 47**).
+**Volume and diversity move together.** Each additional ~100 flights is associated with **1–2** extra Chinese origin airports (**ρ ≈ 0.86; *p* < 0.001; *n* = 47**).
 
-```{r fig-scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap = "Each dot is one EUROCONTROL destination airport. Flight volume is the combined Dec-2019 + Mar-2020 total (log-scale); route diversity is the number of distinct CN/HK origin airports. Spearman $\\rho \\approx 0.86$ (*p* < 0.001; *n* = 47). Liège (LGG) lies above the trend—high diversity for moderate volume—because most flights were cargo."}
+```{r fig-scatter_volume_vs_origin, out.width="80%", fig.align='center', fig.cap = "Each dot is one destination airport. X: combined Dec-2019 + Mar-2020 S/N flights (log-scale). Y: number of distinct CN/HK origin airports. Spearman $\rho \approx 0.86$ (*p* < 0.001; *n* = 47). **LGG** lies above the trend—high diversity for moderate volume—because many flights are cargo charters."}
 knitr::include_graphics("data/figures/scatter_volume_vs_origins.png")
 ```
 
-**Interpretation.** The relationship is driven by major passenger hubs in the upper-right; elsewhere remains low-volume and low-diversity. **LGG** is freight-driven and inflates exposure without adding many travellers (see [Limitations](#limitations)).
-
-**So what?** Because both exposure dimensions are so right-skewed, any country-level correlation with excess mortality will be pulled by the same Western hubs. The next section tests exactly that.
+**Interpretation.** The slope is driven by large passenger hubs in the upper-right; most other airports remain low-volume/low-diversity. **LGG** is freight-biased and inflates “exposure” without adding many travellers (see [Limitations](#limitations)).
 
 ### March 2020 cliff-edge {#march-cliff}
 
-Only countries with a **meaningful December baseline** are plotted.
-We **keep the 21 EUROCONTROL states** that logged **≥ 5 direct CN/HK flights in Dec 2019**; anything smaller (e.g., Croatia’s single inbound charter) would make a −100 % bar visually loud but epidemiologically trivial.
+We **plot only the 21 states** with **≥ 5** direct CN/HK flights in Dec-2019 to avoid visually noisy −100% bars from trivial baselines (e.g., single charters). The correlation analysis uses the full **25-country** panel.
 
-The same ≥ 5-flight filter is used for:
-
-* **@fig-pct_change_filtered** (percentage-change bars)
-* **@tbl-collapse** (absolute Δ-flights in the Appendix)
-
-Subsequent correlation analyses use the full **25-country** panel.
-
-```{r fig-pct_change_filtered, out.width="80%", fig.cap="Percentage change in direct CN/HK flights between the December-2019 baseline and March-2020 for countries with ≥5 December flights (*n* = 21). Every country cut traffic by at least 50%; 7/21 reduced >90%, and 14/21 ≥75%. Belgium, the Netherlands, and Germany retained the highest residual volumes.", fig.align='center'}
+```{r fig-pct_change_filtered, out.width="80%", fig.cap="Percentage change in direct CN/HK S/N flights from Dec-2019 baseline to Mar-2020 for countries with ≥5 December flights (*n* = 21). All countries cut traffic by at least 50%; 7/21 reduced >90%, and 14/21 ≥75%. The Netherlands and Germany retained the largest residual shares; most others were near zero.", fig.align='center'}
 knitr::include_graphics("data/figures/pct_change_filtered.png")
 ```
 
-**What the figure shows.**
-Among the **21 ≥ 5-flight countries**, every one cut traffic by **≥ 50 %** by late March 2020:
+**What the figure shows.** Among the **21 ≥5-flight countries**, every one cut traffic by **≥ 50%** by late March 2020:
 
-* **7 of 21** slashed **> 90 %** (bars pinned near −100 %).
-* **14 of 21** cut **≥ 75 %** — a tightly synchronised shutdown.
-* **Belgium, the Netherlands, and Germany** retained the largest residual shares — yet still **down 30–50 %**. Much of this surviving activity reflects freight or near-empty slot-holders (see [Limitations](#limitations)).
+* **7 of 21** slashed **> 90%** (bars pinned near −100%).
+* **14 of 21** cut **≥ 75%** — a tightly synchronised shutdown.
+* **The Netherlands and Germany** retained the largest **percentage** shares; several others, including **Belgium**, retained **lower percentage shares** but can still rank high in **absolute** counts.
 
-| Signal            | Take-away                                                                                                                                                                          |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Timing**        | The plunge coincides with EU/Schengen **external-border restrictions in mid-March** and the CAAC **“Five-One”** rule announced **26 Mar** (one weekly CN–EU rotation per airline). |
-| **Uniformity**    | Because the contraction is pan-European—not just Italy or Spain—any exposure-mortality link must be driven by traffic that occurred **before** the cliff.                          |
-| **Residual risk** | Absolute flight counts still diverged after March: a few hubs kept **200–350** rotations, so a trickle of import potential remained (see Δ-flights in @tbl-collapse).              |
+| Signal            | Take-away                                                                                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Timing**        | The plunge coincides with EU/Schengen **external-border restrictions** in mid-March and the CAAC **“Five-One”** rule (announced **26 Mar**; one weekly CN–EU rotation per airline). |
+| **Uniformity**    | Because the contraction is pan-European, any exposure–mortality link must be driven by traffic that occurred **before** the cliff.                                                  |
+| **Residual risk** | Absolute counts still diverged after March: a few hubs kept **~200–350** rotations, so a trickle of import potential remained (see Δ-flights in @tbl-collapse).                    |
 
-With direct CN/HK traffic reduced to a trickle after late March, any variation in **first-wave** excess mortality must trace back to flights that arrived **before** the cliff-edge. The next subsection asks whether that pre-collapse exposure leaves a statistical imprint in the **5 May 2020** snapshot.
-
-*(For scale: by December 2020, CN–EU **seat capacity (OAG)** ~**7%** of 2019 by Dec 2020, while **China’s domestic seat capacity** rebounded to ~**93%** [@warnocksmith2021].)*
+With direct CN/HK traffic reduced to a trickle after late March, any variation in **first-wave** excess mortality must trace back to flights that arrived **before** the cliff-edge. The next subsection tests whether pre-collapse exposure leaves a statistical imprint in the **5 May 2020** snapshot. Though, OAG covers scheduled passenger capacity; charter flights are excluded and cargo flights are not included—so these figures are a capacity baseline, not movements or passengers. [@warnocksmith2021]
 
 ## Association with first-wave mortality {#baseline-2020}
 
@@ -479,14 +468,11 @@ knitr::kable(
 )
 ```
 
-**Reading the 2020 snapshot.**
-All four exposure metrics are **positively** associated with first-wave excess mortality (@tbl-spearman_2020). Three are statistically significant; the population-scaled metric is positive but not significant. Using the **Dec + Mar combined** count:
+**Reading the 2020 snapshot.** All four exposure metrics are **positively** associated with first-wave excess mortality (@tbl-spearman_2020). Three are statistically significant; the population-scaled metric is positive but not significant. Using the **Dec + Mar combined** count:
 
-* **Spearman $\rho = 0.526$** (95 % CI **0.177–0.771**, *p* = 0.007).
-* Countries in the **top exposure quartile** recorded **≈ 465 excess deaths / million** more than those in the bottom quartile.
-* @fig-scatter-2020 shows the right-hand tail driven by the big Western gateways (**DEU, GBR, NLD, FRA, ESP, ITA**).
-
-Because exposure is measured **before** the 5 May outcome, reverse causation is implausible for December and largely mitigated for March.
+* **Spearman $\rho = 0.526$** (95% CI **0.177–0.771**, *p* = 0.007; *n* = 25).
+* Countries in the **top exposure quartile** recorded **≈ 465 excess deaths / million** more than those in the bottom quartile (median gap).
+* @fig-scatter-2020 shows an overall positive slope with **notable vertical outliers** (e.g., **ESP** with high mortality despite fewer direct flights; **DEU** with lower mortality given its volume).
 
 ```{r quartile_gap, echo = FALSE}
 snap20 <- corr_df |>
@@ -502,17 +488,23 @@ gap <- with(
 gap <- round(gap) # 465
 ```
 
-```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = fig.cap = "Direct CN/HK flights (Dec-2019 + Mar-2020, log-scale) versus excess deaths per million on 5 May 2020 (n = 25 countries). Spearman $\\rho \\approx 0.53$ (*p* < 0.01)."}
+```{r fig-scatter-2020, echo = FALSE, fig.asp = 0.7, fig.cap = fig.cap ="Direct CN/HK S/N flights (Dec-2019 + Mar-2020, log-scale) versus excess deaths per million on 5 May 2020 (n = 25). Spearman $\rho \approx 0.53$ (*p* < 0.01). Several Western hubs anchor the right tail; **ESP** is a high-mortality outlier at moderate exposure."}
 knitr::include_graphics("data/figures/scatter_2020.png")
 ```
 
+
 ## Evolution 2021–2023 {#evolution-2021-2023}
 
-```{r fig-rho_caterpillar,fig.cap = "Spearman $\\rho$ (points) with 95% bootstrap CIs (bars) for Dec-2019, Mar-2020, and their sum. Estimates are positive in 2020. From 2021 onward they are zero or negative; in 2022 the Mar and Combined metrics are significantly below zero. In 2023 they remain negative, with CIs that touch or narrowly include zero.", fig.asp=0.6}
+```{r fig-rho_caterpillar,fig.cap = "Spearman $\rho$ (points) with 95% bootstrap CIs (bars) for Dec-2019, Mar-2020, and their sum. Estimates are positive in 2020. From 2021 onward they trend toward zero or below; in 2022 the Mar and Combined metrics are significantly negative. In 2023 they remain negative with CIs that touch or narrowly include zero.", fig.asp=0.6}
 knitr::include_graphics("data/figures/rho_caterpillar.png")
 ```
 
-“**Pattern.** Estimates are **positive** in 2020, weaken toward **zero** in 2021, and turn **negative** in 2022–2023. For the **Combined** metric: **2020 $\rho = 0.526$** (95% CI 0.177–0.771; ***p* = 0.007**); **2021 $\rho = -0.306$** (95% CI −0.622–0.111; n.s.); **2022 $\rho = -0.460$** (95% CI −0.792 to −0.001; ***p* ≈ 0.02**); **2023 $\rho = -0.419$** (95% CI −0.749–0.045; ***p* ≈ 0.04**; CI narrowly includes zero). Scaling exposure by population (**Flights per million**) makes the flip visible **already in 2021**.”
+**Pattern.** Estimates are **positive** in 2020, weaken toward **zero** in 2021, and turn **negative** in 2022–2023. For the **Combined** metric:
+
+* **2020:** **ρ = 0.526** (95% CI 0.177–0.771; *p* = 0.007)
+* **2021:** **ρ = −0.306** (95% CI −0.622–0.111; n.s.)
+* **2022:** **ρ = −0.460** (95% CI −0.792 to −0.001; *p* ≈ 0.02)
+* **2023:** **ρ = −0.419** (95% CI −0.749–0.045; **borderline**; CI grazes zero)
 
 ```{r tbl-sensitivity, echo=FALSE}
 sens_tbl <- partial_by_year |>
@@ -528,24 +520,11 @@ knitr::kable(
 )
 ```
 
-**Sensitivity & partial checks.** Controlling for the share aged ≥ 65 shifts *p* by **≤ 0.02** in any year (@tbl-sensitivity). Age structure cannot explain the sign-flip.
+**Sensitivity & partial checks.** Adjusting for the share aged ≥65 leaves effect sizes essentially unchanged (**|Δρ| ≤ 0.02**) and does not alter any year’s inference; age structure cannot explain the sign flip.
 
-## Results summary
+#### Vaccination coverage by exposure quartile (May 2022)
 
-* **2020:** heavier direct CN/HK exposure ↔ **higher** first-wave excess mortality ($\rho \approx 0.53$).
-* **2021:** association ≈ **zero**.
-* **2022–2023:** association **negative** (significant in 2022; negative and borderline in 2023).
-* **Population-scaled exposure** flips **earlier** (negative by 2021).
-
-# Discussion
-
-## Interpreting the reversal (2021–2023)
-
-* **Wealth & structural vulnerability.** Excess-death percentages tend to **fall** with GDP per capita and **rise** with poverty/inequality [@ioannidis2023]. Europe’s most connected hubs (Germany, the UK, the Netherlands, France) also sit in the top GDP tercile, helping explain why the positive flight–mortality link **disappears after 2020**.
-
-* **Vaccination rollout.** On **5 May 2022** (±7 days), the high-exposure quartile (**Q4**, *n* = 6) had a median **78% fully vaccinated** versus **≈ 62%** in the low-exposure quartile (**Q1**, *n* = 7) based on OWID’s `people_fully_vaccinated_per_hundred` series [@mathieu2021owidvaccinations].
-
-```{r tbl-vaccination_exposure, echo=FALSE}
+```{r tbl-vaccination_exposure_res, echo=FALSE}
 vacc_exposure |>
   dplyr::mutate(
     `Exposure quartile` = paste0("Q", q),
@@ -554,45 +533,62 @@ vacc_exposure |>
   ) |>
   dplyr::select(`Exposure quartile`, `Median full-vax %`, n) |>
   knitr::kable(
-    caption = "Full-vaccination coverage on 5 May 2022 by flight-exposure quartile (baseline = Dec 2019 + Mar 2020 flights)."
+    caption = "Full-vaccination coverage on 5 May 2022 (±7 days) by flight-exposure quartile (baseline = Dec-2019 + Mar-2020 flights; OWID `people_fully_vaccinated_per_hundred`)."
   )
 ```
 
-* **Policy timing & capacity.** Countries combining **high government effectiveness** with **early, stringent NPIs** cluster at lower excess mortality [@rahmanian2024]. Complementary aviation work finds travel restrictions are blunt on their own, and the EU **slot-waiver** quickly **reduced incentives** for low-load “ghost flights” from April 2020 [@sun2022_a; @sun2022_b].
+**Gradient.** Median full-vaccination rises from **Q3 ≈ 62%** and **Q1 ≈ 69%** to **Q4 ≈ 78%** (*n* per quartile in table), consistent with wealth/governance gradients and the weakening/negative $\rho$ in 2021–2023.
+
+## Results summary
+
+* **2020:** heavier direct CN/HK exposure ↔ **higher** first-wave excess mortality (**ρ ≈ 0.53**).
+* **2021:** association ≈ **zero**.
+* **2022–2023:** association **negative** (significant in **2022**; **negative/borderline** in **2023**).
+* **Population-scaled exposure** flips **earlier** (negative by **2021**).
+
+# Discussion
+
+## Interpreting the reversal (2021–2023)
+
+* **Wealth & structural vulnerability.** Excess-mortality tends to **fall with GDP per capita** and **rise with poverty/inequality**, which helps explain why the positive flight–mortality link **vanishes after 2020**: Europe’s most connected hubs (Germany, the UK, the Netherlands, France) also sit in the top GDP tercile and had more protective structural factors. [@ioannidis2023]
+
+* **Vaccination rollout.** By **5 May 2022** (±7 days), the **highest-exposure quartile (Q4)** had **higher full-vaccination** than lower-exposure quartiles (see Table @tbl-vaccination_exposure_res), aligning with OWID’s series and helping explain the **post-2020 attenuation/flip**. [@mathieu2021owidvaccinations]
+
+* **Policy timing & capacity.** Comparative work shows **travel curbs mostly delay** spread unless paired with local measures. [@chinazzi2020] In Europe, the **slot-waiver** adopted in late March 2020 **removed the 80/20 “use-it-or-lose-it” incentive**, coinciding with a **drop in statistically abnormal low-load flights** documented for EU carriers. [@sun2022_a; @sun2022_b] Together with vaccination and governance capacity gradients [@rahmanian2024], this helps rationalise the **2022–2023 sign-flip**.
 
 ## Strengths
 
-* **Regulator-grade exposure.** ADRR captures every filed IFR passenger movement, avoiding East-Asia ADS-B gaps.
-* **Lean, transparent cleaning.** S/N only; exact re-files de-duplicated; scripts and derived tables in repo.
-* **Reproducibility.** End-to-end R + Quarto (`build.sh`, `renv.lock`); 5,000-draw bootstrap CIs for every $\rho$.
+* **Regulator-grade exposure.** **ADRR** captures **every filed IFR passenger movement touching European airspace**, avoiding known East-Asia **ADS-B gaps** and origin/destination ambiguities. [@strohmeier2021]
+* **Lean, transparent cleaning.** We keep **S/N** traffic only, de-duplicate exact re-files, and publish scripts/derived tables alongside the manuscript. [@eurocontrol2022seg]
+* **Reproducibility.** End-to-end R + Quarto with `build.sh` and `renv.lock`; **5,000-draw bootstrap CIs** accompany every Spearman $\rho$.
 
 ## Limitations {#limitations}
 
-* **Load-factor bias.** Up to 40% of EU departures in Mar–Apr 2020 flew with <10% seats filled → `F_SUM` measures **potential** imports, not infected travellers.
-* **February gap.** No ADRR slice for Feb 2020 → peak exposure may be underestimated.
-* **Indirect legs invisible.** Multi-leg itineraries (e.g., PVG→DXB→VIE) and non-air links not captured.
-* **Ecological, small *n*.** Country-level design (~25 units) hides within-state variation; residual confounding possible.
+* **Load-factor bias.** Many EU carriers operated **statistically “abnormal” (very low-load)** flights in **Mar–Apr 2020**, receding through 2021; “abnormal” is defined **statistically** (IQR-based outliers vs 2017–2019 baselines), **not** as “<10% seats”. Hence $F_{\text{SUM}}$ measures **potential seeding capacity**, not realised traveller volumes. [@sun2022_b] (At a major hub like **Frankfurt**, passenger volumes collapsed while cargo shifted to freighters and “preighters”.) [@fraport2021]
+* **February gap.** No public **ADRR** slice for **Feb 2020** → peak early-exposure may be **under-estimated**.
+* **Indirect legs invisible.** Multi-leg routings (e.g., **PVG→DXB→VIE**) and non-air links aren’t captured by direct-flight counts.
+* **Ecological, small *n*.** A country-level panel (~25 units) can’t resolve within-state heterogeneity; residual confounding remains possible.
 
 ## Methodological reflections
 
-The project began as a global SEIR on “effective-distance” routes [@brockmann2013], but two data gaps forced a pivot: **(i)** sparse East-Asia ADS-B in Feb 2020 (Appendix @tbl-os-vs-eu-full; @fig-opensky-bar) and **(ii)** no **February** ADRR slice (public snapshots are **Mar | Jun | Sep | Dec**). Given those constraints—and a BA time-box—we chose an exploratory, fully reproducible **rank-correlation** design using **Dec 2019** and **Mar 2020**.
+The project began building a global **effective-distance** SIR model [@brockmann2013], but two constraints forced a pivot: **(i)** sparse **East-Asia ADS-B** coverage in early 2020 (plus OpenSky’s flight-derivation quirks) [@strohmeier2021], and **(ii)** no **February** ADRR snapshot (public months are **Mar | Jun | Sep | Dec**). Given those constraints—and a BA time-box—we adopted an exploratory, fully reproducible **rank-correlation** design on **Dec 2019** and **Mar 2020** exposures against **four annual** excess-mortality snapshots.
 
-## Implications & future work
+## Implications & directions for future research
 
-*What the results do say.* Direct CN/HK flight volumes help explain cross-country differences in **spring 2020** excess mortality. Beyond 2020, domestic factors dominate.
+*What the results do say.* **Direct CN/HK flight volumes** help explain cross-country differences in **spring 2020** excess mortality.
 
-*What they don’t say.* Ecological, rank-based associations do not identify causal effects or passenger-level transmission.
+*What they don’t say.* Ecological, rank-based associations do **not** identify causal effects or passenger-level transmission.
 
-*Next steps (not undertaken here).*
+**Future work (beyond the scope of this study).**
 
-1. **Passenger weighting** via IATA/OAG loads to reduce “ghost-flight” influence.
-2. **Multi-leg mapping** (OD chains, maritime/land links) to capture true import pathways.
-3. **Sub-national panels** to reduce ecological bias.
-4. **Integrated models** (network SEIR/SEnIR) combining exposure, NPIs, vaccination, and health-system capacity.
+1. **Passenger weighting.** Combine ADRR movements with IATA/OAG load factors to down-weight “ghost flights” and approximate imported passenger volumes.
+2. **Multi-leg & multimodal import paths.** Reconstruct OD chains (air–air and air–land/sea) to capture indirect routes (e.g., PVG→DXB→VIE) and non-air entries.
+3. **Sub-national resolution.** Build NUTS-2 or airport-catchment panels to reduce ecological bias and align exposure with local mortality.
+4. **Integrated transmission models.** Embed exposure in network SEIR/SEnIR frameworks with NPIs, vaccination, and health-system capacity to move from association to mechanism.
 
 ## Conclusion
 
-Flight counts are a useful proxy for **initial import pressure**. They correlate with **first-wave** excess mortality but not with later outcomes, which align more with vaccination, policy, and system capacity.
+**Flight counts** are a useful proxy for **initial import pressure**: they **correlate with first-wave excess mortality** but **not** with later outcomes, which align more with **vaccination**, **policy timing**, and **system capacity**.
 
 # References
 
@@ -609,12 +605,12 @@ Flight counts are a useful proxy for **initial import pressure**. They correlate
 
 ### Coverage audit — EUROCONTROL vs OpenSky
 
-OpenSky’s community ADS-B coverage in early 2020 is uneven (strong in W. Europe, thin over East Asia / parts of E. Europe). In our audit, OpenSky **misses** 5 countries entirely and **under-counts** most others relative to ADRR; therefore we treat OpenSky as a **QC benchmark only**.
+OpenSky’s community ADS-B coverage in early 2020 is uneven—**strong in Western Europe**, **thin over East Asia** and parts of **Eastern Europe**—so it **under-counts** direct CN/HK arrivals relative to EUROCONTROL ADRR. In our audit, OpenSky **misses** five countries entirely and **under-counts** most others; we therefore treat OpenSky as a **QC benchmark only**. [@strohmeier2021]
 
 ```{r tbl-os-vs-eu-full, echo=FALSE}
 knitr::kable(
   coverage_tbl,
-  caption = "Direct CN/HK arrivals captured by EUROCONTROL ADRR (EU) vs OpenSky (OS). Rows sorted by EUROCONTROL’s Dec-2019 counts. OS reflects receiver coverage, not filed IFR."
+  caption = "Direct CN/HK arrivals captured by EUROCONTROL ADRR (EU) vs OpenSky (OS). Rows sorted by ADRR Dec-2019 counts. OS reflects receiver coverage, not filed IFR (S/N passenger traffic only)."
 )
 ```
 
@@ -623,27 +619,35 @@ knitr::kable(
 ```{r tbl-collapse, echo=FALSE}
 knitr::kable(
   collapse_tbl |>
+    dplyr::filter(`Dec 2019` >= 5) |>
     dplyr::select(Country, `Dec 2019`, `Mar 2020`, `Δ flights`),
-  caption = "Absolute change in direct CN/HK → EU flights between Dec-2019 and Mar-2020 (countries with ≥5 December flights). Residual March totals highlight hubs that still handled 200–350 rotations post-cliff."
+  caption = "Absolute change in direct CN/HK → EU flights between Dec-2019 and Mar-2020 (countries with ≥5 December flights). Residual March totals highlight hubs that still handled ~200–350 rotations post-cliff."
 )
 ```
 
 ### OpenSky top-10 (illustrative)
 
-![Top-10 destinations by number of direct CN/HK flights in OpenSky data (Dec-2019, Feb-2020, Mar-2020). OpenSky reflects community ADS-B coverage; patterns motivate prioritising EUROCONTROL for exposure measurement.](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width="90%"}
+![Top-10 destinations by number of direct CN/HK flights in OpenSky data (Dec-2019, Feb-2020, Mar-2020). OpenSky reflects community ADS-B coverage; patterns motivate prioritising EUROCONTROL ADRR for exposure measurement.](data/figures/bar_opensky_top10_dec_feb_mar.png){#fig-opensky-bar width="90%"}
 
 ### Vaccination by exposure quartile (May 2022)
 
+Country membership of flight-exposure quartiles (baseline = **Dec-2019 + Mar-2020**; *n* = 25). Quartiles contain 6–7 countries.
+
 ```{r tbl-vaccination-quartiles, echo=FALSE}
-corr_df |>
-  dplyr::filter(target_date == as.Date("2020-05-05")) |>
-  dplyr::mutate(q = dplyr::ntile(total_inbound_flights_combined, 4)) |>
+exposure_base <- corr_df |>
+  dplyr::select(iso3, total_inbound_flights_combined) |>
+  dplyr::distinct()
+
+exposure_q <- exposure_base |>
+  dplyr::mutate(q = dplyr::ntile(total_inbound_flights_combined, 4))
+
+exposure_q |>
   dplyr::group_by(q) |>
   dplyr::summarise(countries = paste(sort(iso3), collapse = ", "), .groups = "drop") |>
   tidyr::pivot_wider(names_from = q, values_from = countries, names_prefix = "Q") |>
   knitr::kable(
     col.names = c("Q1 (low)", "Q2", "Q3", "Q4 (high)"),
-    caption = "Country membership of flight-exposure quartiles (Dec-2019 + Mar-2020 baseline; n = 25; quartiles contain 6–7 countries)."
+    caption = "Country membership of flight-exposure quartiles (Dec-2019 + Mar-2020 baseline)."
   )
 ```
 
