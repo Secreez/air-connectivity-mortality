@@ -66,8 +66,10 @@ Table: Glossary of acronyms and symbols. {#tbl-glossary}
 | **n.s.**               | Not significant                                                                                                                                      |
 | **Preighters**         | Passenger aircraft temporarily converted to carry cargo                                                        
                                      |
-| **HAQ**                | Healthcare Access and Quality Index (Global Burden of Disease amenable-mortality–based score, 0–100; higher = better access/quality).              |
-| **UHC**                | Universal Health Coverage service-coverage index (WHO/World Bank composite of essential health services, 0–100; higher = broader coverage).          |
+| **HAQ**                | Healthcare Access and Quality Index (amenable mortality benchmark) 
+                                     |
+| **UHC**                | Universal Health Coverage – service coverage index                  
+                                     |
 
 # Introduction
 
@@ -81,7 +83,7 @@ Excess-mortality outcomes diverged sharply thereafter. A latent-class mixed-mode
 
 This thesis asks how much of Europe’s first-wave mortality spread is associated with a country’s **direct-flight exposure to Mainland China and Hong Kong** just before lockdowns.
 
-**Provenance & scope.** The project was initially conceived as a global, networked SIR exercise in the spirit of Brockmann & Helbing (2013), seeded in Wuhan and driven by early-2020 air-mobility data. After scoping, two constraints made that infeasible at bachelor scale—the commercial cost of global FR24 history and **East Asia** coverage gaps in community ADS-B (OpenSky). We therefore pivoted early to **EUROCONTROL ADRR** and built **Dec-2019 / Mar-2020** exposure measures for EUROCONTROL states, testing rank associations with **OWID/WMD** excess-mortality snapshots. The **February 2020** ADRR gap is noted as a limitation.
+**Provenance & scope.** The project was initially conceived as a global, networked SIR exercise in the spirit of @brockmann2013 seeded in Wuhan and driven by early-2020 air-mobility data. After scoping, two constraints made that infeasible at bachelor scale—the commercial cost of global FR24 history and **East Asia** coverage gaps in community ADS-B (OpenSky). We therefore pivoted early to **EUROCONTROL ADRR** and built **Dec-2019 / Mar-2020** exposure measures for EUROCONTROL states, testing rank associations with **OWID/WMD** excess-mortality snapshots. The **February 2020** ADRR gap is noted as a limitation.
 
 ## Research question
 
@@ -190,7 +192,7 @@ Table: Analytical variables. {#tbl-vars}
 ### Statistical approach
 
 * **Association.** Spearman’s ρ between each flight metric and $E_t$.
-* **Uncertainty.** 95 % percentile-bootstrap CIs (5,000 draws; seed = 42).
+* **Uncertainty.** 95 % percentile-bootstrap CIs (5,000 draws; seed = 42). [@diciccio1996]
 * **Sensitivity.**
 
   1. replace $F_{\text{SUM}}$ with $FPM$ (population-scaled);
@@ -198,7 +200,7 @@ Table: Analytical variables. {#tbl-vars}
   3. compute **partial Spearman** controlling for the share of population ≥ 65 (rank-residualisation; see code).
 * **Inference stance.** Two-sided tests; $\alpha=0.05$. Given the exploratory aim, **no multiple-testing correction** is applied; emphasis is on effect sizes and CIs.
 
-All analyses run in **R 4.4.0**; the full, reproducible pipeline is scripted in `R/`.
+**Software.** Analyses were conducted in **R 4.4.0** [@R-base]; the full, reproducible pipeline is scripted in `R/`.
 
 A [confounder sanity-check](#tbl-sensitivity) showed that adjusting for age ≥ 65 changed $\rho$ by **< 0.02** in any year, so no further covariates were added (exploratory, correlation-focused study). We did **not** model vaccination, NPIs, GDP or other covariates; any mentions in the Discussion are descriptive context rather than part of the statistical tests.
 
@@ -346,23 +348,23 @@ big_gaps |>
 
 ### Visual encoding & accessibility {#viz-note}
 
-All plots use the **Okabe–Ito** colour-universal palette [@okabe2008]. Direct labels, clear axis titles, and dashed reference lines ensure legibility in greyscale and for common colour-vision deficiencies. We avoid high-valence hues (e.g., “alarm red”) to limit framing bias.
+All plots use the **Okabe–Ito** colour-universal palette [@okabe2008]. Direct labels, clear axis titles, and dashed reference lines ensure legibility in greyscale and for common colour-vision deficiencies. We avoid high-valence hues (e.g., “alarming red”) to limit framing bias.
 
 ## Digital methods & reproducibility {#digmethods}
 
-*This project is as much about **doing** digital research as it is about analysing digital traces. The workflow is designed to be transparent, portable, and easy to criticise.*
+**Reproducibility.** The analysis is fully scripted and rebuildable: from a clean clone, a single command regenerates data, runs the code, and renders the manuscript end to end.
 
-1. **Know your data infrastructure.** Two complementary streams are used: community ADS-B (**OpenSky**) with uneven East Asian coverage and no load factors, and regulator-grade IFR plans (**EUROCONTROL ADRR**) with complete European coverage (but likewise no passenger counts). Mapping each stream’s blind spots (see [Coverage audit](#coverage-audit)) is part of the method, not an afterthought.
+1. **Know the data infrastructure.** Two complementary sources are used: community ADS-B (**OpenSky**), with uneven East Asian coverage and no load factors, and regulator-grade IFR flight plans (**EUROCONTROL ADRR**), with complete European coverage (but likewise no passenger counts). Mapping each stream’s blind spots (see [Coverage audit](#coverage-audit)) is part of the method, not an afterthought.
 
-2. **One-command rebuild.** A bash wrapper `build.sh` orchestrates the entire pipeline—*raw CSV → cleaned RDS → Quarto → PDF/HTML manuscript*. A fresh clone plus the raw inputs reproduces every table and figure without manual edits.
+2. **Single-command rebuild.** A Bash wrapper `build.sh` orchestrates the pipeline — *raw CSV → cleaned RDS → Quarto → PDF/HTML manuscript*. A fresh clone plus the raw inputs reproduces every table and figure without manual edits.
 
-3. **Versioned R environment.** The repo ships an `renv.lock`. Restoring it recreates the exact package stack used during development. `R/00_load_libs.R` installs any missing packages if the lock is absent.
+3. **Versioned R environment.** The repository includes an `renv.lock`. Restoring it recreates the exact package stack used in development. `R/00_load_libs.R` installs any missing packages if the lockfile is absent.
 
-4. **Path-robust, fail-fast code.** All paths use `here::here()`, so the project runs from any working directory. `build.sh` checks for required ADRR dumps and exits early with a clear message if they’re missing.
+4. **Path-robust, fail-fast code.** All paths use `here::here()`, so the project runs from any working directory. `build.sh` checks for required ADRR dumps and exits early with informative messages if they are missing.
 
-5. **Licensing & data access.** Code, Quarto sources, and lightweight derived data live in a private Git repository (MIT licence on release). Large/restricted datasets (e.g., EUROCONTROL snapshots) remain outside Git; the README explains how to obtain them under the correct R&D terms.
+5. **Licensing & data access.** Code, Quarto sources, and lightweight derived data live in a private Git repository (MIT licence on release). Large/restricted datasets (e.g., EUROCONTROL snapshots) are excluded from version control; the README explains how to obtain them under the appropriate R&D terms.
 
-**Transition.** With data quality checks, clear exposure/outcome definitions, and a reproducible build in place, we turn to the empirical results.
+**Transition.** With data-quality checks, clear exposure/outcome definitions, and a reproducible build in place, we proceed to the empirical results.
 
 # Results {#results}
 
@@ -449,12 +451,11 @@ knitr::include_graphics("data/figures/pct_change_filtered.png")
 * **14 of 21** cut **≥ 75%** — a tightly synchronised shutdown.
 * **The Netherlands and Germany** retained the largest **percentage** shares; several others, including **Belgium**, retained **lower percentage shares** but can still rank high in **absolute** counts.
 
-| Signal            | Take-away                                                                                                                                                                           |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Timing**        | The plunge coincides with EU/Schengen **external-border restrictions** in mid-March and the CAAC **“Five-One”** rule (announced **26 Mar**; one weekly CN–EU rotation per airline). |
-| **Uniformity**    | Because the contraction is pan-European, any exposure–mortality link must be driven by traffic that occurred **before** the cliff.                                                  |
-| **Residual risk** | Absolute counts still diverged after March: a few hubs kept **~200–350** rotations, so a trickle of import potential remained (see Δ-flights in @tbl-collapse).                    |
-
+| Signal            | Take-away                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Timing**        | The plunge aligns with EU actions restricting **non-essential travel to the EU** (Commission Communication, **16 Mar 2020**; later codified by **Council Recommendation (EU) 2020/912**, **30 Jun 2020**) and the CAAC **“Five-One”** policy (**26 Mar 2020**) limiting international passenger services to **one route per airline per country** with **at most one weekly flight**. [@eu-comm-2020-travel; @eu-council-2020-912; @CAAC2020] |
+| **Uniformity**    | Because the contraction is pan-European, any exposure–mortality link must be driven by traffic that occurred **before** the cliff.                                                                                                                                                                                                                                                                                                             |
+| **Residual risk** | Absolute counts still diverged after March: a few hubs kept **\~200–350** rotations, so a trickle of import potential remained (see Δ-flights in @tbl-collapse).                                                                                                                                                                                                                                                                               |
 **Data note (capacity vs movements).** The OAG figures cited elsewhere report **scheduled passenger seat capacity** only; **charter** operations and **all-cargo** flights are excluded. Accordingly, these series should be **interpreted as a capacity baseline**, not as counts of movements or passengers. [@warnocksmith2021]
 
 With direct CN/HK traffic reduced to a trickle after late March, any variation in **first-wave** excess mortality must trace back to flights that arrived **before** the cliff-edge. The next subsection tests whether pre-collapse exposure leaves a statistical imprint in the **5 May 2020** snapshot.
