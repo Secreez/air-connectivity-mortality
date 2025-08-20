@@ -107,6 +107,7 @@ panel_plot <- ggplot2::ggplot(plot_df, ggplot2::aes(n_origins, name, fill = mont
   ) +
   ggplot2::theme_minimal(base_size = 9) +
   ggplot2::theme(
+    plot.title = ggplot2::element_text(size = 7.5, hjust = 0.5),
     strip.text = ggplot2::element_text(face = "bold"),
     axis.text.y = ggplot2::element_text(size = 7),
     legend.position = "top",
