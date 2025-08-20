@@ -1,30 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p data/processed data/derived _manuscript
-
-TARGET="${1:-all}"            # pdf | html | all | clean
+TARGET="${1:-all}"          # pdf | html | all | clean
 : "${INSTALL_TINYTEX:=0}"
 
-# Preflight
-command -v quarto  >/dev/null 2>&1 || { echo "✗ Quarto CLI not found in PATH"; exit 127; }
+# --- clean: do first, then exit ---------------------------------------------
+if [[ "$TARGET" == "clean" ]]; then
+  rm -rf _manuscript _freeze .quarto/_freeze .knit_cache cache .Rproj.user
+  echo "✔ Clean complete."
+  exit 0
+fi
+
+# --- create expected dirs ----------------------------------------------------
+mkdir -p data/processed data/derived _manuscript
+
+# --- preflight ---------------------------------------------------------------
 command -v Rscript >/dev/null 2>&1 || { echo "✗ Rscript not found in PATH"; exit 127; }
-# (Optional) warn if Elsevier extension missing
+command -v quarto  >/dev/null 2>&1 || { echo "✗ Quarto CLI not found in PATH"; exit 127; }
 if [[ ! -d "_extensions/elsevier" && ! -d "_extensions/quarto-journals/elsevier" ]]; then
   echo "i Elsevier extension not found. Run:  quarto add quarto-journals/elsevier"
 fi
 
-# 1) Restore renv if present
+# --- packages (renv / TinyTeX optional) -------------------------------------
 if [[ -f renv.lock ]]; then
+  echo "i Using renv.lock to restore package versions"
   Rscript --vanilla -e 'if (!requireNamespace("renv", quietly=TRUE)) install.packages("renv", repos="https://cloud.r-project.org"); renv::restore(prompt=FALSE)'
+else
+  echo "i No renv.lock found — enabling INSTALL_MISSING=1 so 00_load_libs.R can install required packages"
+  export INSTALL_MISSING=1
 fi
 
-# 2) Optional TinyTeX for PDF
-if [[ "$INSTALL_TINYTEX" == "1" ]]; then
-  Rscript --vanilla -e 'if (!requireNamespace("tinytex", quietly=TRUE)) install.packages("tinytex", repos="https://cloud.r-project.org"); if (!tinytex::is_tinytex()) tinytex::install_tinytex()'
-fi
-
-# 3) Preprocessing (skip if file absent)
+# --- preprocessing (skip missing files) -------------------------------------
 for s in \
   R/01_excess_snapshots.R \
   R/02_flight_filter.R \
@@ -37,25 +43,24 @@ do
   [[ -f "$s" ]] && Rscript --vanilla "$s"
 done
 
-# 4) Render
+# --- render ------------------------------------------------------------------
 case "$TARGET" in
-  clean)
-    rm -rf _manuscript _freeze .quarto/_freeze .knit_cache cache .Rproj.user
-    ;;
   pdf)
-    # Use Elsevier PDF format (as defined in _quarto.yml under format: elsevier-pdf)
     quarto render thesis.qmd --to elsevier-pdf
+    echo "↪ PDF: _manuscript/thesis.pdf"
     ;;
   html)
-    # Keep your site-style HTML (or switch to --to elsevier-html if you added it)
-    quarto render thesis.qmd --to html
+    quarto render thesis.qmd --to elsevier-html
+    echo "↪ HTML: _manuscript/index.html"
     ;;
   all)
-    # Builds all formats listed in _quarto.yml (html + elsevier-pdf)
-    quarto render
+    # Render both formats declared for thesis.qmd in _quarto.yml
+    quarto render thesis.qmd
+    echo "↪ HTML: _manuscript/index.html"
+    echo "↪  PDF: _manuscript/thesis.pdf"
     ;;
   *)
     echo "Usage: ./build.sh [all|pdf|html|clean]"; exit 2;;
 esac
 
-echo "✔ Build complete → _manuscript/"
+echo "✔ Build complete."
