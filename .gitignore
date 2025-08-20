@@ -2,6 +2,7 @@
 .DS_Store
 
 # R / RStudio
+.Rprofile
 .Rproj.user/
 .Rhistory
 .Rapp.history
@@ -26,7 +27,7 @@ _cache/
 thesis_cache/
 
 # Manuscript outputs (rendered PDFs/HTML, logs etc.)
-_manuscript/
+# _manuscript/ (deactivated for supervisor)
 
 # Data (large / reproducible)
 

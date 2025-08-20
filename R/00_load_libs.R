@@ -1,9 +1,10 @@
 # R/00_load_libs.R
-
 cran_packages <- c(
-  "styler", "tidyverse", "here", "countrycode",
-  "ggrepel", "scales", "boot", "ppcor", "lubridate", "data.table",
-  "glue"
+  "dplyr", "tidyr", "tibble", "purrr", "stringr", "readr", "forcats",
+  "lubridate",
+  "ggplot2", "ggrepel", "scales",
+  "boot", "ppcor",
+  "here", "glue", "knitr", "styler", "countrycode"
 )
 
 github_specs <- c("PPgp/wpp2024")

@@ -2,13 +2,9 @@
 # Picks the row closest to 5‑May (± 7 d) for 2020‑2023 from OWID
 # Compares OWID mid‑2020 population with UN‑WPP mid‑2020
 
-# !/usr/bin/env Rscript
-# Picks the row closest to 5-May (± 7 d) for 2020-2023 from OWID
-# Compares OWID mid-2020 population with UN-WPP mid-2020
-
 source(here::here("R", "00_load_libs.R"))
 
-EXCLUDE_ISO3 <- c("UKR") # keep all analysis at n = 25
+EXCLUDE_ISO3 <- c("UKR")
 
 euro_ISO3 <- readr::read_csv(
   here::here("data/eurocontrol_iso_map.csv"),

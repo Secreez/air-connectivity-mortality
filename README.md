@@ -4,27 +4,81 @@
 
 ## Research question
 
-> Among continental EUROCONTROL member states, is a higher volume of direct inbound flights from China/Hong Kong/Macao (Dec 2019 & Mar 2020) associated with higher cumulative excess mortality on 5 May 2020?
+> Among continental EUROCONTROL states, did higher volumes of **direct inbound flights from China/Hong Kong** (Dec 2019 & Mar 2020) associate with higher **excess mortality** on **5 May 2020**?
 
-We join EUROCONTROL IFR data with OWID’s excess‑mortality series and:
-- build country‑level exposure metrics (Dec 19, Mar 20, Dec+Mar; flights per million),  
-- compute Spearman ρ for 2020–2023 snapshots,  
-- run quick robustness checks (population normalisation, full‑series filter).
+We join EUROCONTROL IFR snapshots with OWID/WMD, then:
 
-Everything is reproducible with **R ≥ 4.4**, **Quarto CLI ≥ 1.6**, and a LaTeX engine (TinyTeX).
+* build country-level exposure metrics (Dec-2019, Mar-2020, Dec+Mar; also flights-per-million),
+* compute **Spearman ρ** for 2020–2023 with bootstrap CIs,
+* run sensitivity checks (population scaling; complete 4-year mortality series; partial ρ by %≥65).
+
+Everything is reproducible with **R ≥ 4.4**, **Quarto ≥ 1.6**, and a LaTeX engine.
+
+## Requirements
+
+* **R** ≥ 4.4
+* **Quarto CLI** ≥ 1.6 (`quarto --version`)
+* **LaTeX** (TinyTeX recommended)
+
+> This repo **vendors** the Elsevier Quarto template in `_extensions/` (MIT). No manual install needed.
+> If you clone without `_extensions/`, run: `quarto add quarto-journals/elsevier`.
+
+## Data (bring your own)
+
+EUROCONTROL IFR monthly CSV drops are **not** distributed here.
+
+```
+data/raw/
+├── flight_data/
+│   ├── 201912/          # all Dec 2019 *.csv.gz
+│   └── 202003/          # all Mar 2020 *.csv.gz
+├── OurAirports/         # reference airport list
+│   └── airports.csv
+└── owid/
+    └── owid-covid-data.csv
+```
+
+> Keep EUROCONTROL files **compressed** (`*.csv.gz`) and original filenames.
+
+## Quick start
+
+```bash
+# Optional: install TinyTeX if you don’t have LaTeX
+INSTALL_TINYTEX=1 ./build.sh
+
+# Build site + PDF (default)
+./build.sh
+
+# Or individual targets
+./build.sh html      # Elsevier HTML
+./build.sh pdf       # Elsevier PDF
+./build.sh clean     # clear caches and outputs
+```
+
+What the script does:
+
+1. checks data dependencies,
+2. restores exact packages via **renv** (from `renv.lock`),
+3. runs preprocessing scripts in `R/`,
+4. renders **Elsevier** outputs (HTML + PDF).
+
+### Render manually (optional)
+
+```bash
+quarto render thesis.qmd --to elsevier-html
+quarto render thesis.qmd --to elsevier-pdf
+```
 
 ## Repository map
 
 ```
-
 bachelor-thesis/
 ├─ data/
-│  ├─ raw/                      # original CSV (NOT in Git: \~2 GB EUROCONTROL flights)
-│  ├─ processed/                # tidy RDS/CSV created by the pipeline
-│  ├─ derived/                  # final data for the manuscript
-│  └─ figures/                  # PNGs for the manuscript
-├─ R/                           # analysis and package loader
-│  ├─ style_all.R
+│  ├─ raw/            # (you provide)
+│  ├─ processed/      # created by scripts
+│  ├─ derived/        # tables used in the paper
+│  └─ figures/        # PNG/PDF figures
+├─ R/
 │  ├─ 00_load_libs.R
 │  ├─ 01_excess_snapshots.R
 │  ├─ 01b_vax_snap.R
@@ -34,104 +88,45 @@ bachelor-thesis/
 │  ├─ 04_population_qc.R
 │  ├─ 05_descriptive_plots.R
 │  └─ 06_correlation.R
-├─ thesis.qmd                   # main manuscript (Quarto)
-├─ thesis_ref.bib               # references
-├─ _quarto.yml                  # project configuration
-└─ README.md                    # you are here
-
+├─ thesis.qmd
+├─ thesis_ref.bib
+├─ _quarto.yml
+├─ _extensions/       # vendored Elsevier template (MIT)
+└─ build.sh
 ```
 
-Scripts **01–03** create analysis data; notebooks **04–06** generate tables/plots; **thesis.qmd** pulls results into the write‑up.
+## Outputs
 
-## System requirements
-
-- **R** ≥ 4.4  
-- **Quarto CLI** ≥ 1.6 (`quarto --version`)  
-- **LaTeX**: TinyTeX (the build script can install TinyTeX for you)
-
-## Prepare data files (required)
-
-> EUROCONTROL IFR monthly CSV drops are **not** included and must be obtained under EUROCONTROL terms.
-
-Place files exactly like this:
-
-```
-
-data/raw/
-├── flight_data/
-│   ├── 201912/          # all Dec 2019 IFR CSVs (keep as *.csv.gz)
-│   └── 202003/          # all Mar 2020 IFR CSVs (keep as *.csv.gz)
-├── OurAirports/
-│   └── airports.csv
-├── owid/
-│   └── owid-covid-data.csv
-└── Opensky/
-    └── flightlist_x_x.csv
-
-```
-
-**Do not unzip or rename** the EUROCONTROL `.csv.gz` files.
-
-## Quick start
-
-Open a terminal in the project root and run:
-
-```bash
-# Optional one-time LaTeX setup if you don't have it:
-INSTALL_TINYTEX=1 ./build.sh
-
-# Build everything (HTML site + PDF):
-./build.sh
-```
-
-What happens:
-
-* The script checks required files/folders,
-* restores exact R packages via **renv** (`renv.lock`),
-* runs preprocessing notebooks,
-* renders the manuscript site **and** the PDF.
-
-**Targets you can use:**
-
-```bash
-./build.sh all    # default; site + PDF
-./build.sh pdf    # just the PDF (thesis.qmd)
-./build.sh html   # just the HTML site + notebooks
-./build.sh clean  # remove caches and previous outputs
-```
-
-## View results
-
-* **Site (HTML):** `_manuscript/index.html`
+* **HTML site:** `_manuscript/index.html`
 * **PDF:** `_manuscript/thesis.pdf`
-* **Build logs:** `_manuscript/logs/`
+* **Logs:** `_manuscript/logs/`
 
-> **Note:** Don’t use RStudio’s “Render” button. Always use `./build.sh` so data checks and `renv::restore()` run.
+> Tip: avoid RStudio’s “Render” button. Use `./build.sh` so checks and `renv::restore()` run.
 
 ## Reproducibility
 
-* Package versions and sources are pinned in **`renv.lock`**.
-* The build script runs `renv::restore()` automatically; no manual installs needed.
-* Quarto caching (`freeze: auto`) accelerates full‑project renders; it is *not* a substitute for the lockfile.
+* Package versions are pinned in **`renv.lock`**.
+* Quarto caching (`freeze: auto`) speeds re-runs but the lockfile is the source of truth.
+* Scripts are idempotent; delete `data/processed`/`data/derived` to rebuild.
 
 ## Data sources
 
-| Dataset                                                    | Licence        | Link                                                                                                                                         |
-| ---------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| EUROCONTROL ATM flight records (research release)          | © EUROCONTROL¹ | [https://www.eurocontrol.int](https://www.eurocontrol.int)                                                                                   |
-| Crowdsourced air traffic data – The OpenSky Network (2020) | Custom²        | [https://zenodo.org/records/7923702](https://zenodo.org/records/7923702)                                                                     |
-| Excess mortality (HMD‑STMF + WMD via OWID)                 | CC‑BY‑4.0      | [https://ourworldindata.org/excess-mortality-covid](https://ourworldindata.org/excess-mortality-covid)                                       |
-| UN World Population Prospects 2024 (mid‑2020 snapshot)     | CC‑BY‑3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) — R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024) |
-| OurAirports reference                                      | CC0            | [https://ourairports.com](https://ourairports.com)                                                                                           |
+| Dataset                                                | Licence        | Link                                                                                                                                         |
+| ------------------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| EUROCONTROL ATM flight records (research release)      | © EUROCONTROL¹ | [https://www.eurocontrol.int](https://www.eurocontrol.int)                                                                                   |
+| OpenSky crowdsourced air-traffic data (2020)           | Research only² | [https://zenodo.org/records/7923702](https://zenodo.org/records/7923702)                                                                     |
+| Excess mortality (HMD-STMF + WMD via OWID)             | CC-BY-4.0      | [https://ourworldindata.org/excess-mortality-covid](https://ourworldindata.org/excess-mortality-covid)                                       |
+| UN World Population Prospects 2024 (mid-2020 snapshot) | CC-BY-3.0 IGO  | [https://population.un.org/wpp/](https://population.un.org/wpp/) (R pkg: [https://github.com/PPgp/wpp2024](https://github.com/PPgp/wpp2024)) |
+| OurAirports reference                                  | CC0            | [https://ourairports.com](https://ourairports.com)                                                                                           |
 
-¹ EUROCONTROL data are not redistributed here; copy monthly drops into `data/raw/flight_data/YYYYMM/` before rendering.
-² OpenSky data are for research only; redistribution of raw files is not permitted.
+¹ Not redistributed; copy monthly drops to `data/raw/flight_data/YYYYMM/`.
+² Redistribution of raw OpenSky files is not permitted.
 
-## Licence & reuse
+## License
 
-* **Code:** MIT (see `LICENSE`).
-* **Text & figures:** CC‑BY 4.0 unless stated otherwise.
-* Processed data inherit upstream licences; please attribute sources when reusing.
+* **Code:** MIT
+* **Text & figures:** CC-BY 4.0 (unless noted)
+* **Processed data:** inherit upstream licences; attribute sources when reusing.
 
-*Last updated: 2025‑07‑27*
-Maintainer: Maximilian Elixhauser — [maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)
+*Maintainer:* Maximilian Elixhauser — [maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)
+*Last updated:* 2025-08-20

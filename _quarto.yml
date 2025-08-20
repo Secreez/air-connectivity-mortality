@@ -1,13 +1,8 @@
 project:
   type: manuscript
-  render:
-    - thesis.qmd
-
   output-dir: _manuscript
 
 execute-dir: project
-engine: knitr
-
 execute:
   cache: true
   freeze: auto
@@ -17,21 +12,50 @@ execute:
 
 format:
   html:
+    notebook-links: false
     toc: true
     toc-depth: 3
-    theme: slate
+    theme: cosmo
     comments:
       hypothesis: true
-  pdf:
-    pdf-engine: xelatex
-    toc: true
+
+  elsevier-pdf:
+    journal:
+      formatting: preprint
+      model: 3p
+      layout: onecolumn
+      cite-style: authoryear
+    keep-tex: true
+    notebook-links: false
     number-sections: true
-    papersize: a4
-    geometry: margin=1in
-    fig-format: pdf
     tbl-cap-location: top
+    include-in-header:
+      text: |
+        \usepackage{array,longtable}
+        \setlength{\LTleft}{0pt}
+        \setlength{\LTright}{0pt}
+        \makeatletter
+        \def\ps@pprintTitle{%
+          \let\@oddhead\@empty
+          \let\@evenhead\@empty
+          \let\@oddfoot\@empty
+          \let\@evenfoot\@empty}
+        \makeatother
+        \usepackage{newunicodechar}
+        \newunicodechar{≥}{\ensuremath{\geq}}
+        \newunicodechar{≤}{\ensuremath{\leq}}
+        \newunicodechar{≈}{\ensuremath{\approx}}
+        \newunicodechar{∼}{\ensuremath{\sim}} % Unicode "tilde operator"
+        \newunicodechar{×}{\ensuremath{\times}}
+        \newunicodechar{∈}{\ensuremath{\in}}
+        \newunicodechar{ρ}{\ensuremath{\rho}}
+        
 
 bibliography: thesis_ref.bib
 
 manuscript:
   article: thesis.qmd
+  notebooks:
+    - notebook: thesis.qmd
+      title: Article Notebook
+
