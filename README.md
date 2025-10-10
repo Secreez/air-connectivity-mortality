@@ -125,8 +125,8 @@ bachelor-thesis/
 ## License
 
 * **Code:** MIT
-* **Text & figures:** CC-BY 4.0 (unless noted)
+* **Text & figures:** CC-BY 4.0
 * **Processed data:** inherit upstream licences; attribute sources when reusing.
 
 *Maintainer:* Maximilian Elixhauser — [maximilian.elixhauser@stud.plus.ac.at](mailto:maximilian.elixhauser@stud.plus.ac.at)
-*Last updated:* 2025-08-20
+*Last updated:* 2025-10-10
